@@ -21,7 +21,7 @@ export default async function FunnelsPage() {
           <h1 className="text-3xl font-bold">My Funnels</h1>
           <p className="text-muted-foreground">Manage all your funnels</p>
         </div>
-        <Link href="/templates">
+        <Link href="/dashboard/templates">
           <Button className="gap-2">
             <Plus className="w-4 h-4" />
             New Funnel
@@ -36,7 +36,7 @@ export default async function FunnelsPage() {
             <p className="text-muted-foreground mb-4">
               Create your first funnel to get started
             </p>
-            <Link href="/templates">
+            <Link href="/dashboard/templates">
               <Button>Browse Templates</Button>
             </Link>
           </CardContent>

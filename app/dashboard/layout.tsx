@@ -44,7 +44,7 @@ export default async function DashboardLayout({
               Organizations
             </Button>
           </Link>
-          <Link href="/templates">
+          <Link href="/dashboard/templates">
             <Button variant="ghost" className="w-full justify-start gap-2">
               <BarChart3 className="w-4 h-4" />
               Templates

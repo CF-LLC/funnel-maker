@@ -309,16 +309,16 @@ export default function FunnelBuilderPage() {
         </Card>
 
         {/* Preview */}
-        <Card className="overflow-auto">
-          <CardHeader>
-            <CardTitle>Preview</CardTitle>
+        <Card className="overflow-auto flex flex-col">
+          <CardHeader className="border-b">
+            <CardTitle>Live Preview</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex-1 p-0">
             {selectedStep ? (
-              <div className="space-y-4">
+              <div className="h-full">
                 {selectedStep.type === 'affiliate-link' ? (
                   <div 
-                    className="p-8 border rounded-lg min-h-[400px] flex flex-col items-center justify-center text-center"
+                    className="w-full h-full min-h-[600px] flex flex-col items-center justify-center text-center"
                     style={{
                       backgroundColor: selectedStep.backgroundColor || '#6366f1',
                       backgroundImage: selectedStep.backgroundImage 
@@ -329,35 +329,150 @@ export default function FunnelBuilderPage() {
                       color: selectedStep.textColor || '#ffffff',
                     }}
                   >
-                    <div className="space-y-6 max-w-2xl">
-                      <h2 className="text-4xl font-bold">{selectedStep.title}</h2>
-                      <p className="text-xl whitespace-pre-wrap opacity-90">{selectedStep.content}</p>
+                    <div className="space-y-8 max-w-3xl px-8">
+                      <h1 className="text-5xl md:text-6xl font-bold leading-tight drop-shadow-lg">
+                        {selectedStep.title}
+                      </h1>
+                      <p className="text-xl md:text-2xl whitespace-pre-wrap opacity-95 leading-relaxed drop-shadow">
+                        {selectedStep.content}
+                      </p>
                       <a
                         href={selectedStep.affiliateUrl || '#'}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-block px-8 py-4 bg-white text-gray-900 font-semibold rounded-lg hover:scale-105 transition-transform"
+                        className="inline-block px-10 py-5 bg-white text-gray-900 font-bold text-lg rounded-xl shadow-2xl hover:scale-105 hover:shadow-3xl transition-all duration-200"
                         onClick={(e) => e.preventDefault()}
                       >
                         {selectedStep.buttonText || 'Click Here'}
                       </a>
-                      <p className="text-sm opacity-75">
-                        {selectedStep.affiliateUrl ? `→ ${selectedStep.affiliateUrl}` : 'Add your affiliate URL'}
+                      {selectedStep.affiliateUrl && (
+                        <p className="text-sm opacity-75 font-mono">
+                          → {selectedStep.affiliateUrl}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ) : selectedStep.type === 'landing' ? (
+                  <div className="w-full h-full min-h-[600px] bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+                    <div className="max-w-4xl mx-auto px-8 py-16 text-center space-y-8">
+                      <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
+                        {selectedStep.title}
+                      </h1>
+                      <p className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+                        {selectedStep.content}
                       </p>
+                      <button className="px-10 py-5 bg-indigo-600 text-white font-bold text-lg rounded-xl shadow-xl hover:bg-indigo-700 hover:scale-105 transition-all">
+                        Get Started
+                      </button>
+                    </div>
+                  </div>
+                ) : selectedStep.type === 'lead-capture' ? (
+                  <div className="w-full h-full min-h-[600px] bg-gradient-to-br from-purple-50 to-pink-100 dark:from-gray-900 dark:to-purple-900">
+                    <div className="max-w-2xl mx-auto px-8 py-16">
+                      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-10">
+                        <div className="text-center space-y-6 mb-8">
+                          <h2 className="text-4xl font-bold text-gray-900 dark:text-white">
+                            {selectedStep.title}
+                          </h2>
+                          <p className="text-lg text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                            {selectedStep.content}
+                          </p>
+                        </div>
+                        <div className="space-y-4">
+                          <input 
+                            type="text" 
+                            placeholder="Your Name" 
+                            className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-purple-600 focus:outline-none"
+                          />
+                          <input 
+                            type="email" 
+                            placeholder="Your Email" 
+                            className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-purple-600 focus:outline-none"
+                          />
+                          <button className="w-full px-8 py-4 bg-purple-600 text-white font-bold text-lg rounded-lg shadow-lg hover:bg-purple-700 transition-colors">
+                            Submit
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : selectedStep.type === 'sales' ? (
+                  <div className="w-full h-full min-h-[600px] bg-gradient-to-br from-green-50 to-emerald-100 dark:from-gray-900 dark:to-green-900">
+                    <div className="max-w-4xl mx-auto px-8 py-16 space-y-12">
+                      <div className="text-center space-y-6">
+                        <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white">
+                          {selectedStep.title}
+                        </h1>
+                        <p className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                          {selectedStep.content}
+                        </p>
+                      </div>
+                      <div className="grid md:grid-cols-3 gap-6">
+                        <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg text-center">
+                          <div className="text-4xl font-bold text-green-600 mb-2">$29</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">per month</div>
+                          <button className="w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors">
+                            Choose Plan
+                          </button>
+                        </div>
+                        <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl text-center border-4 border-green-600 relative">
+                          <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-600 text-white px-4 py-1 rounded-full text-sm font-bold">
+                            Popular
+                          </div>
+                          <div className="text-4xl font-bold text-green-600 mb-2">$79</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">per month</div>
+                          <button className="w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors">
+                            Choose Plan
+                          </button>
+                        </div>
+                        <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg text-center">
+                          <div className="text-4xl font-bold text-green-600 mb-2">$199</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">per month</div>
+                          <button className="w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors">
+                            Choose Plan
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : selectedStep.type === 'thank-you' ? (
+                  <div className="w-full h-full min-h-[600px] bg-gradient-to-br from-amber-50 to-orange-100 dark:from-gray-900 dark:to-amber-900 flex items-center justify-center">
+                    <div className="max-w-3xl mx-auto px-8 text-center space-y-8">
+                      <div className="w-24 h-24 bg-green-500 rounded-full mx-auto flex items-center justify-center">
+                        <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white">
+                        {selectedStep.title}
+                      </h1>
+                      <p className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+                        {selectedStep.content}
+                      </p>
+                      <button className="px-10 py-5 bg-orange-600 text-white font-bold text-lg rounded-xl shadow-xl hover:bg-orange-700 hover:scale-105 transition-all">
+                        Continue
+                      </button>
                     </div>
                   </div>
                 ) : (
-                  <div className="p-8 border rounded-lg bg-muted/50">
-                    <div className="text-center space-y-4">
-                      <h2 className="text-3xl font-bold">{selectedStep.title}</h2>
-                      <p className="text-lg whitespace-pre-wrap">{selectedStep.content}</p>
+                  <div className="w-full h-full min-h-[600px] bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-16">
+                    <div className="max-w-4xl mx-auto text-center space-y-8">
+                      <h2 className="text-4xl font-bold text-gray-900 dark:text-white">
+                        {selectedStep.title}
+                      </h2>
+                      <p className="text-xl text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+                        {selectedStep.content}
+                      </p>
                     </div>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="flex items-center justify-center h-64 text-muted-foreground">
-                Select a step to preview
+              <div className="flex items-center justify-center h-full min-h-[400px] text-muted-foreground">
+                <div className="text-center space-y-3">
+                  <div className="text-6xl">👈</div>
+                  <p className="text-lg">Select a step to see live preview</p>
+                </div>
               </div>
             )}
           </CardContent>

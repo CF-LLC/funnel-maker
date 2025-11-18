@@ -93,6 +93,11 @@ create policy "Users can update own data"
   on users for update
   using (auth.uid() = id);
 
+drop policy if exists "Users can insert own data" on users;
+create policy "Users can insert own data"
+  on users for insert
+  with check (auth.uid() = id);
+
 -- RLS Policies for organizations
 drop policy if exists "Users can read orgs they belong to" on organizations;
 create policy "Users can read orgs they belong to"
@@ -186,12 +191,7 @@ create policy "Users can read own funnels"
   on funnels for select
   using (
     auth.uid() = user_id or
-    is_public = true or
-    exists (
-      select 1 from org_members
-      where org_members.org_id = funnels.org_id
-      and org_members.user_id = auth.uid()
-    )
+    is_public = true
   );
 
 drop policy if exists "Users can insert own funnels" on funnels;
@@ -202,14 +202,7 @@ create policy "Users can insert own funnels"
 drop policy if exists "Users can update own funnels or org funnels" on funnels;
 create policy "Users can update own funnels or org funnels"
   on funnels for update
-  using (
-    auth.uid() = user_id or
-    exists (
-      select 1 from org_members
-      where org_members.org_id = funnels.org_id
-      and org_members.user_id = auth.uid()
-    )
-  );
+  using (auth.uid() = user_id);
 
 drop policy if exists "Users can delete own funnels" on funnels;
 create policy "Users can delete own funnels"

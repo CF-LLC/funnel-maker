@@ -23,7 +23,7 @@ export default async function DashboardPage() {
           <h1 className="text-3xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground">Welcome back to Funnel Maker</p>
         </div>
-        <Link href="/templates">
+        <Link href="/dashboard/templates">
           <Button className="gap-2">
             <Plus className="w-4 h-4" />
             New Funnel
@@ -82,7 +82,7 @@ export default async function DashboardPage() {
               <p className="text-muted-foreground mb-4">
                 Get started by creating your first funnel
               </p>
-              <Link href="/templates">
+              <Link href="/dashboard/templates">
                 <Button>Browse Templates</Button>
               </Link>
             </CardContent>
