@@ -256,68 +256,72 @@ export default function FunnelBuilderPage() {
   }
 
   return (
-    <div className="h-[calc(100vh-4rem)] p-6">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4 flex-1">
+    <div className="min-h-screen p-4 sm:p-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div className="flex items-start gap-2 sm:gap-4 flex-1 w-full">
           <Link href="/dashboard/funnels">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="shrink-0">
               <ArrowLeft className="w-4 h-4" />
             </Button>
           </Link>
-          <div className="flex-1 max-w-xl space-y-2">
+          <div className="flex-1 space-y-2 min-w-0">
             <Input
               value={funnelName}
               onChange={(e) => setFunnelName(e.target.value)}
-              className="text-2xl font-bold border-none p-0 h-auto focus-visible:ring-0"
+              className="text-xl sm:text-2xl font-bold border-none p-0 h-auto focus-visible:ring-0"
               placeholder="Funnel Name"
             />
-            <div className="flex items-center gap-2 text-sm">
-              <Label className="text-muted-foreground whitespace-nowrap">URL:</Label>
-              <div className="flex items-center gap-1 flex-1">
-                <span className="text-muted-foreground">myfunnelr.vercel.app/f/</span>
+            <div className="flex items-center gap-2 text-sm flex-wrap">
+              <Label className="text-muted-foreground whitespace-nowrap text-xs sm:text-sm">URL:</Label>
+              <div className="flex items-center gap-1 flex-1 min-w-0">
+                <span className="text-muted-foreground text-xs sm:text-sm truncate">myfunnelr.vercel.app/f/</span>
                 <Input
                   value={funnelSlug}
                   onChange={(e) => setFunnelSlug(e.target.value)}
                   placeholder="my-funnel"
-                  className="h-7 text-sm max-w-xs"
+                  className="h-7 text-xs sm:text-sm flex-1 min-w-0"
                 />
               </div>
             </div>
           </div>
-          {isPublic && <Badge variant="secondary">Public</Badge>}
+          {isPublic && <Badge variant="secondary" className="shrink-0">Public</Badge>}
         </div>
-        <div className="flex gap-2 items-center">
+        
+        {/* Action Buttons */}
+        <div className="flex gap-2 items-center flex-wrap w-full sm:w-auto">
           <CollaboratorPresence collaborators={collaborators} />
-          <Button variant="outline" size="sm" onClick={togglePublic}>
-            <Share2 className="w-4 h-4 mr-2" />
-            {isPublic ? 'Make Private' : 'Make Public'}
+          <Button variant="outline" size="sm" onClick={togglePublic} className="text-xs sm:text-sm">
+            <Share2 className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+            <span className="hidden sm:inline">{isPublic ? 'Make Private' : 'Make Public'}</span>
           </Button>
           {isPublic && (
-            <Button variant="outline" size="sm" onClick={copyPublicLink}>
-              <Copy className="w-4 h-4 mr-2" />
-              Copy Link
+            <Button variant="outline" size="sm" onClick={copyPublicLink} className="text-xs sm:text-sm">
+              <Copy className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Copy Link</span>
             </Button>
           )}
-          <Button variant="outline" onClick={exportFunnel} disabled={exporting}>
-            <Download className="w-4 h-4 mr-2" />
-            {exporting ? 'Exporting...' : 'Export HTML'}
+          <Button variant="outline" size="sm" onClick={exportFunnel} disabled={exporting} className="text-xs sm:text-sm">
+            <Download className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+            <span className="hidden sm:inline">{exporting ? 'Exporting...' : 'Export'}</span>
           </Button>
-          <Button variant="destructive" onClick={deleteFunnel}>
-            <Trash2 className="w-4 h-4 mr-2" />
-            Delete
+          <Button variant="destructive" size="sm" onClick={deleteFunnel} className="text-xs sm:text-sm">
+            <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Delete</span>
           </Button>
-          <Button onClick={saveFunnel} disabled={saving}>
-            <Save className="w-4 h-4 mr-2" />
+          <Button size="sm" onClick={saveFunnel} disabled={saving} className="text-xs sm:text-sm">
+            <Save className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
             {saving ? 'Saving...' : 'Save'}
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-[300px_1fr_350px] gap-6 h-full">
+      {/* Main Content - Responsive Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] xl:grid-cols-[300px_1fr_350px] gap-4 sm:gap-6">
         {/* Steps List */}
-        <Card className="overflow-auto">
+        <Card className="overflow-auto max-h-[600px] lg:max-h-none">
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
+            <CardTitle className="flex items-center justify-between text-base sm:text-lg">
               <span>Funnel Steps</span>
               <Button size="sm" onClick={addStep}>
                 <Plus className="w-4 h-4" />
@@ -344,16 +348,16 @@ export default function FunnelBuilderPage() {
         </Card>
 
         {/* Preview */}
-        <Card className="overflow-auto flex flex-col">
+        <Card className="overflow-auto flex flex-col max-h-[600px] lg:max-h-none">
           <CardHeader className="border-b">
-            <CardTitle>Live Preview</CardTitle>
+            <CardTitle className="text-base sm:text-lg">Live Preview</CardTitle>
           </CardHeader>
           <CardContent className="flex-1 p-0">
             {selectedStep ? (
               <div className="h-full">
                 {selectedStep.type === 'affiliate-link' ? (
                   <div 
-                    className="w-full h-full min-h-[600px] flex flex-col items-center justify-center text-center px-8"
+                    className="w-full h-full min-h-[400px] sm:min-h-[600px] flex flex-col items-center justify-center text-center px-4 sm:px-8"
                     style={{
                       backgroundColor: selectedStep.backgroundColor || '#6366f1',
                       backgroundImage: selectedStep.backgroundImage 
@@ -364,14 +368,14 @@ export default function FunnelBuilderPage() {
                       color: selectedStep.textColor || '#ffffff',
                     }}
                   >
-                    <div className="space-y-8 max-w-3xl w-full">
-                      <h1 className="text-5xl md:text-6xl font-bold leading-tight drop-shadow-lg">
+                    <div className="space-y-6 sm:space-y-8 max-w-3xl w-full">
+                      <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight drop-shadow-lg">
                         {selectedStep.title}
                       </h1>
-                      <p className="text-xl md:text-2xl whitespace-pre-wrap opacity-95 leading-relaxed drop-shadow">
+                      <p className="text-base sm:text-lg md:text-xl lg:text-2xl whitespace-pre-wrap opacity-95 leading-relaxed drop-shadow">
                         {selectedStep.content}
                       </p>
-                      <div className="space-y-4 max-w-xl mx-auto">
+                      <div className="space-y-3 sm:space-y-4 max-w-xl mx-auto">
                         {(selectedStep.affiliateLinks && selectedStep.affiliateLinks.length > 0) ? (
                           selectedStep.affiliateLinks.map((link) => (
                             <a
@@ -379,15 +383,15 @@ export default function FunnelBuilderPage() {
                               href={link.url || '#'}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-center justify-center gap-3 px-8 py-4 bg-white text-gray-900 font-bold text-lg rounded-xl shadow-2xl hover:scale-105 hover:shadow-3xl transition-all duration-200"
+                              className="flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-white text-gray-900 font-bold text-base sm:text-lg rounded-xl shadow-2xl hover:scale-105 hover:shadow-3xl transition-all duration-200"
                               onClick={(e) => e.preventDefault()}
                             >
-                              {link.icon && <span className="text-2xl">{link.icon}</span>}
+                              {link.icon && <span className="text-xl sm:text-2xl">{link.icon}</span>}
                               <span>{link.buttonText}</span>
                             </a>
                           ))
                         ) : (
-                          <div className="text-sm opacity-75">
+                          <div className="text-xs sm:text-sm opacity-75">
                             Add affiliate links below
                           </div>
                         )}

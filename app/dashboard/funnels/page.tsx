@@ -15,14 +15,14 @@ export default async function FunnelsPage() {
     .order('created_at', { ascending: false })
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 sm:space-y-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">My Funnels</h1>
-          <p className="text-muted-foreground">Manage all your funnels</p>
+          <h1 className="text-2xl sm:text-3xl font-bold">My Funnels</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">Manage all your funnels</p>
         </div>
         <Link href="/dashboard/templates">
-          <Button className="gap-2">
+          <Button className="gap-2 w-full sm:w-auto">
             <Plus className="w-4 h-4" />
             New Funnel
           </Button>
@@ -31,9 +31,9 @@ export default async function FunnelsPage() {
 
       {!funnels || funnels.length === 0 ? (
         <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <h3 className="text-lg font-semibold mb-2">No funnels yet</h3>
-            <p className="text-muted-foreground mb-4">
+          <CardContent className="flex flex-col items-center justify-center py-12 px-4">
+            <h3 className="text-base sm:text-lg font-semibold mb-2">No funnels yet</h3>
+            <p className="text-sm sm:text-base text-muted-foreground mb-4 text-center">
               Create your first funnel to get started
             </p>
             <Link href="/dashboard/templates">
@@ -42,18 +42,18 @@ export default async function FunnelsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {funnels.map((funnel: any) => (
             <Link key={funnel.id} href={`/dashboard/funnels/${funnel.id}`}>
               <Card className="hover:border-primary transition-colors cursor-pointer h-full">
                 <CardHeader>
-                  <CardTitle>{funnel.name}</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-lg sm:text-xl">{funnel.name}</CardTitle>
+                  <CardDescription className="text-sm">
                     {Array.isArray(funnel.steps) ? funnel.steps.length : 0} steps
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     Created {new Date(funnel.created_at).toLocaleDateString()}
                   </p>
                 </CardContent>

@@ -1,76 +1,104 @@
-import { redirect } from 'next/navigation'
-import Link from 'next/link'
-import { createServerClient } from '@/lib/supabase'
-import { isAdmin } from '@/lib/admin'
-import { Button } from '@/components/ui/button'
-import { LayoutDashboard, Zap, BarChart3, LogOut, Users, CreditCard, Shield } from 'lucide-react'
+'use client'
 
-export default async function DashboardLayout({
+import { useState } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { LayoutDashboard, Zap, BarChart3, LogOut, Users, CreditCard, Shield, Menu, X } from 'lucide-react'
+
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const pathname = usePathname()
 
-  if (!user) {
-    redirect('/auth/login')
-  }
-
-  const adminAccess = await isAdmin(user.id)
+  const navigation = [
+    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Funnels', href: '/dashboard/funnels', icon: Zap },
+    { name: 'Organizations', href: '/dashboard/organizations', icon: Users },
+    { name: 'Templates', href: '/dashboard/templates', icon: BarChart3 },
+    { name: 'Billing', href: '/dashboard/billing', icon: CreditCard },
+  ]
 
   return (
     <div className="min-h-screen flex">
+      {/* Overlay for mobile */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 border-r bg-muted/50 relative flex flex-col">
-        <div className="p-6">
-          <Link href="/" className="text-2xl font-bold">
+      <aside 
+        className={`
+          fixed lg:sticky top-0 left-0 z-50 h-screen
+          w-64 border-r bg-background
+          transition-transform duration-300 ease-in-out
+          flex flex-col
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}
+      >
+        <div className="p-6 border-b flex items-center justify-between">
+          <Link href="/dashboard" className="text-2xl font-bold">
             Funnel Maker
           </Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden"
+          >
+            <X className="w-5 h-5" />
+          </Button>
         </div>
-        <nav className="space-y-1 px-3 flex-1">
-          <Link href="/dashboard">
-            <Button variant="ghost" className="w-full justify-start gap-2">
-              <LayoutDashboard className="w-4 h-4" />
-              Dashboard
-            </Button>
-          </Link>
-          <Link href="/dashboard/funnels">
-            <Button variant="ghost" className="w-full justify-start gap-2">
-              <Zap className="w-4 h-4" />
-              Funnels
-            </Button>
-          </Link>
-          <Link href="/dashboard/organizations">
-            <Button variant="ghost" className="w-full justify-start gap-2">
-              <Users className="w-4 h-4" />
-              Organizations
-            </Button>
-          </Link>
-          <Link href="/dashboard/templates">
-            <Button variant="ghost" className="w-full justify-start gap-2">
-              <BarChart3 className="w-4 h-4" />
-              Templates
-            </Button>
-          </Link>
-          <Link href="/dashboard/billing">
-            <Button variant="ghost" className="w-full justify-start gap-2">
-              <CreditCard className="w-4 h-4" />
-              Billing
-            </Button>
-          </Link>
-          {adminAccess && (
-            <>
-              <div className="h-px bg-border my-2" />
-              <Link href="/dashboard/admin">
-                <Button variant="ghost" className="w-full justify-start gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50">
-                  <Shield className="w-4 h-4" />
-                  Admin
+        
+        <nav className="space-y-1 px-3 flex-1 py-4">
+          {navigation.map((item) => {
+            const Icon = item.icon
+            const isActive = pathname === item.href
+            return (
+              <Link 
+                key={item.href} 
+                href={item.href}
+                onClick={() => {
+                  if (window.innerWidth < 1024) {
+                    setSidebarOpen(false)
+                  }
+                }}
+              >
+                <Button 
+                  variant={isActive ? "secondary" : "ghost"} 
+                  className="w-full justify-start gap-2"
+                >
+                  <Icon className="w-4 h-4" />
+                  {item.name}
                 </Button>
               </Link>
-            </>
-          )}
+            )
+          })}
+          <div className="h-px bg-border my-2" />
+          <Link 
+            href="/dashboard/admin"
+            onClick={() => {
+              if (window.innerWidth < 1024) {
+                setSidebarOpen(false)
+              }
+            }}
+          >
+            <Button 
+              variant={pathname === '/dashboard/admin' ? "secondary" : "ghost"} 
+              className="w-full justify-start gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+            >
+              <Shield className="w-4 h-4" />
+              Admin
+            </Button>
+          </Link>
         </nav>
+
         <div className="p-3 border-t">
           <form action="/auth/signout" method="post">
             <Button variant="ghost" className="w-full justify-start gap-2" type="submit">
@@ -83,7 +111,19 @@ export default async function DashboardLayout({
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto">
-        <div className="container mx-auto p-8">
+        {/* Mobile Menu Button */}
+        <div className="lg:hidden sticky top-0 z-30 bg-background border-b px-4 py-3 flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            <Menu className="w-5 h-5" />
+          </Button>
+          <span className="font-semibold">Funnel Maker</span>
+        </div>
+
+        <div className="container mx-auto p-4 sm:p-6 lg:p-8">
           {children}
         </div>
       </main>
