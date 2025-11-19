@@ -6,17 +6,18 @@ export type Subscription = {
   user_id: string
   stripe_customer_id: string | null
   stripe_subscription_id: string | null
-  plan: PlanType
+  plan_type: PlanType
   status: string
   current_period_end: string | null
   created_at: string
+  updated_at?: string
 }
 
 export async function getUserSubscription(userId: string): Promise<Subscription | null> {
   const supabase = await createServerClient()
   
-  const { data, error } = await (supabase
-    .from('subscriptions') as any)
+  const { data, error } = await supabase
+    .from('subscriptions')
     .select('*')
     .eq('user_id', userId)
     .single()
@@ -28,7 +29,7 @@ export async function getUserSubscription(userId: string): Promise<Subscription 
       user_id: userId,
       stripe_customer_id: null,
       stripe_subscription_id: null,
-      plan: 'free',
+      plan_type: 'free',
       status: 'active',
       current_period_end: null,
       created_at: new Date().toISOString(),
@@ -41,10 +42,10 @@ export async function getUserSubscription(userId: string): Promise<Subscription 
 export async function canCreateFunnel(userId: string): Promise<boolean> {
   const subscription = await getUserSubscription(userId)
   
-  if (!subscription || subscription.plan === 'free') {
+  if (!subscription || subscription.plan_type === 'free') {
     const supabase = await createServerClient()
-    const { data: funnels } = await (supabase
-      .from('funnels') as any)
+    const { data: funnels } = await supabase
+      .from('funnels')
       .select('id')
       .eq('user_id', userId)
     
@@ -56,7 +57,7 @@ export async function canCreateFunnel(userId: string): Promise<boolean> {
 
 export async function hasAnalyticsAccess(userId: string): Promise<boolean> {
   const subscription = await getUserSubscription(userId)
-  return subscription?.plan !== 'free'
+  return subscription?.plan_type !== 'free'
 }
 
 export async function updateSubscription(
@@ -65,6 +66,7 @@ export async function updateSubscription(
 ): Promise<void> {
   const supabase = await createServerClient()
   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await (supabase
     .from('subscriptions') as any)
     .upsert({

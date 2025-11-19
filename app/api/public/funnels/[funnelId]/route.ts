@@ -3,9 +3,9 @@ import { createServerClient } from '@/lib/supabase'
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ funnelId: string }> }
+  context: { params: Promise<{ funnelId: string }> }
 ) {
-  const { funnelId } = await params
+  const { funnelId } = await context.params
 
   try {
     const supabase = await createServerClient()

@@ -30,7 +30,7 @@ export default async function BillingPage() {
   }
 
   const subscription = await getUserSubscription(user.id)
-  const planDetails = getPlanDetails((subscription?.plan || 'free') as PlanType)
+  const planDetails = getPlanDetails((subscription?.plan_type || 'free') as PlanType)
 
   const statusColors = {
     active: 'bg-green-500',
@@ -55,7 +55,7 @@ export default async function BillingPage() {
           <CardContent>
             <div className="text-2xl font-bold">{planDetails.name}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              {subscription?.plan === 'free' ? 'Free forever' : `${formatPrice(planDetails.price)}/month`}
+              {subscription?.plan_type === 'free' ? 'Free forever' : `${formatPrice(planDetails.price)}/month`}
             </p>
           </CardContent>
         </Card>
@@ -92,7 +92,7 @@ export default async function BillingPage() {
                 : 'N/A'}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {subscription?.plan === 'free' ? 'No billing' : 'Auto-renews'}
+              {subscription?.plan_type === 'free' ? 'No billing' : 'Auto-renews'}
             </p>
           </CardContent>
         </Card>
@@ -123,7 +123,7 @@ export default async function BillingPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {subscription?.plan !== 'free' && subscription?.stripe_customer_id ? (
+          {subscription?.plan_type !== 'free' && subscription?.stripe_customer_id ? (
             <form action={handleManageSubscription}>
               <Button type="submit">
                 Manage Subscription

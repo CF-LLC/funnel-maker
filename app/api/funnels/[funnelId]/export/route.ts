@@ -4,10 +4,10 @@ import JSZip from 'jszip'
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ funnelId: string }> }
+  context: { params: Promise<{ funnelId: string }> }
 ) {
+  const { funnelId } = await context.params
   const supabase = await createServerClient()
-  const { funnelId } = await params
 
   const { data: { user } } = await supabase.auth.getUser()
 

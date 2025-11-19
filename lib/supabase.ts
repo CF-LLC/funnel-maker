@@ -22,21 +22,21 @@ export type Database = {
           id: string
           user_id: string
           name: string
-          steps: any
+          steps: Record<string, unknown>
           created_at: string
         }
         Insert: {
           id?: string
           user_id: string
           name: string
-          steps?: any
+          steps?: Record<string, unknown>
           created_at?: string
         }
         Update: {
           id?: string
           user_id?: string
           name?: string
-          steps?: any
+          steps?: Record<string, unknown>
           created_at?: string
         }
       }
@@ -44,20 +44,55 @@ export type Database = {
         Row: {
           id: string
           funnel_id: string
-          data: any
+          data: Record<string, unknown>
           created_at: string
         }
         Insert: {
           id?: string
           funnel_id: string
-          data?: any
+          data?: Record<string, unknown>
           created_at?: string
         }
         Update: {
           id?: string
           funnel_id?: string
-          data?: any
+          data?: Record<string, unknown>
           created_at?: string
+        }
+      }
+      subscriptions: {
+        Row: {
+          id: string
+          user_id: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          plan_type: string
+          status: string
+          current_period_end: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          plan_type: string
+          status: string
+          current_period_end?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          plan_type?: string
+          status?: string
+          current_period_end?: string | null
+          created_at?: string
+          updated_at?: string
         }
       }
     }

@@ -3,8 +3,9 @@ import { createServerClient } from '@/lib/supabase'
 
 export async function GET(
   request: Request,
-  { params }: { params: { funnelId: string } }
+  context: { params: Promise<{ funnelId: string }> }
 ) {
+  const { funnelId } = await context.params
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -15,7 +16,7 @@ export async function GET(
   const { data: funnel } = await supabase
     .from('funnels')
     .select('*')
-    .eq('id', params.funnelId)
+    .eq('id', funnelId)
     .eq('user_id', user.id)
     .single()
 

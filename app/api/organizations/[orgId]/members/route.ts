@@ -5,10 +5,10 @@ import crypto from 'crypto'
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ orgId: string }> }
+  context: { params: Promise<{ orgId: string }> }
 ) {
+  const { orgId } = await context.params
   const supabase = await createServerClient()
-  const { orgId } = await params
 
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -31,10 +31,10 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ orgId: string }> }
+  context: { params: Promise<{ orgId: string }> }
 ) {
+  const { orgId } = await context.params
   const supabase = await createServerClient()
-  const { orgId } = await params
 
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -98,10 +98,10 @@ export async function POST(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ orgId: string }> }
+  context: { params: Promise<{ orgId: string }> }
 ) {
+  const { orgId } = await context.params
   const supabase = await createServerClient()
-  const { orgId } = await params
 
   const { data: { user } } = await supabase.auth.getUser()
 

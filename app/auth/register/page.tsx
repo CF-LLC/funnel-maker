@@ -47,9 +47,10 @@ export default function RegisterPage() {
 
       if (data.user) {
         // Create user record in users table
-        const { error: insertError } = await supabase
-          .from('users')
-          .insert([{ id: data.user.id, email: data.user.email! }] as any)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error: insertError } = await (supabase
+          .from('users') as any)
+          .insert({ id: data.user.id, email: data.user.email! })
 
         if (insertError) {
           console.error('Error creating user record:', insertError)
