@@ -274,7 +274,7 @@ export default function FunnelBuilderPage() {
             <div className="flex items-center gap-2 text-sm">
               <Label className="text-muted-foreground whitespace-nowrap">URL:</Label>
               <div className="flex items-center gap-1 flex-1">
-                <span className="text-muted-foreground">yoursite.com/f/</span>
+                <span className="text-muted-foreground">myfunnelr.vercel.app/f/</span>
                 <Input
                   value={funnelSlug}
                   onChange={(e) => setFunnelSlug(e.target.value)}
