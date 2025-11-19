@@ -43,8 +43,17 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(redirectUrl)
     }
 
-    // Check subscription status for billing gates
-    if (user) {
+    // Check if user is admin (admins bypass all billing restrictions)
+    const { data: adminCheck } = await (supabase
+      .from('admin_users') as any)
+      .select('id')
+      .eq('id', user.id)
+      .single()
+
+    const isAdmin = !!adminCheck
+
+    // Check subscription status for billing gates (skip for admins)
+    if (user && !isAdmin) {
       const { data: subscription } = await (supabase
         .from('subscriptions') as any)
         .select('*')
@@ -53,20 +62,6 @@ export async function middleware(request: NextRequest) {
 
       const plan = subscription?.plan || 'free'
       const status = subscription?.status || 'active'
-
-      // Check if free plan user has exceeded funnel limit
-      if (plan === 'free' && !request.nextUrl.pathname.includes('/billing')) {
-        const { data: funnels } = await (supabase
-          .from('funnels') as any)
-          .select('id')
-          .eq('user_id', user.id)
-
-        if (funnels && funnels.length > 1 && !request.nextUrl.pathname.includes('/pricing')) {
-          const redirectUrl = request.nextUrl.clone()
-          redirectUrl.pathname = '/pricing'
-          return NextResponse.redirect(redirectUrl)
-        }
-      }
 
       // Check if subscription is expired
       if (subscription && status !== 'active' && !request.nextUrl.pathname.includes('/billing')) {
@@ -78,6 +73,10 @@ export async function middleware(request: NextRequest) {
       // Add subscription info to response headers for use in components
       response.headers.set('x-user-plan', plan)
       response.headers.set('x-user-subscription-status', status)
+    } else if (isAdmin) {
+      // Set admin plan headers
+      response.headers.set('x-user-plan', 'enterprise')
+      response.headers.set('x-user-subscription-status', 'active')
     }
   }
 

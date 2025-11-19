@@ -4,6 +4,13 @@ import { useEffect, useState, use } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
+interface AffiliateLink {
+  id: string
+  url: string
+  buttonText: string
+  icon?: string
+}
+
 interface Step {
   id: string
   title: string
@@ -14,6 +21,7 @@ interface Step {
   backgroundColor?: string
   backgroundImage?: string
   textColor?: string
+  affiliateLinks?: AffiliateLink[]
 }
 
 export default function PublicFunnelPage({ params }: { params: Promise<{ funnelId: string }> }) {
@@ -87,25 +95,42 @@ export default function PublicFunnelPage({ params }: { params: Promise<{ funnelI
                     color: step.textColor || '#ffffff',
                   }}
                 >
-                  <div className="space-y-8 max-w-3xl">
+                  <div className="space-y-8 max-w-3xl w-full">
                     <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full">
                       <div className="w-8 h-8 rounded-full bg-white text-gray-900 flex items-center justify-center font-bold text-sm">
                         {index + 1}
                       </div>
-                      <span className="font-medium">Affiliate Link</span>
+                      <span className="font-medium">Affiliate Links</span>
                     </div>
-                    <h2 className="text-5xl font-bold">{step.title}</h2>
+                    <h2 className="text-5xl font-bold leading-tight">{step.title}</h2>
                     <p className="text-2xl whitespace-pre-wrap opacity-95 leading-relaxed">{step.content}</p>
-                    {step.affiliateUrl && (
-                      <a
-                        href={step.affiliateUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-block px-10 py-5 bg-white text-gray-900 font-bold text-lg rounded-xl hover:scale-105 transition-transform shadow-2xl"
-                      >
-                        {step.buttonText || 'Click Here'}
-                      </a>
-                    )}
+                    
+                    <div className="space-y-4 max-w-xl mx-auto">
+                      {(step.affiliateLinks && step.affiliateLinks.length > 0) ? (
+                        step.affiliateLinks.map((link) => (
+                          <a
+                            key={link.id}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-center gap-3 px-8 py-4 bg-white text-gray-900 font-bold text-lg rounded-xl hover:scale-105 transition-transform shadow-2xl"
+                          >
+                            {link.icon && <span className="text-2xl">{link.icon}</span>}
+                            <span>{link.buttonText}</span>
+                          </a>
+                        ))
+                      ) : step.affiliateUrl ? (
+                        // Legacy support for old single-link format
+                        <a
+                          href={step.affiliateUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block px-10 py-5 bg-white text-gray-900 font-bold text-lg rounded-xl hover:scale-105 transition-transform shadow-2xl"
+                        >
+                          {step.buttonText || 'Click Here'}
+                        </a>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
               ) : (

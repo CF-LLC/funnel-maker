@@ -23,6 +23,21 @@ export default function PricingPage() {
       ]
     },
     {
+      name: 'Starter',
+      price: '$9',
+      period: '/month',
+      description: 'For side hustlers',
+      features: [
+        '3 funnels',
+        'All templates',
+        'Email support',
+        'Basic analytics',
+        'Custom domains',
+        'Core integrations'
+      ],
+      popular: false
+    },
+    {
       name: 'Pro',
       price: '$29',
       period: '/month',
@@ -69,7 +84,7 @@ export default function PricingPage() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
           {plans.map((plan) => (
             <Card key={plan.name} className={`flex flex-col ${plan.popular ? 'border-primary shadow-lg scale-105' : ''}`}>
               <CardHeader>

@@ -16,7 +16,7 @@ import { AIContentGenerator } from '@/components/builder/ai-content-generator'
 import { CollaboratorPresence } from '@/components/builder/collaborator-presence'
 import { Plus, Save, ArrowLeft, Trash2, Download, Share2, Copy } from 'lucide-react'
 import Link from 'next/link'
-import type { FunnelStep } from '@/data/templates'
+import type { FunnelStep, AffiliateLink } from '@/data/templates'
 import { RealtimeCollaboration, Collaborator } from '@/lib/realtime-collaboration'
 import { Badge } from '@/components/ui/badge'
 
@@ -26,6 +26,7 @@ export default function FunnelBuilderPage() {
   const supabase = createClient()
   const [funnel, setFunnel] = useState<any>(null)
   const [funnelName, setFunnelName] = useState('')
+  const [funnelSlug, setFunnelSlug] = useState('')
   const [steps, setSteps] = useState<FunnelStep[]>([])
   const [selectedStep, setSelectedStep] = useState<FunnelStep | null>(null)
   const [saving, setSaving] = useState(false)
@@ -78,6 +79,7 @@ export default function FunnelBuilderPage() {
     if (data) {
       setFunnel(data)
       setFunnelName(data.name)
+      setFunnelSlug(data.slug || '')
       setSteps(Array.isArray(data.steps) ? data.steps : [])
       setIsPublic(data.is_public || false)
     }
@@ -158,13 +160,31 @@ export default function FunnelBuilderPage() {
 
   const saveFunnel = async () => {
     setSaving(true)
+    
+    // Sanitize slug
+    const sanitizedSlug = funnelSlug
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+    
     const { error } = await (supabase
       .from('funnels') as any)
-      .update({ name: funnelName, steps, is_public: isPublic })
+      .update({ 
+        name: funnelName, 
+        steps, 
+        is_public: isPublic,
+        slug: sanitizedSlug || null
+      })
       .eq('id', params.funnelId as string)
 
     if (error) {
       console.error('Error saving funnel:', error)
+      if (error.code === '23505') {
+        alert('This URL slug is already taken. Please choose a different one.')
+      }
+    } else {
+      setFunnelSlug(sanitizedSlug)
     }
     setSaving(false)
   }
@@ -179,7 +199,9 @@ export default function FunnelBuilderPage() {
   }
 
   const copyPublicLink = () => {
-    const link = `${window.location.origin}/public/${params.funnelId}`
+    const link = funnelSlug 
+      ? `${window.location.origin}/f/${funnelSlug}`
+      : `${window.location.origin}/public/${params.funnelId}`
     navigator.clipboard.writeText(link)
     alert('Public link copied to clipboard!')
   }
@@ -236,18 +258,31 @@ export default function FunnelBuilderPage() {
   return (
     <div className="h-[calc(100vh-4rem)] p-6">
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-1">
           <Link href="/dashboard/funnels">
             <Button variant="ghost" size="icon">
               <ArrowLeft className="w-4 h-4" />
             </Button>
           </Link>
-          <div>
+          <div className="flex-1 max-w-xl space-y-2">
             <Input
               value={funnelName}
               onChange={(e) => setFunnelName(e.target.value)}
               className="text-2xl font-bold border-none p-0 h-auto focus-visible:ring-0"
+              placeholder="Funnel Name"
             />
+            <div className="flex items-center gap-2 text-sm">
+              <Label className="text-muted-foreground whitespace-nowrap">URL:</Label>
+              <div className="flex items-center gap-1 flex-1">
+                <span className="text-muted-foreground">yoursite.com/f/</span>
+                <Input
+                  value={funnelSlug}
+                  onChange={(e) => setFunnelSlug(e.target.value)}
+                  placeholder="my-funnel"
+                  className="h-7 text-sm max-w-xs"
+                />
+              </div>
+            </div>
           </div>
           {isPublic && <Badge variant="secondary">Public</Badge>}
         </div>
@@ -318,7 +353,7 @@ export default function FunnelBuilderPage() {
               <div className="h-full">
                 {selectedStep.type === 'affiliate-link' ? (
                   <div 
-                    className="w-full h-full min-h-[600px] flex flex-col items-center justify-center text-center"
+                    className="w-full h-full min-h-[600px] flex flex-col items-center justify-center text-center px-8"
                     style={{
                       backgroundColor: selectedStep.backgroundColor || '#6366f1',
                       backgroundImage: selectedStep.backgroundImage 
@@ -329,27 +364,34 @@ export default function FunnelBuilderPage() {
                       color: selectedStep.textColor || '#ffffff',
                     }}
                   >
-                    <div className="space-y-8 max-w-3xl px-8">
+                    <div className="space-y-8 max-w-3xl w-full">
                       <h1 className="text-5xl md:text-6xl font-bold leading-tight drop-shadow-lg">
                         {selectedStep.title}
                       </h1>
                       <p className="text-xl md:text-2xl whitespace-pre-wrap opacity-95 leading-relaxed drop-shadow">
                         {selectedStep.content}
                       </p>
-                      <a
-                        href={selectedStep.affiliateUrl || '#'}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-block px-10 py-5 bg-white text-gray-900 font-bold text-lg rounded-xl shadow-2xl hover:scale-105 hover:shadow-3xl transition-all duration-200"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        {selectedStep.buttonText || 'Click Here'}
-                      </a>
-                      {selectedStep.affiliateUrl && (
-                        <p className="text-sm opacity-75 font-mono">
-                          → {selectedStep.affiliateUrl}
-                        </p>
-                      )}
+                      <div className="space-y-4 max-w-xl mx-auto">
+                        {(selectedStep.affiliateLinks && selectedStep.affiliateLinks.length > 0) ? (
+                          selectedStep.affiliateLinks.map((link) => (
+                            <a
+                              key={link.id}
+                              href={link.url || '#'}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center justify-center gap-3 px-8 py-4 bg-white text-gray-900 font-bold text-lg rounded-xl shadow-2xl hover:scale-105 hover:shadow-3xl transition-all duration-200"
+                              onClick={(e) => e.preventDefault()}
+                            >
+                              {link.icon && <span className="text-2xl">{link.icon}</span>}
+                              <span>{link.buttonText}</span>
+                            </a>
+                          ))
+                        ) : (
+                          <div className="text-sm opacity-75">
+                            Add affiliate links below
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ) : selectedStep.type === 'landing' ? (
@@ -535,25 +577,6 @@ export default function FunnelBuilderPage() {
                 {selectedStep.type === 'affiliate-link' && (
                   <>
                     <div>
-                      <Label htmlFor="affiliate-url">Affiliate URL</Label>
-                      <Input
-                        id="affiliate-url"
-                        type="url"
-                        placeholder="https://example.com/affiliate?ref=yourcode"
-                        value={selectedStep.affiliateUrl || ''}
-                        onChange={(e) => updateStep({ ...selectedStep, affiliateUrl: e.target.value })}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="button-text">Button Text</Label>
-                      <Input
-                        id="button-text"
-                        placeholder="Get Started Now"
-                        value={selectedStep.buttonText || 'Click Here'}
-                        onChange={(e) => updateStep({ ...selectedStep, buttonText: e.target.value })}
-                      />
-                    </div>
-                    <div>
                       <Label htmlFor="bg-color">Background Color</Label>
                       <div className="flex gap-2">
                         <Input
@@ -601,6 +624,93 @@ export default function FunnelBuilderPage() {
                       <p className="text-xs text-muted-foreground mt-1">
                         Use a high-quality image URL from Unsplash, Pexels, or your own hosting
                       </p>
+                    </div>
+
+                    <div className="border-t pt-4 mt-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <Label>Affiliate Links</Label>
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            const newLinks = [...(selectedStep.affiliateLinks || []), {
+                              id: `link-${Date.now()}`,
+                              url: '',
+                              buttonText: 'New Link',
+                              icon: '🔗'
+                            }]
+                            updateStep({ ...selectedStep, affiliateLinks: newLinks })
+                          }}
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          Add Link
+                        </Button>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        {(selectedStep.affiliateLinks || []).map((link, index) => (
+                          <Card key={link.id} className="p-4">
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between">
+                                <Label className="text-sm font-semibold">Link {index + 1}</Label>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => {
+                                    const newLinks = selectedStep.affiliateLinks?.filter(l => l.id !== link.id) || []
+                                    updateStep({ ...selectedStep, affiliateLinks: newLinks })
+                                  }}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                              <div>
+                                <Label className="text-xs">URL</Label>
+                                <Input
+                                  type="url"
+                                  placeholder="https://example.com/affiliate"
+                                  value={link.url}
+                                  onChange={(e) => {
+                                    const newLinks = selectedStep.affiliateLinks?.map(l => 
+                                      l.id === link.id ? { ...l, url: e.target.value } : l
+                                    ) || []
+                                    updateStep({ ...selectedStep, affiliateLinks: newLinks })
+                                  }}
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs">Button Text</Label>
+                                <Input
+                                  placeholder="Click here"
+                                  value={link.buttonText}
+                                  onChange={(e) => {
+                                    const newLinks = selectedStep.affiliateLinks?.map(l => 
+                                      l.id === link.id ? { ...l, buttonText: e.target.value } : l
+                                    ) || []
+                                    updateStep({ ...selectedStep, affiliateLinks: newLinks })
+                                  }}
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs">Icon (emoji)</Label>
+                                <Input
+                                  placeholder="🚀"
+                                  value={link.icon || ''}
+                                  onChange={(e) => {
+                                    const newLinks = selectedStep.affiliateLinks?.map(l => 
+                                      l.id === link.id ? { ...l, icon: e.target.value } : l
+                                    ) || []
+                                    updateStep({ ...selectedStep, affiliateLinks: newLinks })
+                                  }}
+                                  maxLength={4}
+                                />
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  Use emoji or leave blank
+                                </p>
+                              </div>
+                            </div>
+                          </Card>
+                        ))}
+                      </div>
                     </div>
                   </>
                 )}

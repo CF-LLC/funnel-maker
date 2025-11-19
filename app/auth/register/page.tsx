@@ -14,6 +14,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [emailExists, setEmailExists] = useState(false)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const supabase = createClient()
@@ -21,6 +22,7 @@ export default function RegisterPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setEmailExists(false)
     setLoading(true)
 
     try {
@@ -33,7 +35,12 @@ export default function RegisterPage() {
       })
 
       if (error) {
-        setError(error.message)
+        // Check if the error is about email already being registered
+        if (error.message.includes('already registered') || error.message.includes('already exists') || error.message.includes('User already registered')) {
+          setEmailExists(true)
+        } else {
+          setError(error.message)
+        }
         setLoading(false)
         return
       }
@@ -73,6 +80,16 @@ return (
         </CardHeader>
         <form onSubmit={handleRegister}>
           <CardContent className="space-y-4">
+            {emailExists && (
+              <Alert variant="destructive">
+                <AlertDescription>
+                  This email is already registered.{' '}
+                  <Link href="/auth/login" className="text-primary hover:underline font-semibold">
+                    Sign in instead
+                  </Link>
+                </AlertDescription>
+              </Alert>
+            )}
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>

@@ -64,6 +64,11 @@ begin
   if not exists (select 1 from information_schema.columns where table_name = 'funnels' and column_name = 'is_public') then
     alter table funnels add column is_public boolean default false;
   end if;
+  
+  -- Add slug column if it doesn't exist
+  if not exists (select 1 from information_schema.columns where table_name = 'funnels' and column_name = 'slug') then
+    alter table funnels add column slug text unique;
+  end if;
 end $$;
 
 -- Create analytics table
@@ -238,7 +243,7 @@ create table if not exists subscriptions (
   user_id uuid references users(id) on delete cascade unique,
   stripe_customer_id text unique,
   stripe_subscription_id text unique,
-  plan_type text not null check (plan_type in ('free', 'pro', 'enterprise')),
+  plan_type text not null check (plan_type in ('free', 'starter', 'pro', 'enterprise')),
   status text not null,
   current_period_end timestamptz,
   created_at timestamptz default now(),
@@ -263,4 +268,53 @@ drop policy if exists "Users can insert own subscription" on subscriptions;
 create policy "Users can insert own subscription"
   on subscriptions for insert
   with check (auth.uid() = user_id);
+
+-- Create admin users table
+create table if not exists admin_users (
+  id uuid primary key references users(id) on delete cascade,
+  email text unique not null,
+  created_at timestamptz default now()
+);
+
+-- Enable RLS for admin_users
+alter table admin_users enable row level security;
+
+-- RLS Policies for admin_users
+drop policy if exists "Admins can read admin list" on admin_users;
+create policy "Admins can read admin list"
+  on admin_users for select
+  using (
+    exists (
+      select 1 from admin_users
+      where admin_users.id = auth.uid()
+    )
+  );
+
+-- Insert admin user (will create after user signs up)
+-- Run this manually after your account is created:
+-- insert into admin_users (id, email)
+-- select id, email from users where email = 'cooperfeatherstone13@gmail.com'
+-- on conflict (email) do nothing;
+
+-- Create function to prevent duplicate email signups
+create or replace function check_email_uniqueness()
+returns trigger as $$
+begin
+  if exists (
+    select 1 from auth.users
+    where email = new.email
+    and id != new.id
+  ) then
+    raise exception 'An account with this email already exists';
+  end if;
+  return new;
+end;
+$$ language plpgsql security definer;
+
+-- Create trigger to enforce email uniqueness
+drop trigger if exists enforce_email_uniqueness on auth.users;
+create trigger enforce_email_uniqueness
+  before insert or update on auth.users
+  for each row
+  execute function check_email_uniqueness();
 

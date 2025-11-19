@@ -1,8 +1,9 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createServerClient } from '@/lib/supabase'
+import { isAdmin } from '@/lib/admin'
 import { Button } from '@/components/ui/button'
-import { LayoutDashboard, Zap, BarChart3, LogOut, Users, CreditCard } from 'lucide-react'
+import { LayoutDashboard, Zap, BarChart3, LogOut, Users, CreditCard, Shield } from 'lucide-react'
 
 export default async function DashboardLayout({
   children,
@@ -16,16 +17,18 @@ export default async function DashboardLayout({
     redirect('/auth/login')
   }
 
+  const adminAccess = await isAdmin(user.id)
+
   return (
     <div className="min-h-screen flex">
       {/* Sidebar */}
-      <aside className="w-64 border-r bg-muted/50">
+      <aside className="w-64 border-r bg-muted/50 relative flex flex-col">
         <div className="p-6">
           <Link href="/" className="text-2xl font-bold">
             Funnel Maker
           </Link>
         </div>
-        <nav className="space-y-1 px-3">
+        <nav className="space-y-1 px-3 flex-1">
           <Link href="/dashboard">
             <Button variant="ghost" className="w-full justify-start gap-2">
               <LayoutDashboard className="w-4 h-4" />
@@ -56,8 +59,19 @@ export default async function DashboardLayout({
               Billing
             </Button>
           </Link>
+          {adminAccess && (
+            <>
+              <div className="h-px bg-border my-2" />
+              <Link href="/dashboard/admin">
+                <Button variant="ghost" className="w-full justify-start gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50">
+                  <Shield className="w-4 h-4" />
+                  Admin
+                </Button>
+              </Link>
+            </>
+          )}
         </nav>
-        <div className="absolute bottom-6 left-3 right-3">
+        <div className="p-3 border-t">
           <form action="/auth/signout" method="post">
             <Button variant="ghost" className="w-full justify-start gap-2" type="submit">
               <LogOut className="w-4 h-4" />
