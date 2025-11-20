@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase'
 import { Menu, X } from 'lucide-react'
@@ -9,9 +10,10 @@ import { Menu, X } from 'lucide-react'
 export function Navbar() {
   const [user, setUser] = useState<any>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const router = useRouter()
   const supabase = createClient()
 
-  useEffect(() => {
+useEffect(() => {
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       setUser(user)
@@ -27,14 +29,21 @@ export function Navbar() {
     }
   }, [])
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    setMobileMenuOpen(false)
+    router.push('/')
+    router.refresh()
+  }
+
   return (
     <nav className="border-b bg-background sticky top-0 z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center space-x-8">
+        <div className="flex items-center gap-4 sm:gap-8">
           <Link href="/" className="text-xl sm:text-2xl font-bold">
             Funnel Maker
           </Link>
-          <div className="hidden md:flex space-x-6">
+          <div className="hidden md:flex gap-6">
             <Link href="/#features" className="text-sm hover:text-primary">
               Features
             </Link>
@@ -47,34 +56,32 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* Desktop Actions */}
-        <div className="hidden sm:flex items-center space-x-4">
+        {/* Desktop Actions - Always visible */}
+        <div className="flex items-center gap-2 sm:gap-4">
           {user ? (
             <>
               <Link href="/dashboard">
-                <Button variant="ghost">Dashboard</Button>
+                <Button variant="ghost" size="sm" className="sm:size-default">Dashboard</Button>
               </Link>
-              <form action="/auth/signout" method="post">
-                <Button variant="outline" type="submit">Sign Out</Button>
-              </form>
+              <Button variant="outline" size="sm" className="sm:size-default" onClick={handleSignOut}>Sign Out</Button>
             </>
           ) : (
             <>
               <Link href="/auth/login">
-                <Button variant="ghost">Login</Button>
+                <Button variant="ghost" size="sm" className="sm:size-default">Login</Button>
               </Link>
               <Link href="/auth/register">
-                <Button>Start Building Free</Button>
+                <Button size="sm" className="sm:size-default">Start Free</Button>
               </Link>
             </>
           )}
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Menu Button - Hidden on larger screens */}
         <Button
           variant="ghost"
           size="icon"
-          className="sm:hidden"
+          className="hidden"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -115,11 +122,9 @@ export function Navbar() {
                       Dashboard
                     </Button>
                   </Link>
-                  <form action="/auth/signout" method="post">
-                    <Button variant="outline" type="submit" className="w-full">
-                      Sign Out
-                    </Button>
-                  </form>
+                  <Button variant="outline" onClick={handleSignOut} className="w-full">
+                    Sign Out
+                  </Button>
                 </>
               ) : (
                 <>

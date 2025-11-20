@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { LayoutDashboard, Zap, BarChart3, LogOut, Users, CreditCard, Shield, Menu, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
@@ -16,6 +16,7 @@ export default function DashboardLayout({
   const [isAdmin, setIsAdmin] = useState(false)
   const [userEmail, setUserEmail] = useState('')
   const pathname = usePathname()
+  const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
@@ -36,6 +37,12 @@ export default function DashboardLayout({
     { name: 'Templates', href: '/dashboard/templates', icon: BarChart3 },
     { name: 'Billing', href: '/dashboard/billing', icon: CreditCard },
   ]
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    router.push('/')
+    router.refresh()
+  }
 
   return (
     <div className="min-h-screen flex">
@@ -107,12 +114,14 @@ export default function DashboardLayout({
             </>
           )}
           
-          <form action="/auth/signout" method="post">
-            <Button variant="ghost" className="w-full justify-start gap-2" type="submit">
-              <LogOut className="w-4 h-4" />
-              Sign Out
-            </Button>
-          </form>
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start gap-2" 
+            onClick={handleSignOut}
+          >
+            <LogOut className="w-4 h-4" />
+            Sign Out
+          </Button>
         </nav>
       </aside>
 
