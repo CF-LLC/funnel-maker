@@ -47,38 +47,59 @@ export default function LoginPage() {
       }
 
       if (data.user) {
-        // Ensure user record exists in database
+        // Ensure user record exists in database (handles cases where signup failed midway)
         try {
+          // Check if user record exists
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { error: upsertError } = await (supabase
+          const { data: existingUser } = await (supabase
             .from('users') as any)
-            .upsert(
-              { id: data.user.id, email: data.user.email! },
-              { onConflict: 'id' }
-            )
+            .select('id')
+            .eq('id', data.user.id)
+            .single()
 
-          if (upsertError) {
-            console.error('Error ensuring user record:', upsertError)
+          // Create user record if it doesn't exist
+          if (!existingUser) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error: insertError } = await (supabase
+              .from('users') as any)
+              .insert({ id: data.user.id, email: data.user.email! })
+
+            if (insertError) {
+              console.error('Error creating user record:', insertError)
+              setError('There was an issue setting up your account. Please contact support.')
+              setLoading(false)
+              return
+            }
           }
 
-          // Ensure subscription exists
+          // Check if subscription exists
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { error: subError } = await (supabase
+          const { data: existingSub } = await (supabase
             .from('subscriptions') as any)
-            .upsert(
-              {
+            .select('user_id')
+            .eq('user_id', data.user.id)
+            .single()
+
+          // Create subscription if it doesn't exist
+          if (!existingSub) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error: subError } = await (supabase
+              .from('subscriptions') as any)
+              .insert({
                 user_id: data.user.id,
                 plan_type: 'free',
                 status: 'active'
-              },
-              { onConflict: 'user_id' }
-            )
+              })
 
-          if (subError) {
-            console.error('Error ensuring subscription:', subError)
+            if (subError) {
+              console.error('Error creating subscription:', subError)
+            }
           }
         } catch (setupError) {
           console.error('User setup error:', setupError)
+          setError('There was an issue setting up your account. Please try again or contact support.')
+          setLoading(false)
+          return
         }
 
         // Small delay to ensure everything is saved
