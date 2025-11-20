@@ -10,21 +10,36 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  // Get organizations where user is owner or member
-  const { data: orgs, error } = await (supabase
-    .from('organizations') as any)
-    .select(`
-      *,
-      org_members!inner(role),
-      owner:users!organizations_owner_id_fkey(email)
-    `)
-    .or(`owner_id.eq.${user.id},org_members.user_id.eq.${user.id}`)
+  try {
+    // Get organizations where user is owner
+    const { data: ownedOrgs, error: ownedError } = await (supabase
+      .from('organizations') as any)
+      .select(`
+        *,
+        owner:users!organizations_owner_id_fkey(email)
+      `)
+      .eq('owner_id', user.id)
 
-  if (error) {
+    // Get organizations where user is a member
+    const { data: memberOrgs, error: memberError } = await (supabase
+      .from('org_members') as any)
+      .select(`
+        org_id,
+        role,
+        organization:organizations(*)
+      `)
+      .eq('user_id', user.id)
+
+    const organizations = [
+      ...(ownedOrgs || []).map(org => ({ ...org, org_members: [{ role: 'owner' }] })),
+      ...(memberOrgs || []).map(m => ({ ...m.organization, org_members: [{ role: m.role }] }))
+    ]
+
+    return NextResponse.json({ organizations })
+  } catch (error: any) {
+    console.error('Error fetching organizations:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
-
-  return NextResponse.json({ organizations: orgs })
 }
 
 export async function POST(request: Request) {

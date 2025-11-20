@@ -32,10 +32,14 @@ export default function OrganizationsPage() {
   const fetchOrganizations = async () => {
     try {
       const res = await fetch('/api/organizations')
+      if (!res.ok) {
+        throw new Error('Failed to fetch organizations')
+      }
       const data = await res.json()
       setOrganizations(data.organizations || [])
     } catch (error) {
       console.error('Error fetching organizations:', error)
+      alert('Failed to load organizations')
     } finally {
       setLoading(false)
     }
@@ -48,17 +52,23 @@ export default function OrganizationsPage() {
     try {
       const res = await fetch('/api/organizations', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json'},
         body: JSON.stringify({ name: newOrgName }),
       })
+
+      const data = await res.json()
 
       if (res.ok) {
         setIsCreateOpen(false)
         setNewOrgName('')
-        fetchOrganizations()
+        await fetchOrganizations()
+        alert(`Organization "${data.organization.name}" created successfully!`)
+      } else {
+        alert(`Error: ${data.error || 'Failed to create organization'}`)
       }
     } catch (error) {
       console.error('Error creating organization:', error)
+      alert('Failed to create organization. Please try again.')
     } finally {
       setCreating(false)
     }

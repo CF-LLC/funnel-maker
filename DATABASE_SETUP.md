@@ -1,11 +1,16 @@
 # Database Setup Instructions
 
-## IMPORTANT: Run these steps in your Supabase SQL Editor
+## IMPORTANT: Run these steps in your Supabase SQL Editor IN ORDER
 
 ### Step 1: Run the main schema
 Copy and paste the entire contents of `supabase-schema.sql` into your Supabase SQL Editor and run it.
 
-### Step 2: Set up automatic user creation (CRITICAL)
+### Step 2: Fix RLS Policies (CRITICAL - DO THIS FIRST!)
+Copy and paste the entire contents of `supabase/migrations/fix-rls-policies.sql` into your Supabase SQL Editor and run it.
+
+**Why this is needed:** The default RLS policies block the trigger from creating records. This fixes that.
+
+### Step 3: Set up automatic user creation
 Copy and paste the entire contents of `supabase/migrations/auto-create-user.sql` into your Supabase SQL Editor and run it.
 
 This will create triggers that automatically:

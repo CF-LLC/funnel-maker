@@ -32,8 +32,7 @@ useEffect(() => {
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     setMobileMenuOpen(false)
-    router.push('/')
-    router.refresh()
+    window.location.href = '/'
   }
 
   return (
