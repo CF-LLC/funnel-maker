@@ -157,7 +157,6 @@ export default function PublicFunnelPage({ params }: { params: Promise<{ funnelI
               )}
           </div>
         ))}
-        </div>
 
         {steps.length === 0 && (
           <div className="min-h-screen flex items-center justify-center">
