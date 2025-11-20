@@ -25,6 +25,21 @@ export default function RegisterPage() {
     setEmailExists(false)
     setLoading(true)
 
+    // Validate password strength
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.')
+      setLoading(false)
+      return
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address.')
+      setLoading(false)
+      return
+    }
+
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -35,11 +50,21 @@ export default function RegisterPage() {
       })
 
       if (error) {
-        // Check if the error is about email already being registered
-        if (error.message.includes('already registered') || error.message.includes('already exists') || error.message.includes('User already registered')) {
+        // Check for specific error types and provide helpful messages
+        if (error.message.includes('already registered') || 
+            error.message.includes('already exists') || 
+            error.message.includes('User already registered')) {
           setEmailExists(true)
+        } else if (error.message.includes('Password should be at least')) {
+          setError('Password must be at least 6 characters long.')
+        } else if (error.message.includes('invalid email')) {
+          setError('Please enter a valid email address.')
+        } else if (error.message.includes('network')) {
+          setError('Network error. Please check your internet connection and try again.')
+        } else if (error.message.includes('rate limit')) {
+          setError('Too many signup attempts. Please wait a few minutes and try again.')
         } else {
-          setError(error.message)
+          setError(error.message || 'Failed to create account. Please try again.')
         }
         setLoading(false)
         return
@@ -54,6 +79,7 @@ export default function RegisterPage() {
 
         if (insertError) {
           console.error('Error creating user record:', insertError)
+          // Don't block the user from proceeding if this fails
         }
 
         // Send welcome email in the background
@@ -67,8 +93,9 @@ export default function RegisterPage() {
         router.push('/dashboard')
         router.refresh()
       }
-    } catch {
-      setError('An unexpected error occurred')
+    } catch (err) {
+      console.error('Registration error:', err)
+      setError('An unexpected error occurred. Please try again later.')
       setLoading(false)
     }
   }

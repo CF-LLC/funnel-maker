@@ -30,7 +30,18 @@ export default function LoginPage() {
       })
 
       if (error) {
-        setError(error.message)
+        // Provide user-friendly error messages
+        if (error.message.includes('Invalid login credentials')) {
+          setError('Invalid email or password. Please check your credentials and try again.')
+        } else if (error.message.includes('Email not confirmed')) {
+          setError('Please verify your email address before signing in. Check your inbox for the confirmation link.')
+        } else if (error.message.includes('Too many requests')) {
+          setError('Too many login attempts. Please wait a few minutes and try again.')
+        } else if (error.message.includes('network')) {
+          setError('Network error. Please check your internet connection and try again.')
+        } else {
+          setError(error.message || 'Failed to sign in. Please try again.')
+        }
         setLoading(false)
         return
       }
@@ -40,8 +51,9 @@ export default function LoginPage() {
         router.push('/dashboard')
         router.refresh()
       }
-    } catch {
-      setError('An unexpected error occurred')
+    } catch (err) {
+      console.error('Login error:', err)
+      setError('An unexpected error occurred. Please try again later.')
       setLoading(false)
     }
   }
