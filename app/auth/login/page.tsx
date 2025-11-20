@@ -47,6 +47,40 @@ export default function LoginPage() {
       }
 
       if (data.user) {
+        // Ensure user record exists in database
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { error: upsertError } = await (supabase
+            .from('users') as any)
+            .upsert(
+              { id: data.user.id, email: data.user.email! },
+              { onConflict: 'id' }
+            )
+
+          if (upsertError) {
+            console.error('Error ensuring user record:', upsertError)
+          }
+
+          // Ensure subscription exists
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { error: subError } = await (supabase
+            .from('subscriptions') as any)
+            .upsert(
+              {
+                user_id: data.user.id,
+                plan_type: 'free',
+                status: 'active'
+              },
+              { onConflict: 'user_id' }
+            )
+
+          if (subError) {
+            console.error('Error ensuring subscription:', subError)
+          }
+        } catch (setupError) {
+          console.error('User setup error:', setupError)
+        }
+
         // Redirect to dashboard
         router.push('/dashboard')
         router.refresh()

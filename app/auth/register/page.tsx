@@ -71,27 +71,57 @@ export default function RegisterPage() {
       }
 
       if (data.user) {
-        // Create user record in users table
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error: insertError } = await (supabase
-          .from('users') as any)
-          .insert({ id: data.user.id, email: data.user.email! })
+        try {
+          // Create/update user record in users table (use upsert to handle duplicates)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { error: upsertError } = await (supabase
+            .from('users') as any)
+            .upsert(
+              { id: data.user.id, email: data.user.email! },
+              { onConflict: 'id' }
+            )
 
-        if (insertError) {
-          console.error('Error creating user record:', insertError)
-          // Don't block the user from proceeding if this fails
+          if (upsertError) {
+            console.error('Error creating user record:', upsertError)
+            // Show error but don't block signup
+            setError('Account created but there was an issue setting up your profile. You can still proceed.')
+          }
+
+          // Create default subscription record
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { error: subError } = await (supabase
+            .from('subscriptions') as any)
+            .upsert(
+              {
+                user_id: data.user.id,
+                plan_type: 'free',
+                status: 'active'
+              },
+              { onConflict: 'user_id' }
+            )
+
+          if (subError) {
+            console.error('Error creating subscription:', subError)
+          }
+
+          // Send welcome email in the background
+          fetch('/api/emails/welcome', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: data.user.email }),
+          }).catch(console.error)
+
+          // Small delay to ensure database writes complete
+          await new Promise(resolve => setTimeout(resolve, 500))
+
+          // Redirect to dashboard
+          router.push('/dashboard')
+          router.refresh()
+        } catch (setupError) {
+          console.error('User setup error:', setupError)
+          setError('Account created but there was an issue. Please try logging in.')
+          setLoading(false)
         }
-
-        // Send welcome email in the background
-        fetch('/api/emails/welcome', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: data.user.email }),
-        }).catch(console.error)
-
-        // Redirect to dashboard
-        router.push('/dashboard')
-        router.refresh()
       }
     } catch (err) {
       console.error('Registration error:', err)

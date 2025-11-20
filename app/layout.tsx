@@ -17,11 +17,12 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "Funnel Maker - Build High-Converting Sales Funnels",
   description: "Create professional sales funnels with drag-and-drop ease. Build landing pages, capture leads, and convert visitors into customers with our powerful funnel builder.",
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-  },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({

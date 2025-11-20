@@ -12,7 +12,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   const [isAdmin, setIsAdmin] = useState(false)
   const [userEmail, setUserEmail] = useState('')
   const pathname = usePathname()
@@ -39,21 +39,13 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen flex">
-      {/* Overlay for mobile */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
+      {/* Sidebar - always rendered */}
       <aside 
         className={`
-          fixed lg:sticky top-0 left-0 z-50 h-screen
+          fixed top-0 left-0 z-50 h-screen
           w-64 border-r bg-background
           transition-transform duration-300 ease-in-out
-          flex flex-col
+          flex flex-col shadow-lg
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
@@ -65,7 +57,6 @@ export default function DashboardLayout({
             variant="ghost"
             size="icon"
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden"
           >
             <X className="w-5 h-5" />
           </Button>
@@ -79,11 +70,7 @@ export default function DashboardLayout({
               <Link 
                 key={item.href} 
                 href={item.href}
-                onClick={() => {
-                  if (window.innerWidth < 1024) {
-                    setSidebarOpen(false)
-                  }
-                }}
+                onClick={() => setSidebarOpen(false)}
               >
                 <Button 
                   variant={isActive ? "secondary" : "ghost"} 
@@ -100,11 +87,7 @@ export default function DashboardLayout({
               <div className="h-px bg-border my-2" />
               <Link 
                 href="/dashboard/admin"
-                onClick={() => {
-                  if (window.innerWidth < 1024) {
-                    setSidebarOpen(false)
-                  }
-                }}
+                onClick={() => setSidebarOpen(false)}
               >
                 <Button 
                   variant={pathname === '/dashboard/admin' ? "secondary" : "ghost"} 
@@ -135,9 +118,12 @@ export default function DashboardLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
-        {/* Mobile Menu Button */}
-        <div className="lg:hidden sticky top-0 z-30 bg-background border-b px-4 py-3 flex items-center gap-3">
+      <main 
+        className="flex-1 overflow-auto transition-all duration-300"
+        style={{ marginLeft: sidebarOpen ? '256px' : '0' }}
+      >
+        {/* Menu Button - Always Visible */}
+        <div className="sticky top-0 z-30 bg-background border-b px-4 py-3 flex items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
