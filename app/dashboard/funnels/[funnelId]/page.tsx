@@ -12,8 +12,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { SortableStep } from '@/components/builder/sortable-step'
-import { AIContentGenerator } from '@/components/builder/ai-content-generator'
 import { CollaboratorPresence } from '@/components/builder/collaborator-presence'
+import { StepTypeDialog } from '@/components/builder/step-type-dialog'
+import { LandingEditor, LeadCaptureEditor, SalesEditor, ThankYouEditor, AffiliateLinkEditor } from '@/components/builder/step-editors'
 import { Plus, Save, ArrowLeft, Trash2, Download, Share2, Copy } from 'lucide-react'
 import Link from 'next/link'
 import type { FunnelStep, AffiliateLink } from '@/data/templates'
@@ -36,6 +37,7 @@ export default function FunnelBuilderPage() {
   const [exporting, setExporting] = useState(false)
   const [userId, setUserId] = useState<string>('')
   const [userEmail, setUserEmail] = useState<string>('')
+  const [showStepTypeDialog, setShowStepTypeDialog] = useState(false)
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -123,13 +125,45 @@ export default function FunnelBuilderPage() {
   }
 
   const addStep = () => {
+    setShowStepTypeDialog(true)
+  }
+
+  const createStepWithType = (type: FunnelStep['type']) => {
+    const stepTitles = {
+      'landing': 'New Landing Page',
+      'lead-capture': 'New Lead Capture Form',
+      'sales': 'New Sales Page',
+      'thank-you': 'Thank You Page',
+      'affiliate-link': 'Affiliate Links Page'
+    }
+
     const newStep: FunnelStep = {
       id: `step-${Date.now()}`,
-      type: 'landing',
-      title: 'New Step',
-      content: 'Step content goes here',
+      type,
+      title: stepTitles[type] || 'New Step',
+      content: 'Add your content here...',
       order: steps.length,
     }
+
+    // Initialize type-specific defaults
+    if (type === 'affiliate-link') {
+      newStep.backgroundColor = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+      newStep.textColor = '#ffffff'
+      newStep.affiliateLinks = []
+      newStep.buttonStyle = 'modern'
+    } else if (type === 'lead-capture') {
+      newStep.formFields = ['name', 'email']
+      newStep.ctaText = 'Submit'
+    } else if (type === 'sales') {
+      newStep.pricing = { amount: '$99', currency: 'USD', interval: 'one-time' }
+      newStep.ctaText = 'Buy Now'
+    } else if (type === 'landing') {
+      newStep.ctaText = 'Get Started'
+      newStep.features = []
+    } else if (type === 'thank-you') {
+      newStep.ctaText = 'Continue'
+    }
+
     setSteps([...steps, newStep])
     setSelectedStep(newStep)
   }
@@ -225,16 +259,6 @@ export default function FunnelBuilderPage() {
       console.error('Export error:', error)
     } finally {
       setExporting(false)
-    }
-  }
-
-  const handleAIContentGenerated = (content: { headline: string; body: string; cta: string }) => {
-    if (selectedStep) {
-      updateStep({
-        ...selectedStep,
-        title: content.headline,
-        content: `${content.body}\n\nCall to Action: ${content.cta}`,
-      })
     }
   }
 
@@ -359,10 +383,9 @@ export default function FunnelBuilderPage() {
                   <div 
                     className="w-full h-full min-h-[400px] sm:min-h-[600px] flex flex-col items-center justify-center text-center px-4 sm:px-8"
                     style={{
-                      backgroundColor: selectedStep.backgroundColor || '#6366f1',
-                      backgroundImage: selectedStep.backgroundImage 
+                      background: selectedStep.backgroundImage 
                         ? `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${selectedStep.backgroundImage})`
-                        : 'none',
+                        : selectedStep.backgroundColor || '#6366f1',
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
                       color: selectedStep.textColor || '#ffffff',
@@ -377,19 +400,42 @@ export default function FunnelBuilderPage() {
                       </p>
                       <div className="space-y-3 sm:space-y-4 max-w-xl mx-auto">
                         {(selectedStep.affiliateLinks && selectedStep.affiliateLinks.length > 0) ? (
-                          selectedStep.affiliateLinks.map((link) => (
-                            <a
-                              key={link.id}
-                              href={link.url || '#'}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-white text-gray-900 font-bold text-base sm:text-lg rounded-xl shadow-2xl hover:scale-105 hover:shadow-3xl transition-all duration-200"
-                              onClick={(e) => e.preventDefault()}
-                            >
-                              {link.icon && <span className="text-xl sm:text-2xl">{link.icon}</span>}
-                              <span>{link.buttonText}</span>
-                            </a>
-                          ))
+                          selectedStep.affiliateLinks.map((link) => {
+                            const buttonStyle = selectedStep.buttonStyle || 'modern'
+                            const getButtonClasses = () => {
+                              const base = "flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 font-bold text-base sm:text-lg transition-all duration-200"
+                              
+                              switch(buttonStyle) {
+                                case 'sharp':
+                                  return `${base} bg-white text-gray-900 shadow-2xl hover:scale-105 hover:shadow-3xl`
+                                case 'pill':
+                                  return `${base} bg-white text-gray-900 rounded-full shadow-2xl hover:scale-105 hover:shadow-3xl`
+                                case 'gradient':
+                                  return `${base} bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-xl shadow-2xl hover:scale-105 hover:shadow-3xl`
+                                case 'outline':
+                                  return `${base} bg-transparent border-2 border-white text-white rounded-xl hover:bg-white hover:text-gray-900`
+                                case 'glass':
+                                  return `${base} bg-white/20 backdrop-blur-md border border-white/30 text-white rounded-xl shadow-2xl hover:bg-white/30`
+                                case 'modern':
+                                default:
+                                  return `${base} bg-white text-gray-900 rounded-xl shadow-2xl hover:scale-105 hover:shadow-3xl`
+                              }
+                            }
+                            
+                            return (
+                              <a
+                                key={link.id}
+                                href={link.url || '#'}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={getButtonClasses()}
+                                onClick={(e) => e.preventDefault()}
+                              >
+                                {link.icon && <span className="text-xl sm:text-2xl">{link.icon}</span>}
+                                <span>{link.buttonText}</span>
+                              </a>
+                            )
+                          })
                         ) : (
                           <div className="text-xs sm:text-sm opacity-75">
                             Add affiliate links below
@@ -525,208 +571,79 @@ export default function FunnelBuilderPage() {
         </Card>
 
         {/* Editor */}
-        <Card className="overflow-auto">
+        <Card className="overflow-auto max-h-[calc(100vh-200px)]">
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Edit Step</CardTitle>
+            <CardTitle className="flex items-center justify-between">
+              <span>Edit Step</span>
               {selectedStep && (
-                <AIContentGenerator
-                  onContentGenerated={handleAIContentGenerated}
-                  stepType={selectedStep.type}
-                  currentContent={selectedStep.content}
-                />
+                <Badge variant="secondary" className="text-xs">
+                  {selectedStep.type === 'landing' && 'Landing Page'}
+                  {selectedStep.type === 'lead-capture' && 'Lead Capture'}
+                  {selectedStep.type === 'sales' && 'Sales Page'}
+                  {selectedStep.type === 'thank-you' && 'Thank You'}
+                  {selectedStep.type === 'affiliate-link' && 'Affiliate Links'}
+                </Badge>
               )}
-            </div>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {selectedStep ? (
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="step-type">Step Type</Label>
-                  <Select
-                    value={selectedStep.type}
-                    onValueChange={(value: any) => updateStep({ ...selectedStep, type: value })}
-                  >
-                    <SelectTrigger id="step-type">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="landing">Landing Page</SelectItem>
-                      <SelectItem value="lead-capture">Lead Capture</SelectItem>
-                      <SelectItem value="sales">Sales Page</SelectItem>
-                      <SelectItem value="thank-you">Thank You Page</SelectItem>
-                      <SelectItem value="affiliate-link">Affiliate Link Page</SelectItem>
-                    </SelectContent>
-                  </Select>
+              <>
+                <div className="mb-4 p-3 bg-muted rounded-lg text-sm text-muted-foreground">
+                  💡 <strong>Step type is locked.</strong> Create a new step to use a different type.
                 </div>
-                <div>
-                  <Label htmlFor="step-title">Title</Label>
-                  <Input
-                    id="step-title"
-                    value={selectedStep.title}
-                    onChange={(e) => updateStep({ ...selectedStep, title: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="step-content">Content</Label>
-                  <Textarea
-                    id="step-content"
-                    value={selectedStep.content}
-                    onChange={(e) => updateStep({ ...selectedStep, content: e.target.value })}
-                    rows={10}
-                  />
-                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="step-title">Internal Title</Label>
+                    <Input
+                      id="step-title"
+                      value={selectedStep.title}
+                      onChange={(e) => updateStep({ ...selectedStep, title: e.target.value })}
+                      placeholder="For your reference only"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      This is only visible to you in the builder
+                    </p>
+                  </div>
 
-                {/* Affiliate Link Fields */}
-                {selectedStep.type === 'affiliate-link' && (
-                  <>
-                    <div>
-                      <Label htmlFor="bg-color">Background Color</Label>
-                      <div className="flex gap-2">
-                        <Input
-                          id="bg-color"
-                          type="color"
-                          value={selectedStep.backgroundColor || '#6366f1'}
-                          onChange={(e) => updateStep({ ...selectedStep, backgroundColor: e.target.value })}
-                          className="w-20 h-10"
-                        />
-                        <Input
-                          type="text"
-                          value={selectedStep.backgroundColor || '#6366f1'}
-                          onChange={(e) => updateStep({ ...selectedStep, backgroundColor: e.target.value })}
-                          placeholder="#6366f1"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <Label htmlFor="text-color">Text Color</Label>
-                      <div className="flex gap-2">
-                        <Input
-                          id="text-color"
-                          type="color"
-                          value={selectedStep.textColor || '#ffffff'}
-                          onChange={(e) => updateStep({ ...selectedStep, textColor: e.target.value })}
-                          className="w-20 h-10"
-                        />
-                        <Input
-                          type="text"
-                          value={selectedStep.textColor || '#ffffff'}
-                          onChange={(e) => updateStep({ ...selectedStep, textColor: e.target.value })}
-                          placeholder="#ffffff"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <Label htmlFor="bg-image">Background Image URL (optional)</Label>
-                      <Input
-                        id="bg-image"
-                        type="url"
-                        placeholder="https://images.unsplash.com/photo-..."
-                        value={selectedStep.backgroundImage || ''}
-                        onChange={(e) => updateStep({ ...selectedStep, backgroundImage: e.target.value })}
-                      />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Use a high-quality image URL from Unsplash, Pexels, or your own hosting
-                      </p>
-                    </div>
-
-                    <div className="border-t pt-4 mt-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <Label>Affiliate Links</Label>
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            const newLinks = [...(selectedStep.affiliateLinks || []), {
-                              id: `link-${Date.now()}`,
-                              url: '',
-                              buttonText: 'New Link',
-                              icon: '🔗'
-                            }]
-                            updateStep({ ...selectedStep, affiliateLinks: newLinks })
-                          }}
-                        >
-                          <Plus className="w-4 h-4 mr-1" />
-                          Add Link
-                        </Button>
-                      </div>
-                      
-                      <div className="space-y-4">
-                        {(selectedStep.affiliateLinks || []).map((link, index) => (
-                          <Card key={link.id} className="p-4">
-                            <div className="space-y-3">
-                              <div className="flex items-center justify-between">
-                                <Label className="text-sm font-semibold">Link {index + 1}</Label>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() => {
-                                    const newLinks = selectedStep.affiliateLinks?.filter(l => l.id !== link.id) || []
-                                    updateStep({ ...selectedStep, affiliateLinks: newLinks })
-                                  }}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </div>
-                              <div>
-                                <Label className="text-xs">URL</Label>
-                                <Input
-                                  type="url"
-                                  placeholder="https://example.com/affiliate"
-                                  value={link.url}
-                                  onChange={(e) => {
-                                    const newLinks = selectedStep.affiliateLinks?.map(l => 
-                                      l.id === link.id ? { ...l, url: e.target.value } : l
-                                    ) || []
-                                    updateStep({ ...selectedStep, affiliateLinks: newLinks })
-                                  }}
-                                />
-                              </div>
-                              <div>
-                                <Label className="text-xs">Button Text</Label>
-                                <Input
-                                  placeholder="Click here"
-                                  value={link.buttonText}
-                                  onChange={(e) => {
-                                    const newLinks = selectedStep.affiliateLinks?.map(l => 
-                                      l.id === link.id ? { ...l, buttonText: e.target.value } : l
-                                    ) || []
-                                    updateStep({ ...selectedStep, affiliateLinks: newLinks })
-                                  }}
-                                />
-                              </div>
-                              <div>
-                                <Label className="text-xs">Icon (emoji)</Label>
-                                <Input
-                                  placeholder="🚀"
-                                  value={link.icon || ''}
-                                  onChange={(e) => {
-                                    const newLinks = selectedStep.affiliateLinks?.map(l => 
-                                      l.id === link.id ? { ...l, icon: e.target.value } : l
-                                    ) || []
-                                    updateStep({ ...selectedStep, affiliateLinks: newLinks })
-                                  }}
-                                  maxLength={4}
-                                />
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  Use emoji or leave blank
-                                </p>
-                              </div>
-                            </div>
-                          </Card>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
+                  <div className="border-t pt-4">
+                    {selectedStep.type === 'landing' && (
+                      <LandingEditor step={selectedStep} onUpdate={updateStep} />
+                    )}
+                    {selectedStep.type === 'lead-capture' && (
+                      <LeadCaptureEditor step={selectedStep} onUpdate={updateStep} />
+                    )}
+                    {selectedStep.type === 'sales' && (
+                      <SalesEditor step={selectedStep} onUpdate={updateStep} />
+                    )}
+                    {selectedStep.type === 'thank-you' && (
+                      <ThankYouEditor step={selectedStep} onUpdate={updateStep} />
+                    )}
+                    {selectedStep.type === 'affiliate-link' && (
+                      <AffiliateLinkEditor step={selectedStep} onUpdate={updateStep} />
+                    )}
+                  </div>
+                </div>
+              </>
             ) : (
               <div className="flex items-center justify-center h-64 text-muted-foreground">
-                Select a step to edit
+                <div className="text-center space-y-2">
+                  <div className="text-4xl">📝</div>
+                  <p>Select a step to edit</p>
+                </div>
               </div>
             )}
           </CardContent>
         </Card>
       </div>
+
+      {/* Step Type Selection Dialog */}
+      <StepTypeDialog
+        open={showStepTypeDialog}
+        onClose={() => setShowStepTypeDialog(false)}
+        onSelect={createStepWithType}
+      />
     </div>
   )
 }

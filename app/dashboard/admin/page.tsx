@@ -30,10 +30,20 @@ type Funnel = {
   user: { email: string } | null
 }
 
+type Organization = {
+  id: string
+  name: string
+  slug: string | null
+  created_at: string
+  owner: { email: string } | null
+  members: { count: number }[]
+}
+
 export default function AdminPage() {
   const [loading, setLoading] = useState(true)
   const [users, setUsers] = useState<User[]>([])
   const [funnels, setFunnels] = useState<Funnel[]>([])
+  const [organizations, setOrganizations] = useState<Organization[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const router = useRouter()
@@ -51,14 +61,8 @@ export default function AdminPage() {
       return
     }
 
-    // Check if user is admin
-    const { data: adminData } = await supabase
-      .from('admin_users')
-      .select('id')
-      .eq('id', user.id)
-      .single()
-
-    if (!adminData) {
+    // Check if user is admin (hardcoded email check)
+    if (user.email !== 'cooperfeatherstone13@gmail.com') {
       router.push('/dashboard')
       return
     }
@@ -82,8 +86,19 @@ export default function AdminPage() {
       `)
       .order('created_at', { ascending: false })
 
+    // Load organizations
+    const { data: orgsData } = await supabase
+      .from('organizations')
+      .select(`
+        *,
+        owner:users!organizations_owner_id_fkey(email),
+        members:organization_members(count)
+      `)
+      .order('created_at', { ascending: false })
+
     setUsers(usersData || [])
     setFunnels(funnelsData || [])
+    setOrganizations(orgsData || [])
     setLoading(false)
   }
 
@@ -102,13 +117,20 @@ export default function AdminPage() {
     funnel.user?.email.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  const filteredOrganizations = organizations.filter(org =>
+    org.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    org.owner?.email.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
   const stats = {
     totalUsers: users.length,
     totalFunnels: funnels.length,
+    totalOrganizations: organizations.length,
     publicFunnels: funnels.filter(f => f.is_public).length,
     paidUsers: users.filter(u => u.subscription?.plan_type !== 'free' && u.subscription?.plan_type).length,
     activeSubs: users.filter(u => u.subscription?.status === 'active').length,
     avgFunnelsPerUser: users.length > 0 ? (funnels.length / users.length).toFixed(1) : 0,
+    totalMembers: organizations.reduce((acc, org) => acc + (org.members?.[0]?.count || 0), 0),
     planBreakdown: {
       free: users.filter(u => !u.subscription || u.subscription.plan_type === 'free').length,
       starter: users.filter(u => u.subscription?.plan_type === 'starter').length,
@@ -150,7 +172,7 @@ export default function AdminPage() {
       </div>
 
       {/* Stats Overview */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Users</CardTitle>
@@ -179,13 +201,26 @@ export default function AdminPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Organizations</CardTitle>
+            <Users className="w-4 h-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalOrganizations}</div>
+            <p className="text-xs text-muted-foreground">
+              {stats.totalMembers} total members
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Active Subscriptions</CardTitle>
             <DollarSign className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.activeSubs}</div>
             <p className="text-xs text-muted-foreground">
-              {((stats.activeSubs / stats.totalUsers) * 100).toFixed(1)}% conversion rate
+              {stats.totalUsers > 0 ? ((stats.activeSubs / stats.totalUsers) * 100).toFixed(1) : 0}% conversion rate
             </p>
           </CardContent>
         </Card>
@@ -316,6 +351,53 @@ export default function AdminPage() {
                           <ExternalLink className="w-4 h-4" />
                         </Button>
                       </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Organizations Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>All Organizations ({filteredOrganizations.length})</CardTitle>
+          <CardDescription>Teams and organizations on the platform</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3 max-h-[600px] overflow-y-auto">
+            {filteredOrganizations.map((org) => (
+              <div key={org.id} className="border rounded-lg p-4 hover:bg-muted/50">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="font-medium">{org.name}</div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0"
+                        onClick={() => copyToClipboard(org.id, `org-${org.id}`)}
+                      >
+                        {copiedId === `org-${org.id}` ? (
+                          <Check className="w-3 h-3 text-green-500" />
+                        ) : (
+                          <Copy className="w-3 h-3" />
+                        )}
+                      </Button>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                      <span>Owner: {org.owner?.email || 'Unknown'}</span>
+                      <span>•</span>
+                      <span>{org.members?.[0]?.count || 0} members</span>
+                      <span>•</span>
+                      <span>{new Date(org.created_at).toLocaleDateString()}</span>
+                    </div>
+                    {org.slug && (
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Slug: {org.slug}
+                      </div>
                     )}
                   </div>
                 </div>

@@ -22,6 +22,7 @@ interface Step {
   backgroundImage?: string
   textColor?: string
   affiliateLinks?: AffiliateLink[]
+  buttonStyle?: 'modern' | 'sharp' | 'pill' | 'gradient' | 'outline' | 'glass'
 }
 
 export default function PublicFunnelPage({ params }: { params: Promise<{ funnelId: string }> }) {
@@ -86,10 +87,9 @@ export default function PublicFunnelPage({ params }: { params: Promise<{ funnelI
                 <div
                   className="rounded-lg overflow-hidden min-h-[500px] flex flex-col items-center justify-center text-center p-12"
                   style={{
-                    backgroundColor: step.backgroundColor || '#6366f1',
-                    backgroundImage: step.backgroundImage
+                    background: step.backgroundImage
                       ? `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${step.backgroundImage})`
-                      : 'none',
+                      : step.backgroundColor || '#6366f1',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     color: step.textColor || '#ffffff',
@@ -107,18 +107,41 @@ export default function PublicFunnelPage({ params }: { params: Promise<{ funnelI
                     
                     <div className="space-y-4 max-w-xl mx-auto">
                       {(step.affiliateLinks && step.affiliateLinks.length > 0) ? (
-                        step.affiliateLinks.map((link) => (
-                          <a
-                            key={link.id}
-                            href={link.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center justify-center gap-3 px-8 py-4 bg-white text-gray-900 font-bold text-lg rounded-xl hover:scale-105 transition-transform shadow-2xl"
-                          >
-                            {link.icon && <span className="text-2xl">{link.icon}</span>}
-                            <span>{link.buttonText}</span>
-                          </a>
-                        ))
+                        step.affiliateLinks.map((link) => {
+                          const buttonStyle = step.buttonStyle || 'modern'
+                          const getButtonClasses = () => {
+                            const base = "flex items-center justify-center gap-3 px-8 py-4 font-bold text-lg transition-all duration-200"
+                            
+                            switch(buttonStyle) {
+                              case 'sharp':
+                                return `${base} bg-white text-gray-900 shadow-2xl hover:scale-105`
+                              case 'pill':
+                                return `${base} bg-white text-gray-900 rounded-full shadow-2xl hover:scale-105`
+                              case 'gradient':
+                                return `${base} bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-xl shadow-2xl hover:scale-105`
+                              case 'outline':
+                                return `${base} bg-transparent border-2 border-white text-white rounded-xl hover:bg-white hover:text-gray-900`
+                              case 'glass':
+                                return `${base} bg-white/20 backdrop-blur-md border border-white/30 text-white rounded-xl shadow-2xl hover:bg-white/30`
+                              case 'modern':
+                              default:
+                                return `${base} bg-white text-gray-900 rounded-xl shadow-2xl hover:scale-105`
+                            }
+                          }
+                          
+                          return (
+                            <a
+                              key={link.id}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={getButtonClasses()}
+                            >
+                              {link.icon && <span className="text-2xl">{link.icon}</span>}
+                              <span>{link.buttonText}</span>
+                            </a>
+                          )
+                        })
                       ) : step.affiliateUrl ? (
                         // Legacy support for old single-link format
                         <a

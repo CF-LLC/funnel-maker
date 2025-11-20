@@ -18,6 +18,7 @@ export type FunnelStep = {
   backgroundImage?: string
   textColor?: string
   affiliateLinks?: AffiliateLink[] // new multi-link support
+  buttonStyle?: 'modern' | 'sharp' | 'pill' | 'gradient' | 'outline' | 'glass'
   // Additional customization options
   headline?: string
   subheadline?: string
