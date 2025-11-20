@@ -118,4 +118,16 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Prevent zoom on mobile when focusing inputs */
+  @media screen and (max-width: 768px) {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    textarea,
+    select {
+      font-size: 16px !important;
+    }
+  }
 }

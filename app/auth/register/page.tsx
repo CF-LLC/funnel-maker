@@ -30,7 +30,7 @@ export default function RegisterPage() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/callback`,
         },
       })
 
@@ -63,8 +63,9 @@ export default function RegisterPage() {
           body: JSON.stringify({ email: data.user.email }),
         }).catch(console.error)
 
-        // Force a hard refresh to ensure session is properly set
-        window.location.href = '/dashboard'
+        // Redirect to dashboard
+        router.push('/dashboard')
+        router.refresh()
       }
     } catch {
       setError('An unexpected error occurred')
@@ -105,6 +106,8 @@ return (
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                autoComplete="email"
+                className="text-base"
               />
             </div>
             <div className="space-y-2">
@@ -116,6 +119,8 @@ return (
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
+                autoComplete="new-password"
+                className="text-base"
               />
               <p className="text-xs text-muted-foreground">
                 Must be at least 6 characters

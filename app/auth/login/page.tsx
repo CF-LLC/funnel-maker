@@ -36,8 +36,9 @@ export default function LoginPage() {
       }
 
       if (data.user) {
-        // Force a hard refresh to ensure session is properly set
-        window.location.href = '/dashboard'
+        // Redirect to dashboard
+        router.push('/dashboard')
+        router.refresh()
       }
     } catch {
       setError('An unexpected error occurred')
@@ -68,6 +69,8 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                autoComplete="email"
+                className="text-base"
               />
             </div>
             <div className="space-y-2">
@@ -78,6 +81,8 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                autoComplete="current-password"
+                className="text-base"
               />
             </div>
           </CardContent>
