@@ -1,0 +1,25 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- High-res icon for PWA/app icon -->
+  <defs>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="256" fill="white"/>
+  
+  <!-- Funnel top section -->
+  <path d="M 128 140 L 384 140 L 340 260 L 172 260 Z" fill="url(#iconGradient)" opacity="0.9"/>
+  
+  <!-- Funnel middle section -->
+  <path d="M 172 260 L 340 260 L 300 350 L 212 350 Z" fill="url(#iconGradient)" opacity="0.75"/>
+  
+  <!-- Funnel bottom section -->
+  <path d="M 212 350 L 300 350 L 276 420 L 236 420 Z" fill="url(#iconGradient)" opacity="0.6"/>
+  
+  <!-- Conversion arrow -->
+  <path d="M 256 430 L 256 470" stroke="#667eea" stroke-width="16" stroke-linecap="round"/>
+  <path d="M 236 455 L 256 475 L 276 455" fill="none" stroke="#667eea" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
