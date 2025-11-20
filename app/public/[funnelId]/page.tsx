@@ -146,17 +146,17 @@ export default function PublicFunnelPage({ params }: { params: Promise<{ funnelI
                   </div>
                 </div>
               ) : (
-              <div className="min-h-screen flex items-center justify-center p-8">
-                <div className="max-w-4xl w-full">
-                  <div className="prose prose-lg max-w-none">
-                    <h2 className="text-4xl font-bold mb-4">{step.title}</h2>
-                    <p className="text-xl whitespace-pre-wrap">{step.content}</p>
+                <div className="min-h-screen flex items-center justify-center p-8">
+                  <div className="max-w-4xl w-full">
+                    <div className="prose prose-lg max-w-none">
+                      <h2 className="text-4xl font-bold mb-4">{step.title}</h2>
+                      <p className="text-xl whitespace-pre-wrap">{step.content}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-            </div>
-          ))}
+              )}
+          </div>
+        ))}
         </div>
 
         {steps.length === 0 && (
