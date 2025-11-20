@@ -34,6 +34,21 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // Handle auth callbacks from Supabase (email confirmations, password resets, etc.)
+  if (request.nextUrl.pathname === '/' && (request.nextUrl.searchParams.has('code') || request.nextUrl.searchParams.has('token'))) {
+    const type = request.nextUrl.searchParams.get('type')
+    const redirectUrl = request.nextUrl.clone()
+    
+    if (type === 'recovery') {
+      redirectUrl.pathname = '/auth/callback'
+      redirectUrl.searchParams.set('type', 'recovery')
+      return NextResponse.redirect(redirectUrl)
+    } else {
+      redirectUrl.pathname = '/auth/callback'
+      return NextResponse.redirect(redirectUrl)
+    }
+  }
+
   // Protected routes that require authentication
   if (request.nextUrl.pathname.startsWith('/dashboard')) {
     if (!user) {
