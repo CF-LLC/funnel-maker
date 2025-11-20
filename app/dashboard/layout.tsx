@@ -1,18 +1,33 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { LayoutDashboard, Zap, BarChart3, LogOut, Users, CreditCard, Shield, Menu, X } from 'lucide-react'
+import { createClient } from '@/lib/supabase'
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [userEmail, setUserEmail] = useState('')
   const pathname = usePathname()
+  const supabase = createClient()
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user?.email) {
+        setUserEmail(user.email)
+        setIsAdmin(user.email === 'cooperfeatherstone13@gmail.com')
+      }
+    }
+    checkAdmin()
+  }, [])
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -80,26 +95,35 @@ export default function DashboardLayout({
               </Link>
             )
           })}
-          <div className="h-px bg-border my-2" />
-          <Link 
-            href="/dashboard/admin"
-            onClick={() => {
-              if (window.innerWidth < 1024) {
-                setSidebarOpen(false)
-              }
-            }}
-          >
-            <Button 
-              variant={pathname === '/dashboard/admin' ? "secondary" : "ghost"} 
-              className="w-full justify-start gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
-            >
-              <Shield className="w-4 h-4" />
-              Admin
-            </Button>
-          </Link>
+          {isAdmin && (
+            <>
+              <div className="h-px bg-border my-2" />
+              <Link 
+                href="/dashboard/admin"
+                onClick={() => {
+                  if (window.innerWidth < 1024) {
+                    setSidebarOpen(false)
+                  }
+                }}
+              >
+                <Button 
+                  variant={pathname === '/dashboard/admin' ? "secondary" : "ghost"} 
+                  className="w-full justify-start gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                >
+                  <Shield className="w-4 h-4" />
+                  Admin
+                </Button>
+              </Link>
+            </>
+          )}
         </nav>
 
-        <div className="p-3 border-t">
+        <div className="p-3 border-t space-y-2">
+          {userEmail && (
+            <div className="px-3 py-2 text-xs text-muted-foreground truncate">
+              {userEmail}
+            </div>
+          )}
           <form action="/auth/signout" method="post">
             <Button variant="ghost" className="w-full justify-start gap-2" type="submit">
               <LogOut className="w-4 h-4" />
