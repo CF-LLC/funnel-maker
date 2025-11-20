@@ -116,20 +116,21 @@ export default function DashboardLayout({
               </Link>
             </>
           )}
-        </nav>
-
-        <div className="p-3 border-t space-y-2">
-          {userEmail && (
-            <div className="px-3 py-2 text-xs text-muted-foreground truncate">
-              {userEmail}
-            </div>
-          )}
+          
           <form action="/auth/signout" method="post">
             <Button variant="ghost" className="w-full justify-start gap-2" type="submit">
               <LogOut className="w-4 h-4" />
               Sign Out
             </Button>
           </form>
+        </nav>
+
+        <div className="p-3 border-t">
+          {userEmail && (
+            <div className="px-3 py-2 text-xs text-muted-foreground truncate">
+              {userEmail}
+            </div>
+          )}
         </div>
       </aside>
 
