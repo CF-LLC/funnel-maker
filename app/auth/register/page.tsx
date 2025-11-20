@@ -14,6 +14,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [emailExists, setEmailExists] = useState(false)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -22,6 +23,7 @@ export default function RegisterPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setSuccess('')
     setEmailExists(false)
     setLoading(true)
 
@@ -41,11 +43,16 @@ export default function RegisterPage() {
     }
 
     try {
+      setSuccess('Creating your account...')
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/callback`,
+          data: {
+            email_confirm: true, // Auto-confirm for development
+          }
         },
       })
 
@@ -55,24 +62,35 @@ export default function RegisterPage() {
             error.message.includes('already exists') || 
             error.message.includes('User already registered')) {
           setEmailExists(true)
+          setSuccess('')
         } else if (error.message.includes('Password should be at least')) {
           setError('Password must be at least 6 characters long.')
+          setSuccess('')
         } else if (error.message.includes('invalid email')) {
           setError('Please enter a valid email address.')
+          setSuccess('')
         } else if (error.message.includes('network')) {
           setError('Network error. Please check your internet connection and try again.')
+          setSuccess('')
         } else if (error.message.includes('rate limit')) {
           setError('Too many signup attempts. Please wait a few minutes and try again.')
+          setSuccess('')
         } else {
           setError(error.message || 'Failed to create account. Please try again.')
+          setSuccess('')
         }
         setLoading(false)
         return
       }
 
       if (data.user) {
+        setSuccess('Account created! Setting up your profile...')
+        
         try {
-          // Create/update user record in users table (use upsert to handle duplicates)
+          // Wait a bit for Supabase trigger to complete
+          await new Promise(resolve => setTimeout(resolve, 1000))
+          
+          // Verify user record exists, create if not
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const { error: upsertError } = await (supabase
             .from('users') as any)
@@ -83,11 +101,13 @@ export default function RegisterPage() {
 
           if (upsertError) {
             console.error('Error creating user record:', upsertError)
-            // Show error but don't block signup
-            setError('Account created but there was an issue setting up your profile. You can still proceed.')
+            setError('Account created but there was an issue setting up your profile. Please try logging in.')
+            setSuccess('')
+            setLoading(false)
+            return
           }
 
-          // Create default subscription record
+          // Verify subscription exists, create if not
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const { error: subError } = await (supabase
             .from('subscriptions') as any)
@@ -111,21 +131,24 @@ export default function RegisterPage() {
             body: JSON.stringify({ email: data.user.email }),
           }).catch(console.error)
 
-          // Small delay to ensure database writes complete
-          await new Promise(resolve => setTimeout(resolve, 500))
+          setSuccess('Success! Redirecting to your dashboard...')
+          
+          // Give user time to see the success message
+          await new Promise(resolve => setTimeout(resolve, 1000))
 
           // Redirect to dashboard
-          router.push('/dashboard')
-          router.refresh()
+          window.location.href = '/dashboard'
         } catch (setupError) {
           console.error('User setup error:', setupError)
-          setError('Account created but there was an issue. Please try logging in.')
+          setError('Account created but there was an issue setting up. Please try logging in.')
+          setSuccess('')
           setLoading(false)
         }
       }
     } catch (err) {
       console.error('Registration error:', err)
       setError('An unexpected error occurred. Please try again later.')
+      setSuccess('')
       setLoading(false)
     }
   }
@@ -152,6 +175,11 @@ return (
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            {success && (
+              <Alert className="bg-green-50 text-green-900 border-green-200">
+                <AlertDescription>{success}</AlertDescription>
               </Alert>
             )}
             <div className="space-y-2">

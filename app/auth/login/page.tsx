@@ -81,9 +81,11 @@ export default function LoginPage() {
           console.error('User setup error:', setupError)
         }
 
+        // Small delay to ensure everything is saved
+        await new Promise(resolve => setTimeout(resolve, 300))
+        
         // Redirect to dashboard
-        router.push('/dashboard')
-        router.refresh()
+        window.location.href = '/dashboard'
       }
     } catch (err) {
       console.error('Login error:', err)
