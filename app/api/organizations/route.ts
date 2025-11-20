@@ -31,8 +31,8 @@ export async function GET() {
       .eq('user_id', user.id)
 
     const organizations = [
-      ...(ownedOrgs || []).map(org => ({ ...org, org_members: [{ role: 'owner' }] })),
-      ...(memberOrgs || []).map(m => ({ ...m.organization, org_members: [{ role: m.role }] }))
+      ...(ownedOrgs || []).map((org: any) => ({ ...org, org_members: [{ role: 'owner' }] })),
+      ...(memberOrgs || []).map((m: any) => ({ ...m.organization, org_members: [{ role: m.role }] }))
     ]
 
     return NextResponse.json({ organizations })
