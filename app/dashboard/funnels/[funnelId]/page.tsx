@@ -589,10 +589,6 @@ export default function FunnelBuilderPage() {
           <CardContent>
             {selectedStep ? (
               <>
-                <div className="mb-4 p-3 bg-muted rounded-lg text-sm text-muted-foreground">
-                  💡 <strong>Step type is locked.</strong> Create a new step to use a different type.
-                </div>
-                
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="step-title">Internal Title</Label>

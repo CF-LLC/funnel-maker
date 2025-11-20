@@ -49,17 +49,24 @@ export default function DashboardLayout({
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
-        <div className="p-6 border-b flex items-center justify-between">
-          <Link href="/dashboard" className="text-2xl font-bold">
-            Funnel Maker
-          </Link>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <X className="w-5 h-5" />
-          </Button>
+        <div className="p-6 border-b">
+          <div className="flex items-center justify-between mb-2">
+            <Link href="/dashboard" className="text-2xl font-bold">
+              Funnel Maker
+            </Link>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSidebarOpen(false)}
+            >
+              <X className="w-5 h-5" />
+            </Button>
+          </div>
+          {userEmail && (
+            <div className="text-xs text-muted-foreground truncate">
+              {userEmail}
+            </div>
+          )}
         </div>
         
         <nav className="space-y-1 px-3 flex-1 py-4">
@@ -107,14 +114,6 @@ export default function DashboardLayout({
             </Button>
           </form>
         </nav>
-
-        <div className="p-3 border-t">
-          {userEmail && (
-            <div className="px-3 py-2 text-xs text-muted-foreground truncate">
-              {userEmail}
-            </div>
-          )}
-        </div>
       </aside>
 
       {/* Main Content */}

@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useState, use } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Heart } from 'lucide-react'
 
 interface AffiliateLink {
   id: string
@@ -73,37 +73,26 @@ export default function PublicFunnelPage({ params }: { params: Promise<{ funnelI
   const steps = funnel?.steps || []
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/50">
-      <div className="container mx-auto px-4 py-12 max-w-4xl">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">{funnel.name}</h1>
-          <p className="text-muted-foreground">Public Funnel Preview</p>
-        </div>
-
-        <div className="space-y-8">
-          {steps.map((step: Step, index: number) => (
-            <div key={step.id}>
-              {step.type === 'affiliate-link' ? (
-                <div
-                  className="rounded-lg overflow-hidden min-h-[500px] flex flex-col items-center justify-center text-center p-12"
-                  style={{
-                    background: step.backgroundImage
-                      ? `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${step.backgroundImage})`
-                      : step.backgroundColor || '#6366f1',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    color: step.textColor || '#ffffff',
-                  }}
-                >
-                  <div className="space-y-8 max-w-3xl w-full">
-                    <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full">
-                      <div className="w-8 h-8 rounded-full bg-white text-gray-900 flex items-center justify-center font-bold text-sm">
-                        {index + 1}
-                      </div>
-                      <span className="font-medium">Affiliate Links</span>
-                    </div>
-                    <h2 className="text-5xl font-bold leading-tight">{step.title}</h2>
-                    <p className="text-2xl whitespace-pre-wrap opacity-95 leading-relaxed">{step.content}</p>
+    <div className="min-h-screen flex flex-col">
+      {/* Funnel Content */}
+      <div className="flex-1">
+        {steps.map((step: Step) => (
+          <div key={step.id}>
+            {step.type === 'affiliate-link' ? (
+              <div
+                className="min-h-screen flex flex-col items-center justify-center text-center p-8 md:p-12"
+                style={{
+                  background: step.backgroundImage
+                    ? `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${step.backgroundImage})`
+                    : step.backgroundColor || '#6366f1',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  color: step.textColor || '#ffffff',
+                }}
+              >
+                <div className="space-y-8 max-w-3xl w-full">
+                  <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight drop-shadow-lg">{step.title}</h2>
+                  <p className="text-xl md:text-2xl whitespace-pre-wrap opacity-95 leading-relaxed drop-shadow">{step.content}</p>
                     
                     <div className="space-y-4 max-w-xl mx-auto">
                       {(step.affiliateLinks && step.affiliateLinks.length > 0) ? (
@@ -157,35 +146,41 @@ export default function PublicFunnelPage({ params }: { params: Promise<{ funnelI
                   </div>
                 </div>
               ) : (
-                <Card className="overflow-hidden">
-                  <CardContent className="p-8">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                        {index + 1}
-                      </div>
-                      <div>
-                        <h2 className="text-2xl font-bold">{step.title}</h2>
-                        <p className="text-sm text-muted-foreground capitalize">{step.type}</p>
-                      </div>
-                    </div>
-                    <div className="prose max-w-none">
-                      <p className="text-lg whitespace-pre-wrap">{step.content}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+              <div className="min-h-screen flex items-center justify-center p-8">
+                <div className="max-w-4xl w-full">
+                  <div className="prose prose-lg max-w-none">
+                    <h2 className="text-4xl font-bold mb-4">{step.title}</h2>
+                    <p className="text-xl whitespace-pre-wrap">{step.content}</p>
+                  </div>
+                </div>
+              </div>
+            )}
             </div>
           ))}
         </div>
 
         {steps.length === 0 && (
-          <Card>
-            <CardContent className="text-center py-12">
-              <p className="text-muted-foreground">This funnel has no steps yet.</p>
-            </CardContent>
-          </Card>
+          <div className="min-h-screen flex items-center justify-center">
+            <p className="text-muted-foreground">This funnel has no steps yet.</p>
+          </div>
         )}
       </div>
+
+      {/* Footer */}
+      <footer className="py-4 text-center border-t bg-background">
+        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+          <a 
+            href="https://cf-llc.github.io" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="font-semibold hover:text-foreground transition-colors"
+          >
+            CF-LLC
+          </a>
+          <span>Made With</span>
+          <Heart className="w-4 h-4 fill-red-500 text-red-500" />
+        </div>
+      </footer>
     </div>
   )
 }
