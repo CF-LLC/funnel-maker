@@ -49,57 +49,41 @@ export default function LoginPage() {
       if (data.user) {
         // Ensure user record exists in database (handles cases where signup failed midway)
         try {
-          // Check if user record exists
+          // Try to upsert user record - this will create if doesn't exist, or do nothing if it does
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { data: existingUser } = await (supabase
+          const { error: upsertError } = await (supabase
             .from('users') as any)
-            .select('id')
-            .eq('id', data.user.id)
-            .single()
+            .upsert(
+              { id: data.user.id, email: data.user.email! },
+              { onConflict: 'id', ignoreDuplicates: false }
+            )
 
-          // Create user record if it doesn't exist
-          if (!existingUser) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error: insertError } = await (supabase
-              .from('users') as any)
-              .insert({ id: data.user.id, email: data.user.email! })
-
-            if (insertError) {
-              console.error('Error creating user record:', insertError)
-              setError('There was an issue setting up your account. Please contact support.')
-              setLoading(false)
-              return
-            }
+          // Only error out if it's NOT a permission error (permission error means record exists but RLS blocks view)
+          if (upsertError && !upsertError.message.includes('violates row-level security')) {
+            console.error('Error upserting user record:', upsertError)
+            // Don't block login for this
           }
 
-          // Check if subscription exists
+          // Try to upsert subscription - create if doesn't exist
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { data: existingSub } = await (supabase
+          const { error: subError } = await (supabase
             .from('subscriptions') as any)
-            .select('user_id')
-            .eq('user_id', data.user.id)
-            .single()
-
-          // Create subscription if it doesn't exist
-          if (!existingSub) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error: subError } = await (supabase
-              .from('subscriptions') as any)
-              .insert({
+            .upsert(
+              {
                 user_id: data.user.id,
                 plan_type: 'free',
                 status: 'active'
-              })
+              },
+              { onConflict: 'user_id', ignoreDuplicates: false }
+            )
 
-            if (subError) {
-              console.error('Error creating subscription:', subError)
-            }
+          // Only log subscription errors, don't block login
+          if (subError && !subError.message.includes('violates row-level security')) {
+            console.error('Error upserting subscription:', subError)
           }
         } catch (setupError) {
           console.error('User setup error:', setupError)
-          setError('There was an issue setting up your account. Please try again or contact support.')
-          setLoading(false)
-          return
+          // Don't block login - just log the error and continue
         }
 
         // Small delay to ensure everything is saved
