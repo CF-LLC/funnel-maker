@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { SortableStep } from '@/components/builder/sortable-step'
 import { CollaboratorPresence } from '@/components/builder/collaborator-presence'
 import { StepTypeDialog } from '@/components/builder/step-type-dialog'
+import { TemplateFieldsEditor, publishErrorMessage } from '@/components/builder/template-fields-editor'
 import { LandingEditor, LeadCaptureEditor, SalesEditor, ThankYouEditor, AffiliateLinkEditor } from '@/components/builder/step-editors'
 import { Plus, Save, ArrowLeft, Trash2, Download, Share2, Copy } from 'lucide-react'
 import Link from 'next/link'
@@ -214,8 +215,12 @@ export default function FunnelBuilderPage() {
 
     if (error) {
       console.error('Error saving funnel:', error)
+      const publishMsg = publishErrorMessage(error)
       if (error.code === '23505') {
         alert('This URL slug is already taken. Please choose a different one.')
+      } else if (publishMsg) {
+        alert(publishMsg)
+        setIsPublic(false)
       }
     } else {
       setFunnelSlug(sanitizedSlug)
@@ -225,11 +230,15 @@ export default function FunnelBuilderPage() {
 
   const togglePublic = async () => {
     const newIsPublic = !isPublic
-    setIsPublic(newIsPublic)
-    await (supabase
+    const { error } = await (supabase
       .from('funnels') as any)
       .update({ is_public: newIsPublic })
       .eq('id', params.funnelId as string)
+    if (error) {
+      alert(publishErrorMessage(error) || 'Could not change publish status')
+      return
+    }
+    setIsPublic(newIsPublic)
   }
 
   const copyPublicLink = () => {
@@ -299,7 +308,7 @@ export default function FunnelBuilderPage() {
             <div className="flex items-center gap-2 text-sm flex-wrap">
               <Label className="text-muted-foreground whitespace-nowrap text-xs sm:text-sm">URL:</Label>
               <div className="flex items-center gap-1 flex-1 min-w-0">
-                <span className="text-muted-foreground text-xs sm:text-sm truncate">myfunnelr.vercel.app/f/</span>
+                <span className="text-muted-foreground text-xs sm:text-sm truncate">{(process.env.NEXT_PUBLIC_APP_URL || 'https://funnels.saasnation.site').replace(/^https?:\/\//, '')}/f/</span>
                 <Input
                   value={funnelSlug}
                   onChange={(e) => setFunnelSlug(e.target.value)}
@@ -499,31 +508,12 @@ export default function FunnelBuilderPage() {
                           {selectedStep.content}
                         </p>
                       </div>
-                      <div className="grid md:grid-cols-3 gap-6">
-                        <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg text-center">
-                          <div className="text-4xl font-bold text-green-600 mb-2">$29</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">per month</div>
-                          <button className="w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors">
-                            Choose Plan
-                          </button>
-                        </div>
-                        <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl text-center border-4 border-green-600 relative">
-                          <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-600 text-white px-4 py-1 rounded-full text-sm font-bold">
-                            Popular
-                          </div>
-                          <div className="text-4xl font-bold text-green-600 mb-2">$79</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">per month</div>
-                          <button className="w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors">
-                            Choose Plan
-                          </button>
-                        </div>
-                        <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg text-center">
-                          <div className="text-4xl font-bold text-green-600 mb-2">$199</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">per month</div>
-                          <button className="w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors">
-                            Choose Plan
-                          </button>
-                        </div>
+                      <div className="max-w-sm mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg text-center space-y-4">
+                        <div className="text-5xl font-bold text-green-600">{selectedStep.priceLabel || selectedStep.pricing?.amount || 'Set a price'}</div>
+                        <button className={`w-full px-6 py-3 font-semibold rounded-lg ${selectedStep.paymentLink ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                          {selectedStep.ctaText || 'Buy now'}
+                        </button>
+                        {!selectedStep.paymentLink && <p className="text-xs text-gray-500">Add your Stripe Payment Link to enable the button</p>}
                       </div>
                     </div>
                   </div>
@@ -619,6 +609,7 @@ export default function FunnelBuilderPage() {
                     {selectedStep.type === 'affiliate-link' && (
                       <AffiliateLinkEditor step={selectedStep} onUpdate={updateStep} />
                     )}
+                    <TemplateFieldsEditor step={selectedStep} onUpdate={updateStep} userId={userId} slug={funnelSlug} />
                   </div>
                 </div>
               </>

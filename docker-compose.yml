@@ -7,9 +7,14 @@ services:
         NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
         NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
         NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+        NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-}
+        NEXT_PUBLIC_STARTER_SITES_URL: ${NEXT_PUBLIC_STARTER_SITES_URL:-}
+        NEXT_PUBLIC_STRIPE_LINK_MONTHLY: ${NEXT_PUBLIC_STRIPE_LINK_MONTHLY:-}
+        NEXT_PUBLIC_STRIPE_LINK_YEARLY: ${NEXT_PUBLIC_STRIPE_LINK_YEARLY:-}
+        NEXT_PUBLIC_STRIPE_LINK_FOUNDING: ${NEXT_PUBLIC_STRIPE_LINK_FOUNDING:-}
     env_file: .env
     restart: unless-stopped
-    # Only reachable from the host; Cloudflare Tunnel routes funnels.spockshop.com here.
+    # Only reachable from the host; Cloudflare Tunnel routes funnels.saasnation.site here.
     ports:
       - "127.0.0.1:3010:3000"
     mem_limit: 512m

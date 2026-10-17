@@ -20,7 +20,7 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link href="/auth/register">
             <Button size="lg" className="gap-2">
-              Start Building Free <ArrowRight className="w-4 h-4" />
+              Get started <ArrowRight className="w-4 h-4" />
             </Button>
           </Link>
           <Link href="/templates">
