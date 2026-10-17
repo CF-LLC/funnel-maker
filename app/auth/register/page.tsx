@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
+import { authCallbackUrl } from '@/lib/auth-urls'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -55,7 +56,7 @@ export default function RegisterPage() {
         email,
         password,
         options: {
-          emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/callback`,
+          emailRedirectTo: authCallbackUrl(),
           // Turnstile token for Supabase Auth's built-in captcha (only sent when a site key is configured)
           ...(turnstileSiteKeySet ? { captchaToken } : {}),
           data: { template },
