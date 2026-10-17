@@ -2,11 +2,20 @@ import { Resend } from 'resend'
 import { WelcomeEmail } from '@/emails/welcome'
 import { FunnelExportEmail } from '@/emails/funnel-export'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+let _resend: Resend | null = null
+
+/** Lazily create the Resend client; v1 sends no email, so a missing key must not break the build. */
+function getResend(): Resend {
+  if (_resend) return _resend
+  const key = process.env.RESEND_API_KEY
+  if (!key) throw new Error('RESEND_API_KEY is not set')
+  _resend = new Resend(key)
+  return _resend
+}
 
 export async function sendWelcomeEmail(email: string) {
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from: 'Funnel Maker <onboarding@funnelmaker.app>',
       to: [email],
       subject: 'Welcome to Funnel Maker! 🎉',
@@ -31,7 +40,7 @@ export async function sendFunnelExportEmail(
   downloadUrl: string
 ) {
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from: 'Funnel Maker <exports@funnelmaker.app>',
       to: [email],
       subject: `Your funnel "${funnelName}" is ready to download`,
@@ -57,7 +66,7 @@ export async function sendTeamInviteEmail(
   inviterName: string
 ) {
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from: 'Funnel Maker <team@funnelmaker.app>',
       to: [email],
       subject: `You've been invited to join ${orgName} on Funnel Maker`,
