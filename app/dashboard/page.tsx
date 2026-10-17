@@ -15,6 +15,14 @@ export default async function DashboardPage() {
     .order('created_at', { ascending: false })
 
   const funnelCount = funnels?.length || 0
+  const liveCount = (funnels || []).filter((f: any) => f.is_public).length
+  const { data: profile } = await (supabase.from('users') as any)
+    .select('approved, signup_template')
+    .eq('id', user!.id)
+    .maybeSingle()
+  const approved = !!profile?.approved
+  const signupTemplate: string | null = profile?.signup_template || null
+  const TEMPLATE_NAMES: Record<string, string> = { 'book-call': 'Book a call', 'sales-page': 'Sales page', 'free-download': 'Free download' }
 
   return (
     <div className="space-y-8">
@@ -30,6 +38,15 @@ export default async function DashboardPage() {
           </Button>
         </Link>
       </div>
+
+      {!approved && (
+        <Card className="border-amber-400 bg-amber-50">
+          <CardContent className="py-4 text-sm text-amber-900">
+            <strong>Your account is waiting for approval</strong> (usually within 24 hours). You can build and preview
+            funnels now; publishing unlocks once you&apos;re approved.
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid md:grid-cols-3 gap-6">
         <Card>
@@ -47,27 +64,23 @@ export default async function DashboardPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Views</CardTitle>
+            <CardTitle className="text-sm font-medium">Live funnels</CardTitle>
             <BarChart3 className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">
-              Across all funnels
-            </p>
+            <div className="text-2xl font-bold">{liveCount} / 3</div>
+            <p className="text-xs text-muted-foreground">Your plan includes up to 3 live funnels</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">Account</CardTitle>
             <TrendingUp className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0%</div>
-            <p className="text-xs text-muted-foreground">
-              Average across funnels
-            </p>
+            <div className="text-2xl font-bold">{approved ? 'Approved' : 'Pending'}</div>
+            <p className="text-xs text-muted-foreground">{approved ? 'You can publish funnels' : 'Publishing unlocks after approval'}</p>
           </CardContent>
         </Card>
       </div>
@@ -80,10 +93,10 @@ export default async function DashboardPage() {
               <Zap className="w-12 h-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold mb-2">No funnels yet</h3>
               <p className="text-muted-foreground mb-4">
-                Get started by creating your first funnel
+                {signupTemplate ? `Start with the ${TEMPLATE_NAMES[signupTemplate] || 'template'} you picked at signup` : 'Get started by creating your first funnel'}
               </p>
-              <Link href="/dashboard/templates">
-                <Button>Browse Templates</Button>
+              <Link href={signupTemplate ? `/dashboard/templates?start=${signupTemplate}` : '/dashboard/templates'}>
+                <Button>{signupTemplate ? `Create my ${TEMPLATE_NAMES[signupTemplate] || ''} funnel` : 'Browse Templates'}</Button>
               </Link>
             </CardContent>
           </Card>

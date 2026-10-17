@@ -9,6 +9,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { templates } from '@/data/templates'
+import { Turnstile, turnstileSiteKeySet } from '@/components/turnstile'
+import { useCallback } from 'react'
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('')
@@ -17,6 +20,9 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState('')
   const [emailExists, setEmailExists] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [template, setTemplate] = useState<string>('book-call')
+  const [captchaToken, setCaptchaToken] = useState('')
+  const onToken = useCallback((t: string) => setCaptchaToken(t), [])
   const router = useRouter()
   const supabase = createClient()
 
@@ -50,9 +56,9 @@ export default function RegisterPage() {
         password,
         options: {
           emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/callback`,
-          data: {
-            email_confirm: true, // Auto-confirm for development
-          }
+          // Turnstile token for Supabase Auth's built-in captcha (only sent when a site key is configured)
+          ...(turnstileSiteKeySet ? { captchaToken } : {}),
+          data: { template },
         },
       })
 
@@ -211,6 +217,19 @@ return (
                 Must be at least 6 characters
               </p>
             </div>
+            <fieldset className="space-y-2">
+              <legend className="text-sm font-medium mb-1">What do you want to build first?</legend>
+              {templates.map((t) => (
+                <label key={t.id} className={`flex gap-3 items-start border rounded-lg p-3 cursor-pointer ${template === t.id ? 'border-primary bg-primary/5' : ''}`}>
+                  <input type="radio" name="template" value={t.id} checked={template === t.id} onChange={() => setTemplate(t.id)} className="mt-1" />
+                  <span>
+                    <span className="block font-medium text-sm">{t.name}</span>
+                    <span className="block text-xs text-muted-foreground">{t.description}</span>
+                  </span>
+                </label>
+              ))}
+            </fieldset>
+            <Turnstile onToken={onToken} />
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={loading}>

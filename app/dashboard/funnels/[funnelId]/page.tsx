@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { SortableStep } from '@/components/builder/sortable-step'
 import { CollaboratorPresence } from '@/components/builder/collaborator-presence'
 import { StepTypeDialog } from '@/components/builder/step-type-dialog'
+import { TemplateFieldsEditor, publishErrorMessage } from '@/components/builder/template-fields-editor'
 import { LandingEditor, LeadCaptureEditor, SalesEditor, ThankYouEditor, AffiliateLinkEditor } from '@/components/builder/step-editors'
 import { Plus, Save, ArrowLeft, Trash2, Download, Share2, Copy } from 'lucide-react'
 import Link from 'next/link'
@@ -214,8 +215,12 @@ export default function FunnelBuilderPage() {
 
     if (error) {
       console.error('Error saving funnel:', error)
+      const publishMsg = publishErrorMessage(error)
       if (error.code === '23505') {
         alert('This URL slug is already taken. Please choose a different one.')
+      } else if (publishMsg) {
+        alert(publishMsg)
+        setIsPublic(false)
       }
     } else {
       setFunnelSlug(sanitizedSlug)
@@ -225,11 +230,15 @@ export default function FunnelBuilderPage() {
 
   const togglePublic = async () => {
     const newIsPublic = !isPublic
-    setIsPublic(newIsPublic)
-    await (supabase
+    const { error } = await (supabase
       .from('funnels') as any)
       .update({ is_public: newIsPublic })
       .eq('id', params.funnelId as string)
+    if (error) {
+      alert(publishErrorMessage(error) || 'Could not change publish status')
+      return
+    }
+    setIsPublic(newIsPublic)
   }
 
   const copyPublicLink = () => {
@@ -299,7 +308,7 @@ export default function FunnelBuilderPage() {
             <div className="flex items-center gap-2 text-sm flex-wrap">
               <Label className="text-muted-foreground whitespace-nowrap text-xs sm:text-sm">URL:</Label>
               <div className="flex items-center gap-1 flex-1 min-w-0">
-                <span className="text-muted-foreground text-xs sm:text-sm truncate">myfunnelr.vercel.app/f/</span>
+                <span className="text-muted-foreground text-xs sm:text-sm truncate">{(process.env.NEXT_PUBLIC_APP_URL || 'https://funnels.spockshop.com').replace(/^https?:\/\//, '')}/f/</span>
                 <Input
                   value={funnelSlug}
                   onChange={(e) => setFunnelSlug(e.target.value)}
@@ -619,6 +628,7 @@ export default function FunnelBuilderPage() {
                     {selectedStep.type === 'affiliate-link' && (
                       <AffiliateLinkEditor step={selectedStep} onUpdate={updateStep} />
                     )}
+                    <TemplateFieldsEditor step={selectedStep} onUpdate={updateStep} userId={userId} slug={funnelSlug} />
                   </div>
                 </div>
               </>

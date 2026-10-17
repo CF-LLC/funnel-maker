@@ -14,8 +14,8 @@ export async function GET(
 
     // Check if looking up by slug or ID
     const query = bySlug
-      ? (supabase.from('funnels') as any).select('*').eq('slug', funnelId).eq('is_public', true)
-      : (supabase.from('funnels') as any).select('*').eq('id', funnelId).eq('is_public', true)
+      ? (supabase.from('funnels') as any).select('id, name, slug, template, steps').eq('slug', funnelId).eq('is_public', true)
+      : (supabase.from('funnels') as any).select('id, name, slug, template, steps').eq('id', funnelId).eq('is_public', true)
 
     const { data: funnel, error } = await query.single()
 

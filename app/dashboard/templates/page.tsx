@@ -13,7 +13,8 @@ export default function DashboardTemplatesPage() {
 
   useEffect(() => {
     // Check for pending template after login
-    const pendingTemplate = sessionStorage.getItem('pendingTemplate')
+    const start = new URLSearchParams(window.location.search).get('start')
+    const pendingTemplate = sessionStorage.getItem('pendingTemplate') || start
     if (pendingTemplate) {
       sessionStorage.removeItem('pendingTemplate')
       handleUseTemplate(pendingTemplate)
@@ -59,6 +60,7 @@ export default function DashboardTemplatesPage() {
         .insert([{
           user_id: user.id,
           name: template.name,
+          template: template.id,
           steps: template.steps
         }] as any)
         .select()
