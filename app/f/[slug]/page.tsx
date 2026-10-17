@@ -3,6 +3,7 @@
 import { useEffect, useState, use } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Heart } from 'lucide-react'
+import { LeadForm } from '@/components/lead-form'
 
 interface AffiliateLink {
   id: string
@@ -150,6 +151,7 @@ export default function SlugFunnelPage({ params }: { params: Promise<{ slug: str
                   <div className="prose prose-lg max-w-none">
                     <h2 className="text-4xl font-bold mb-4">{step.title}</h2>
                     <p className="text-xl whitespace-pre-wrap">{step.content}</p>
+                    {step.type === 'lead-capture' && <LeadForm slug={resolvedParams.slug} />}
                   </div>
                 </div>
               </div>

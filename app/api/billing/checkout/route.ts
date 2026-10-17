@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
-import { stripe, getPlanDetails, PlanType } from '@/lib/stripe'
+import { getStripe, getPlanDetails, PlanType } from '@/lib/stripe'
 
 export async function POST(request: Request) {
   try {
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     let customerId = existingSubscription?.stripe_customer_id
 
     if (!customerId) {
-      const customer = await stripe.customers.create({
+      const customer = await getStripe().customers.create({
         email: user.email!,
         metadata: {
           supabase_user_id: user.id,
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     }
 
     // Create Checkout Session
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripe().checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
       payment_method_types: ['card'],

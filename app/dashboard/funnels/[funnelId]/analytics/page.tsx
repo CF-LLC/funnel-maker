@@ -4,161 +4,90 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { TrendingUp, Users, Target } from 'lucide-react'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { Target, Download } from 'lucide-react'
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
+type Lead = { id: string; created_at: string; name: string | null; email: string; phone: string | null; template: string | null }
 
-export default function AnalyticsPage() {
+export default function LeadsPage() {
   const params = useParams()
-  const [data, setData] = useState<any>(null)
-  const [timeRange, setTimeRange] = useState('7d')
-  const [loading, setLoading] = useState(true)
+  const funnelId = String(params.funnelId)
+  const [stats, setStats] = useState<any>(null)
+  const [leads, setLeads] = useState<Lead[]>([])
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    loadAnalytics()
-  }, [params.funnelId, timeRange])
+    Promise.all([fetch(`/api/analytics/${funnelId}`), fetch(`/api/funnels/${funnelId}/leads`)])
+      .then(async ([a, l]) => {
+        if (!a.ok || !l.ok) throw new Error('Could not load leads')
+        setStats(await a.json())
+        setLeads((await l.json()).leads)
+      })
+      .catch((e) => setError(e.message))
+  }, [funnelId])
 
-  const loadAnalytics = async () => {
-    setLoading(true)
-    const response = await fetch(`/api/analytics/${params.funnelId}`)
-    const analyticsData = await response.json()
-    setData(analyticsData)
-    setLoading(false)
-  }
-
-  if (loading || !data) {
-    return <div>Loading analytics...</div>
-  }
+  if (error) return <div className="text-red-600">{error}</div>
+  if (!stats) return <div>Loading leads...</div>
 
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Analytics</h1>
-          <p className="text-muted-foreground">Track your funnel performance</p>
+          <h1 className="text-3xl font-bold">Leads</h1>
+          <p className="text-muted-foreground">Real submissions from your funnel. Visitor tracking is coming later.</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant={timeRange === '24h' ? 'default' : 'outline'} onClick={() => setTimeRange('24h')}>
-            24h
-          </Button>
-          <Button variant={timeRange === '7d' ? 'default' : 'outline'} onClick={() => setTimeRange('7d')}>
-            7d
-          </Button>
-          <Button variant={timeRange === '30d' ? 'default' : 'outline'} onClick={() => setTimeRange('30d')}>
-            30d
-          </Button>
-        </div>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Visitors</CardTitle>
-            <Users className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{data.totalVisitors}</div>
-            <p className="text-xs text-muted-foreground">
-              +12.5% from last period
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Leads</CardTitle>
-            <Target className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{data.totalLeads}</div>
-            <p className="text-xs text-muted-foreground">
-              +8.2% from last period
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
-            <TrendingUp className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{data.conversionRate}%</div>
-            <p className="text-xs text-muted-foreground">
-              +2.1% from last period
-            </p>
-          </CardContent>
-        </Card>
+        <Button asChild>
+          <a href={`/api/funnels/${funnelId}/leads?format=csv`}><Download className="w-4 h-4 mr-2" />Export CSV</a>
+        </Button>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
         <Card>
-          <CardHeader>
-            <CardTitle>Visitors Over Time</CardTitle>
-            <CardDescription>Daily visitor count</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total leads</CardTitle>
+            <Target className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={data.visitors}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="value" stroke="#8884d8" name="Visitors" />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
+          <CardContent><div className="text-2xl font-bold">{stats.totalLeads}</div></CardContent>
         </Card>
-
         <Card>
-          <CardHeader>
-            <CardTitle>Leads Generated</CardTitle>
-            <CardDescription>Daily lead count</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={data.leads}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="value" fill="#82ca9d" name="Leads" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Conversion Distribution</CardTitle>
-            <CardDescription>Conversion vs non-conversion</CardDescription>
-          </CardHeader>
-          <CardContent className="flex justify-center">
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={data.conversions}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }: any) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {data.conversions.map((entry: any, index: number) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
+          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Last 30 days</CardTitle></CardHeader>
+          <CardContent><div className="text-2xl font-bold">{stats.leadsLast30Days}</div></CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader><CardTitle>Leads per day</CardTitle><CardDescription>Last 30 days (UTC)</CardDescription></CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={stats.leads}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis allowDecimals={false} />
+              <Tooltip />
+              <Bar dataKey="value" fill="#82ca9d" name="Leads" />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader><CardTitle>Recent leads</CardTitle></CardHeader>
+        <CardContent>
+          {leads.length === 0 ? <p className="text-muted-foreground">No leads yet.</p> : (
+            <table className="w-full text-sm">
+              <thead><tr className="text-left border-b"><th className="py-2">Date</th><th>Name</th><th>Email</th><th>Phone</th></tr></thead>
+              <tbody>
+                {leads.slice(0, 100).map((l) => (
+                  <tr key={l.id} className="border-b">
+                    <td className="py-2">{new Date(l.created_at).toLocaleString()}</td>
+                    <td>{l.name}</td><td>{l.email}</td><td>{l.phone}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }
