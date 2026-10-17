@@ -4,7 +4,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Zap, BarChart3, TrendingUp, Plus } from 'lucide-react'
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const sp = await searchParams
+  const checkoutSuccess = sp.checkout === 'success'
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -38,6 +40,15 @@ export default async function DashboardPage() {
           </Button>
         </Link>
       </div>
+
+      {checkoutSuccess && (
+        <Card className="border-green-500 bg-green-50" role="status">
+          <CardContent className="py-4 text-sm text-green-900">
+            <strong>Payment received, thank you!</strong> Your account will be activated within 24 hours. Your Stripe
+            receipt is on its way to your email.
+          </CardContent>
+        </Card>
+      )}
 
       {!approved && (
         <Card className="border-amber-400 bg-amber-50">
