@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
+import { safeReturnPath } from '@/lib/safe-redirect'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -90,7 +91,8 @@ export default function LoginPage() {
         await new Promise(resolve => setTimeout(resolve, 300))
         
         // Redirect to dashboard
-        window.location.href = '/dashboard'
+        const params = new URLSearchParams(window.location.search)
+        window.location.href = safeReturnPath(params.get('redirectTo') ?? params.get('next'))
       }
     } catch (err) {
       console.error('Login error:', err)
