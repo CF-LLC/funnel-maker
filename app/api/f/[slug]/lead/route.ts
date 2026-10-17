@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { validateLead } from '@/lib/leads'
 import { rateLimit, clientIp } from '@/lib/server/rate-limit'
+import { verifyTurnstile } from '@/lib/turnstile'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,6 +32,10 @@ export async function POST(request: Request, context: { params: Promise<{ slug: 
   // Honeypot: bots fill the hidden "website" field. Pretend success.
   if (body && typeof body === 'object' && (body as Record<string, unknown>).website) {
     return NextResponse.json({ ok: true }, { status: 201 })
+  }
+
+  if (!(await verifyTurnstile((body as Record<string, unknown>)?.turnstileToken, ip))) {
+    return NextResponse.json({ error: 'Bot check failed, please try again' }, { status: 403 })
   }
 
   const v = validateLead(body)
