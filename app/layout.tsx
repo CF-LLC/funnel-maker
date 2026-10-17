@@ -16,6 +16,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://funnels.saasnation.site"),
   title: "Funnel Maker - Build High-Converting Sales Funnels",
   description: "Create professional sales funnels with drag-and-drop ease. Build landing pages, capture leads, and convert visitors into customers with our powerful funnel builder.",
   icons: {

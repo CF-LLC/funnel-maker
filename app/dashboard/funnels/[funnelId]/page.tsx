@@ -308,7 +308,7 @@ export default function FunnelBuilderPage() {
             <div className="flex items-center gap-2 text-sm flex-wrap">
               <Label className="text-muted-foreground whitespace-nowrap text-xs sm:text-sm">URL:</Label>
               <div className="flex items-center gap-1 flex-1 min-w-0">
-                <span className="text-muted-foreground text-xs sm:text-sm truncate">{(process.env.NEXT_PUBLIC_APP_URL || 'https://funnels.spockshop.com').replace(/^https?:\/\//, '')}/f/</span>
+                <span className="text-muted-foreground text-xs sm:text-sm truncate">{(process.env.NEXT_PUBLIC_APP_URL || 'https://funnels.saasnation.site').replace(/^https?:\/\//, '')}/f/</span>
                 <Input
                   value={funnelSlug}
                   onChange={(e) => setFunnelSlug(e.target.value)}
@@ -508,31 +508,12 @@ export default function FunnelBuilderPage() {
                           {selectedStep.content}
                         </p>
                       </div>
-                      <div className="grid md:grid-cols-3 gap-6">
-                        <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg text-center">
-                          <div className="text-4xl font-bold text-green-600 mb-2">$29</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">per month</div>
-                          <button className="w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors">
-                            Choose Plan
-                          </button>
-                        </div>
-                        <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl text-center border-4 border-green-600 relative">
-                          <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-600 text-white px-4 py-1 rounded-full text-sm font-bold">
-                            Popular
-                          </div>
-                          <div className="text-4xl font-bold text-green-600 mb-2">$79</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">per month</div>
-                          <button className="w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors">
-                            Choose Plan
-                          </button>
-                        </div>
-                        <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg text-center">
-                          <div className="text-4xl font-bold text-green-600 mb-2">$199</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">per month</div>
-                          <button className="w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors">
-                            Choose Plan
-                          </button>
-                        </div>
+                      <div className="max-w-sm mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg text-center space-y-4">
+                        <div className="text-5xl font-bold text-green-600">{selectedStep.priceLabel || selectedStep.pricing?.amount || 'Set a price'}</div>
+                        <button className={`w-full px-6 py-3 font-semibold rounded-lg ${selectedStep.paymentLink ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                          {selectedStep.ctaText || 'Buy now'}
+                        </button>
+                        {!selectedStep.paymentLink && <p className="text-xs text-gray-500">Add your Stripe Payment Link to enable the button</p>}
                       </div>
                     </div>
                   </div>

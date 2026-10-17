@@ -41,7 +41,7 @@ export function safeCssColor(v: unknown): string | undefined {
 }
 
 export function starterSitesUrl(template?: string | null): string {
-  const base = process.env.NEXT_PUBLIC_STARTER_SITES_URL || 'https://cf-llc.github.io/'
+  const base = process.env.NEXT_PUBLIC_STARTER_SITES_URL || 'https://cf-llc.github.io/' /* placeholder until Cooper sets the real URL */
   const url = new URL(base)
   url.searchParams.set('ref', 'funnel-maker')
   url.searchParams.set('tpl', template || 'none')

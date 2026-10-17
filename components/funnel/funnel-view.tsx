@@ -17,19 +17,19 @@ type Funnel = { id: string; name: string; slug: string | null; template: string 
 
 const THANKS_TYPES = ['thank-you']
 
-export function FunnelView({ slug, mode }: { slug: string; mode: 'main' | 'thanks' }) {
+export function FunnelView({ slug, id, mode }: { slug?: string; id?: string; mode: 'main' | 'thanks' }) {
   const [funnel, setFunnel] = useState<Funnel | null>(null)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    fetch(`/api/public/funnels/${encodeURIComponent(slug)}?bySlug=true`)
+    fetch(id ? `/api/public/funnels/${encodeURIComponent(id)}` : `/api/public/funnels/${encodeURIComponent(slug || '')}?bySlug=true`)
       .then(async (r) => {
         const d = await r.json()
         if (!r.ok) throw new Error(d.error || 'Funnel not found')
         setFunnel(d.funnel)
       })
       .catch((e) => setError(e.message || 'Failed to load funnel'))
-  }, [slug])
+  }, [slug, id])
 
   if (error) {
     return (
@@ -44,7 +44,7 @@ export function FunnelView({ slug, mode }: { slug: string; mode: 'main' | 'thank
 
   const all = [...(funnel.steps || [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
   const steps = all.filter((s) => (mode === 'thanks' ? THANKS_TYPES.includes(s.type) : !THANKS_TYPES.includes(s.type)))
-  const thanksHref = all.some((s) => THANKS_TYPES.includes(s.type)) ? `/f/${slug}/thanks` : undefined
+  const thanksHref = funnel.slug && all.some((s) => THANKS_TYPES.includes(s.type)) ? `/f/${funnel.slug}/thanks` : undefined
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-900">
