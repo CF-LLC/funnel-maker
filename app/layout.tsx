@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { SessionProvider } from "@/components/session-provider";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Toaster } from "@/components/ui/toast";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
+  themeColor: '#7c3aed',
 };
 
 export default function RootLayout({
@@ -45,6 +46,7 @@ export default function RootLayout({
         <SessionProvider>
           {children}
         </SessionProvider>
+        <Toaster />
         <SpeedInsights />
       </body>
     </html>

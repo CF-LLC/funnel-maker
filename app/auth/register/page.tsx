@@ -161,8 +161,9 @@ export default function RegisterPage() {
   }
 
 return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/50 p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-app p-4">
+      <Card className="w-full max-w-md overflow-hidden shadow-xl shadow-violet-500/10">
+        <div className="h-1.5 bg-brand" />
         <CardHeader>
           <CardTitle className="text-2xl">Create an account</CardTitle>
           <CardDescription>Start building funnels in minutes</CardDescription>

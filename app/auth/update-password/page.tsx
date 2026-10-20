@@ -83,8 +83,9 @@ export default function UpdatePasswordPage() {
 
   if (!validSession && !error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-muted/50 p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen flex items-center justify-center bg-app p-4">
+        <Card className="w-full max-w-md overflow-hidden shadow-xl shadow-violet-500/10">
+          <div className="h-1.5 bg-brand" />
           <CardHeader>
             <CardTitle className="text-2xl">Loading...</CardTitle>
           </CardHeader>
@@ -95,8 +96,9 @@ export default function UpdatePasswordPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-muted/50 p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen flex items-center justify-center bg-app p-4">
+        <Card className="w-full max-w-md overflow-hidden shadow-xl shadow-violet-500/10">
+          <div className="h-1.5 bg-brand" />
           <CardHeader>
             <CardTitle className="text-2xl">Password updated!</CardTitle>
             <CardDescription>Your password has been successfully changed</CardDescription>
@@ -114,8 +116,9 @@ export default function UpdatePasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/50 p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-app p-4">
+      <Card className="w-full max-w-md overflow-hidden shadow-xl shadow-violet-500/10">
+        <div className="h-1.5 bg-brand" />
         <CardHeader>
           <CardTitle className="text-2xl">Set new password</CardTitle>
           <CardDescription>Enter your new password below</CardDescription>

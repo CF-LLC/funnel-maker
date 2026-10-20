@@ -59,8 +59,9 @@ export default function ResetPasswordPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-muted/50 p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen flex items-center justify-center bg-app p-4">
+        <Card className="w-full max-w-md overflow-hidden shadow-xl shadow-violet-500/10">
+          <div className="h-1.5 bg-brand" />
           <CardHeader>
             <CardTitle className="text-2xl">Check your email</CardTitle>
             <CardDescription>Password reset instructions sent</CardDescription>
@@ -89,8 +90,9 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/50 p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-app p-4">
+      <Card className="w-full max-w-md overflow-hidden shadow-xl shadow-violet-500/10">
+        <div className="h-1.5 bg-brand" />
         <CardHeader>
           <CardTitle className="text-2xl">Reset your password</CardTitle>
           <CardDescription>Enter your email to receive reset instructions</CardDescription>
