@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: Request, context: { params: Promise<{ slug: string }> }) {
   const { slug } = await context.params
   if (!/^[a-z0-9][a-z0-9-]{0,99}$/i.test(slug)) {
-    return NextResponse.json({ error: 'Funnel not found' }, { status: 404 })
+    return NextResponse.json({ error: 'This page is unavailable.' }, { status: 404 })
   }
 
   const ip = clientIp(request)
@@ -59,7 +59,7 @@ export async function POST(request: Request, context: { params: Promise<{ slug: 
 
   if (error) {
     if (error.message?.includes('funnel_not_found')) {
-      return NextResponse.json({ error: 'Funnel not found' }, { status: 404 })
+      return NextResponse.json({ error: 'This page is unavailable.' }, { status: 404 })
     }
     console.error('lead submit failed', error.code)
     return NextResponse.json({ error: 'Could not save lead' }, { status: 500 })

@@ -9,6 +9,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  // Lapsed subscribers (had funnels/all access, none active) can't create funnels; pending signups can draft.
+  const { data: lapsed } = await (supabase as any).rpc('fm_funnels_lapsed', { uid: user.id })
+  if (lapsed === true) {
+    return NextResponse.json({ error: 'funnels_access_required' }, { status: 403 })
+  }
+
   const body = await request.json()
   const { name, steps } = body
 

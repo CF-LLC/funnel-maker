@@ -51,7 +51,7 @@ export function TemplatePicker({ returnTo }: { returnTo: string }) {
         .from('funnels')
         .insert([{ user_id: user.id, name: template.name, template: template.id, steps: template.steps }] as any)
         .select('id')
-      if (error) throw new Error(error.message)
+      if (error) throw new Error(error.message?.includes('funnels_access_required') ? 'your Funnel Maker subscription is not active. Renew on the Billing page.' : error.message)
       const id = (data?.[0] as any)?.id
       if (!id) throw new Error('No funnel id returned')
       toast(`${template.name} created. Click any text to edit it.`)
