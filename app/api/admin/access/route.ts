@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { currentAdminId, serviceClient } from '@/lib/server/admin-client'
 import { setAccess } from '@/lib/server/access-admin'
-import { isTool, ACCESS_SOURCES } from '@/lib/access'
+import { isAccessTool, ACCESS_SOURCES } from '@/lib/access'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,7 +11,7 @@ export async function GET() {
   const db = serviceClient()
   const [{ data: users, error: e1 }, { data: access, error: e2 }] = await Promise.all([
     db.from('users').select('id, email, approved, plan, wish_tool').order('email').limit(1000),
-    db.from('app_access').select('user_id, tool, plan, source, active, founding_lapsed, created_at').limit(5000),
+    db.from('app_access').select('user_id, tool, plan, source, active, founding_lapsed, created_at, stripe_subscription_id').limit(5000),
   ])
   if (e1 || e2) return NextResponse.json({ error: 'Could not load access' }, { status: 500 })
   return NextResponse.json({ users, access })
@@ -20,7 +20,7 @@ export async function GET() {
 export async function POST(request: Request) {
   if (!(await currentAdminId())) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   const b = await request.json().catch(() => null)
-  if (!b || typeof b.userId !== 'string' || !/^[0-9a-f-]{36}$/i.test(b.userId) || !isTool(b.tool) || typeof b.active !== 'boolean') {
+  if (!b || typeof b.userId !== 'string' || !/^[0-9a-f-]{36}$/i.test(b.userId) || !isAccessTool(b.tool) || typeof b.active !== 'boolean') {
     return NextResponse.json({ error: 'Invalid body' }, { status: 400 })
   }
   if (b.source !== undefined && !(ACCESS_SOURCES as readonly string[]).includes(b.source)) return NextResponse.json({ error: 'Invalid source' }, { status: 400 })

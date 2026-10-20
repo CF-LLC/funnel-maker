@@ -1,10 +1,10 @@
 import { serviceClient } from '@/lib/server/admin-client'
-import type { Tool, AccessSource } from '@/lib/access'
+import type { AccessTool, AccessSource } from '@/lib/access'
 
 /** Founding invoices access is only granted while invoices hasn't launched (INVOICES_FOUNDING_OPEN != 'false'). */
 export const foundingOpen = () => process.env.INVOICES_FOUNDING_OPEN !== 'false'
 
-export async function setAccess(userId: string, tool: Tool, patch: { active: boolean; source?: AccessSource; plan?: string | null }) {
+export async function setAccess(userId: string, tool: AccessTool, patch: { active: boolean; source?: AccessSource; plan?: string | null }) {
   const db = serviceClient()
   const { data: existing } = await db.from('app_access').select('id, source').eq('user_id', userId).eq('tool', tool).maybeSingle()
   if (existing) {
