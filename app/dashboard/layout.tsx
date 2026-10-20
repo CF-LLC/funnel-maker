@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Zap, LayoutTemplate, LogOut, Users, CreditCard, Shield, Menu, X, Plus } from 'lucide-react'
+import { LayoutDashboard, Zap, LayoutTemplate, LogOut, Users, CreditCard, Shield, Menu, X, Plus, Receipt } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -35,6 +35,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'My funnels', href: '/dashboard/funnels', icon: Zap },
     { name: 'Templates', href: '/dashboard/templates', icon: LayoutTemplate },
+    { name: 'Invoices', href: '/invoices', icon: Receipt },
     { name: 'Organizations', href: '/dashboard/organizations', icon: Users },
     { name: 'Billing', href: '/dashboard/billing', icon: CreditCard },
   ]

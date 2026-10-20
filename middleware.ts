@@ -50,7 +50,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Protected routes that require authentication
-  if (request.nextUrl.pathname.startsWith('/dashboard')) {
+  if (request.nextUrl.pathname.startsWith('/dashboard') || request.nextUrl.pathname.startsWith('/invoices')) {
     if (!user) {
       const redirectUrl = request.nextUrl.clone()
       redirectUrl.pathname = '/auth/login'
