@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
 
+const UNAVAILABLE = 'This page is unavailable.'
+export const dynamic = 'force-dynamic'
+
 export async function GET(
   request: Request,
   context: { params: Promise<{ funnelId: string }> }
@@ -20,11 +23,12 @@ export async function GET(
     const { data: funnel, error } = await query.single()
 
     if (error || !funnel) {
-      return NextResponse.json({ error: 'Funnel not found or not public' }, { status: 404 })
+      // Neutral message: same response for unknown, unpublished, or owner-lapsed funnels (RLS hides the latter).
+      return NextResponse.json({ error: UNAVAILABLE }, { status: 404, headers: { 'Cache-Control': 'no-store' } })
     }
 
-    return NextResponse.json({ funnel })
+    return NextResponse.json({ funnel }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: 'Something went wrong' }, { status: 500 })
   }
 }

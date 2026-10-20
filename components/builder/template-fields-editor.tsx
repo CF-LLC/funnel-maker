@@ -90,6 +90,7 @@ export function TemplateFieldsEditor({ step, onUpdate, userId, slug }: Props) {
 export function publishErrorMessage(err: { message?: string } | null | undefined): string | null {
   const m = err?.message || ''
   if (m.includes('account_pending_approval')) return 'Your account is waiting for approval. You can publish once it is approved (usually within 24 hours).'
+  if (m.includes('funnels_access_required')) return 'Your Funnel Maker subscription isn\u2019t active, so funnels can\u2019t be published. Renew on the Billing page to go live again; your funnels and leads are kept.'
   if (m.includes('live_funnel_limit')) return 'You already have 3 live funnels, the maximum on your plan. Unpublish one first.'
   return null
 }

@@ -19,7 +19,7 @@ services:
       - "127.0.0.1:3010:3000"
     mem_limit: 512m
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/ >/dev/null || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/healthz >/dev/null || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3

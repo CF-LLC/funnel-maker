@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { FunnelRenderer, type RenderFunnel } from '@/components/funnel/funnel-renderer'
 
 export function FunnelView({ slug, id, mode }: { slug?: string; id?: string; mode: 'main' | 'thanks' }) {
@@ -12,16 +11,19 @@ export function FunnelView({ slug, id, mode }: { slug?: string; id?: string; mod
     fetch(id ? `/api/public/funnels/${encodeURIComponent(id)}` : `/api/public/funnels/${encodeURIComponent(slug || '')}?bySlug=true`)
       .then(async (r) => {
         const d = await r.json()
-        if (!r.ok) throw new Error(d.error || 'Funnel not found')
+        if (!r.ok) throw new Error(r.status === 404 ? 'This page is unavailable.' : d.error || 'Something went wrong')
         setFunnel(d.funnel)
       })
-      .catch((e) => setError(e.message || 'Failed to load funnel'))
+      .catch((e) => setError(e.message || 'This page is unavailable.'))
   }, [slug, id])
 
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <Alert variant="destructive" className="max-w-md"><AlertDescription>{error}</AlertDescription></Alert>
+        <div className="max-w-md text-center">
+          <h1 className="text-xl font-semibold">Page unavailable</h1>
+          <p className="mt-2 text-sm text-muted-foreground">{error === 'This page is unavailable.' ? 'This page isn\u2019t available right now.' : error}</p>
+        </div>
       </div>
     )
   }
