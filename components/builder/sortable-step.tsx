@@ -42,26 +42,29 @@ export function SortableStep({ step, isSelected, onClick, onDelete }: SortableSt
   return (
     <div ref={setNodeRef} style={style}>
       <Card
-        className={`p-3 cursor-pointer hover:border-primary transition-colors ${
-          isSelected ? 'border-primary bg-primary/5' : ''
+        className={`press p-2.5 cursor-pointer hover:border-violet-300 ${
+          isSelected ? 'border-violet-500 bg-violet-50 ring-1 ring-violet-500' : ''
         }`}
         onClick={onClick}
       >
         <div className="flex items-center gap-2">
-          <button {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
+          <button {...attributes} {...listeners} aria-label={`Reorder ${step.title}`} onClick={(e) => e.stopPropagation()} className="-my-1 -ml-1 flex h-11 w-9 shrink-0 cursor-grab touch-none items-center justify-center rounded-md hover:bg-muted active:cursor-grabbing">
             <GripVertical className="w-4 h-4 text-muted-foreground" />
           </button>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <span className={`text-xs px-2 py-0.5 rounded-full ${getStepColor(step.type)}`}>
-                {step.order + 1}
+                {(step.order ?? 0) + 1}
               </span>
+              <span className="text-xs text-muted-foreground">{({ landing: 'Section', 'lead-capture': 'Form', sales: 'Offer', 'thank-you': 'Thank-you page', 'affiliate-link': 'Links' } as Record<string, string>)[step.type] || step.type}</span>
             </div>
             <p className="font-medium text-sm truncate">{step.title}</p>
           </div>
           <Button
             size="icon"
             variant="ghost"
+            aria-label={`Delete ${step.title}`}
+            className="h-11 w-11 shrink-0 text-muted-foreground hover:text-red-600"
             onClick={(e) => {
               e.stopPropagation()
               onDelete()

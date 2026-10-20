@@ -1,130 +1,18 @@
-'use client'
-
-import { useEffect } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { Navbar } from '@/components/nav/navbar'
 import { Footer } from '@/components/nav/footer'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { templates } from '@/data/templates'
-import { createClient } from '@/lib/supabase'
+import { TemplatePicker } from '@/components/templates/template-picker'
 
 export default function TemplatesPage() {
-  const router = useRouter()
-  const supabase = createClient()
-
-  useEffect(() => {
-    // Check for pending template after login
-    const pendingTemplate = sessionStorage.getItem('pendingTemplate')
-    if (pendingTemplate) {
-      sessionStorage.removeItem('pendingTemplate')
-      handleUseTemplate(pendingTemplate)
-    }
-  }, [])
-
-  const handleUseTemplate = async (templateId: string) => {
-    const { data: { user } } = await supabase.auth.getUser()
-    
-    if (!user) {
-      // Store the template ID to use after login
-      sessionStorage.setItem('pendingTemplate', templateId)
-      router.push('/auth/login?redirectTo=/templates')
-      return
-    }
-
-    const template = templates.find(t => t.id === templateId)
-    if (!template) return
-
-    try {
-      // Ensure user exists in users table
-      const { data: existingUser, error: userCheckError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('id', user.id)
-        .maybeSingle()
-
-      if (!existingUser && !userCheckError) {
-        // Create user record if it doesn't exist
-        const { error: insertUserError } = await supabase
-          .from('users')
-          .insert([{ id: user.id, email: user.email! }] as any)
-        
-        if (insertUserError) {
-          console.error('Error creating user record:', insertUserError)
-          alert(`Failed to create user record: ${insertUserError.message}`)
-          return
-        }
-      }
-
-      const { data, error } = await supabase
-        .from('funnels')
-        .insert([{
-          user_id: user.id,
-          name: template.name,
-          steps: template.steps
-        }] as any)
-        .select()
-
-      if (error) {
-        console.error('Error creating funnel:', error.message || error)
-        alert(`Failed to create funnel: ${error.message || 'Unknown error'}`)
-        return
-      }
-
-      if (data && data[0]) {
-        router.push(`/dashboard/funnels/${(data[0] as any).id}`)
-      }
-    } catch (err) {
-      console.error('Unexpected error:', err)
-      alert('An unexpected error occurred. Please try again.')
-    }
-  }
-
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-app">
       <Navbar />
-      
-      <section className="container mx-auto px-4 py-20">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Funnel Templates
-          </h1>
-          <p className="text-xl text-muted-foreground">
-            Start with a proven template and customize it to your needs
-          </p>
+      <section className="container mx-auto flex-1 px-4 py-14 sm:py-20">
+        <div className="mx-auto mb-10 max-w-2xl text-center">
+          <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">Templates that <span className="text-brand">wow</span></h1>
+          <p className="mt-4 text-lg text-muted-foreground">Animated gradients, starfields, glass and parallax. Fast on every phone, and calm for people who prefer less motion.</p>
         </div>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          {templates.map((template) => (
-            <Card key={template.id} className="flex flex-col">
-              <CardHeader>
-                <CardTitle>{template.name}</CardTitle>
-                <CardDescription>{template.description}</CardDescription>
-              </CardHeader>
-              <CardContent className="flex-1 flex flex-col">
-                <div className="mb-4 space-y-2">
-                  {template.steps.map((step, index) => (
-                    <div key={step.id} className="flex items-center gap-2 text-sm">
-                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <span className="text-xs font-bold text-primary">{index + 1}</span>
-                      </div>
-                      <span className="text-muted-foreground">{step.title}</span>
-                    </div>
-                  ))}
-                </div>
-                <Button 
-                  className="mt-auto" 
-                  onClick={() => handleUseTemplate(template.id)}
-                >
-                  Use Template
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <TemplatePicker returnTo="/dashboard/templates" />
       </section>
-
       <Footer />
     </div>
   )

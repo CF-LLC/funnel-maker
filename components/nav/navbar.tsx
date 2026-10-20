@@ -36,11 +36,11 @@ useEffect(() => {
   }
 
   return (
-    <nav className="border-b bg-background sticky top-0 z-50">
+    <nav className="border-b bg-background/80 backdrop-blur sticky top-0 z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-4 sm:gap-8">
-          <Link href="/" className="text-xl sm:text-2xl font-bold">
-            Funnel Maker
+          <Link href="/" className="flex items-center gap-2 text-xl font-extrabold">
+            <span aria-hidden className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-white text-sm">✦</span>Funnel Maker
           </Link>
           <div className="hidden md:flex gap-6">
             <Link href="/#features" className="text-sm hover:text-primary">
