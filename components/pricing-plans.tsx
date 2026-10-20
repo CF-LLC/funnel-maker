@@ -47,6 +47,9 @@ export function PricingPlans() {
           </Card>
         )
       })}
+      <p className="md:col-span-3 text-center text-xs text-muted-foreground">
+        By paying you agree to our <Link href="/terms" className="underline">Terms</Link>, <Link href="/privacy" className="underline">Privacy Policy</Link> and <Link href="/refund" className="underline">Refund Policy</Link> (14-day money-back guarantee).
+      </p>
     </div>
   )
 }

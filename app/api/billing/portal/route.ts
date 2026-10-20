@@ -1,42 +1,12 @@
 import { NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase'
-import { getStripe } from '@/lib/stripe'
 
-export async function POST() {
-  try {
-    const supabase = await createServerClient()
-    const { data: { user } } = await supabase.auth.getUser()
+// Billing runs on Stripe Payment Links (lib/plans.ts) with manual activation in /dashboard/admin/approvals.
+// This legacy Stripe API route is disabled so it can never create Stripe objects or write billing state.
+export const dynamic = 'force-dynamic'
 
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Get customer ID from subscription
-    const { data: subscription } = await (supabase
-      .from('subscriptions') as any)
-      .select('stripe_customer_id')
-      .eq('user_id', user.id)
-      .single()
-
-    if (!subscription?.stripe_customer_id) {
-      return NextResponse.json(
-        { error: 'No subscription found' },
-        { status: 404 }
-      )
-    }
-
-    // Create billing portal session
-    const portalSession = await getStripe().billingPortal.sessions.create({
-      customer: subscription.stripe_customer_id,
-      return_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/billing`,
-    })
-
-    return NextResponse.json({ url: portalSession.url })
-  } catch (error: any) {
-    console.error('Portal error:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to create portal session' },
-      { status: 500 }
-    )
-  }
+function gone() {
+  return NextResponse.json({ error: 'Billing is handled by Stripe Payment Links. See /pricing.' }, { status: 410 })
 }
+
+export const GET = gone
+export const POST = gone
