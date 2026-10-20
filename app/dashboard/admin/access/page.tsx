@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 type U = { id: string; email: string; approved: boolean; plan: string | null; wish_tool: string | null }
-type A = { user_id: string; tool: 'funnels' | 'invoices'; plan: string | null; source: string; active: boolean; founding_lapsed: boolean; created_at: string }
-const TOOLS = ['funnels', 'invoices'] as const
+type A = { user_id: string; tool: 'funnels' | 'invoices' | 'all'; plan: string | null; source: string; active: boolean; founding_lapsed: boolean; created_at: string }
+const TOOLS = ['funnels', 'invoices', 'all'] as const
 type Filter = 'all' | 'active' | 'inactive' | 'none'
 
 export default function AccessPage() {
@@ -53,6 +53,8 @@ export default function AccessPage() {
             <b>Founding invoices access</b> is included only while the user&apos;s <b>funnels</b> access stays active.
             If funnels access is turned off, founding invoices access turns off too and is marked <b>lapsed</b> permanently;
             re-subscribing to funnels does not restore it. After a lapse, grant invoices as <b>single</b> ($12) or <b>all_access</b> instead.
+            <b>all</b> = All Access: one row that unlocks every tool (current and future). Funnels counts as active if either the funnels or the all row is active.
+            Rows with a Stripe subscription are kept in sync by the Stripe webhook; your changes here are a manual override.
             Approving an account on the Approvals page grants funnels access (and founding invoices while INVOICES_FOUNDING_OPEN isn&apos;t &quot;false&quot;).
           </div>
           <div className="flex flex-wrap gap-2 items-center text-sm">
@@ -67,20 +69,20 @@ export default function AccessPage() {
             <tbody>
               {list.map((u) => {
                 const a = row(u.id, tool)
-                const fundsActive = !!row(u.id, 'funnels')?.active
+                const fundsActive = !!row(u.id, 'funnels')?.active || !!row(u.id, 'all')?.active
                 return (
                   <tr key={u.id} className="border-b align-middle">
                     <td className="py-2 pr-2">{u.email}</td>
                     <td className="pr-2">{a ? (a.active ? <span className="text-green-700">Active</span> : <span className="text-muted-foreground">Inactive</span>) : '—'}
                       {a?.founding_lapsed && <span className="ml-1 text-xs text-amber-700">(founding lapsed)</span>}</td>
                     <td className="pr-2">{a?.source || '—'}{tool === 'invoices' && a?.source === 'founding' && a.active && <span className="block text-xs text-muted-foreground">while funnels active</span>}</td>
-                    <td className="pr-2">{a?.plan || '—'}</td>
+                    <td className="pr-2">{a?.plan || '—'}{(a as any)?.stripe_subscription_id && <span className="block text-xs text-muted-foreground">Stripe</span>}</td>
                     <td className="pr-2">{a ? new Date(a.created_at).toLocaleDateString() : '—'}</td>
                     <td className="text-right space-x-1 whitespace-nowrap">
                       {a?.active
                         ? <Button size="sm" variant="outline" onClick={() => post({ userId: u.id, tool, active: false })}>Deactivate</Button>
                         : <>
-                            <Button size="sm" onClick={() => post({ userId: u.id, tool, active: true, source: 'single' })}>Approve (single)</Button>
+                            {tool !== 'all' && <Button size="sm" onClick={() => post({ userId: u.id, tool, active: true, source: 'single' })}>Approve (single)</Button>}
                             <Button size="sm" variant="secondary" onClick={() => post({ userId: u.id, tool, active: true, source: 'all_access' })}>All access</Button>
                             {tool === 'invoices' && !a?.founding_lapsed && fundsActive &&
                               <Button size="sm" variant="ghost" onClick={() => post({ userId: u.id, tool, active: true, source: 'founding' })}>Founding</Button>}
