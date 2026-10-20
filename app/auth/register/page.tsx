@@ -22,6 +22,7 @@ export default function RegisterPage() {
   const [emailExists, setEmailExists] = useState(false)
   const [loading, setLoading] = useState(false)
   const [template, setTemplate] = useState<string>('book-call')
+  const [wishTool, setWishTool] = useState('')
   const [captchaToken, setCaptchaToken] = useState('')
   const onToken = useCallback((t: string) => setCaptchaToken(t), [])
   const router = useRouter()
@@ -59,7 +60,7 @@ export default function RegisterPage() {
           emailRedirectTo: authCallbackUrl(),
           // Turnstile token for Supabase Auth's built-in captcha (only sent when a site key is configured)
           ...(turnstileSiteKeySet ? { captchaToken } : {}),
-          data: { template },
+          data: { template, ...(wishTool.trim() ? { wish_tool: wishTool.trim().slice(0, 500) } : {}) },
         },
       })
 
@@ -231,6 +232,11 @@ return (
                 </label>
               ))}
             </fieldset>
+            <div className="space-y-2">
+              <label htmlFor="wish_tool" className="text-sm font-medium">What tool do you wish you had? <span className="text-muted-foreground font-normal">(optional)</span></label>
+              <textarea id="wish_tool" name="wish_tool" value={wishTool} onChange={(e) => setWishTool(e.target.value)} maxLength={500} rows={2}
+                placeholder="e.g. simple invoices, a booking page, client check-ins…" className="w-full rounded-md border bg-background px-3 py-2 text-base" />
+            </div>
             <Turnstile onToken={onToken} />
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
