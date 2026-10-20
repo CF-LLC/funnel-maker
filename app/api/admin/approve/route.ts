@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { currentAdminId, serviceClient } from '@/lib/server/admin-client'
+import { syncApproval } from '@/lib/server/access-admin'
 
 export const dynamic = 'force-dynamic'
 
@@ -41,5 +42,9 @@ export async function POST(request: Request) {
   if (Object.keys(update).length === 0) return NextResponse.json({ error: 'Nothing to update' }, { status: 400 })
   const { error } = await serviceClient().from('users').update(update).eq('id', userId)
   if (error) return NextResponse.json({ error: 'Could not update user' }, { status: 500 })
+  if (typeof update.approved === 'boolean') {
+    const sync = await syncApproval(userId, update.approved)
+    if (sync?.error) return NextResponse.json({ error: 'Approved, but tool access did not sync' }, { status: 500 })
+  }
   return NextResponse.json({ ok: true })
 }

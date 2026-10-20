@@ -158,6 +158,7 @@ export default function AdminPage() {
           <div>
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
             <p className="text-muted-foreground">System overview and management</p>
+            <p className="text-sm mt-1 space-x-3"><a className="underline" href="/dashboard/admin/approvals">Approvals &amp; payments</a><a className="underline" href="/dashboard/admin/access">Tool access &amp; signup wishes</a></p>
           </div>
         </div>
         <div className="relative w-64">
