@@ -1,8 +1,8 @@
 import { serviceClient } from '@/lib/server/admin-client'
 import type { AccessTool, AccessSource } from '@/lib/access'
 
-/** Founding invoices access is only granted while invoices hasn't launched (INVOICES_FOUNDING_OPEN != 'false'). */
-export const foundingOpen = () => process.env.INVOICES_FOUNDING_OPEN !== 'false'
+/** Founding invoices perk is closed to new signups (Oct 24, 2026). Only re-opens if INVOICES_FOUNDING_OPEN === 'true'. Existing founding rows are never touched here. */
+export const foundingOpen = () => process.env.INVOICES_FOUNDING_OPEN === 'true'
 
 export async function setAccess(userId: string, tool: AccessTool, patch: { active: boolean; source?: AccessSource; plan?: string | null }) {
   const db = serviceClient()
