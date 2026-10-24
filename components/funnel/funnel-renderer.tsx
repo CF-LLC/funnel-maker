@@ -4,7 +4,8 @@ import { useRef } from 'react'
 import { LeadForm } from '@/components/lead-form'
 import { CanvasField, useParallax, useScrollReveal } from '@/components/funnel/effects'
 import { themeFor, type ThemeId } from '@/data/templates'
-import { safeBookingUrl, safeCssColor, safeDownloadUrl, safeHttpsUrl, safePaymentLink, starterSitesUrl } from '@/lib/url-safety'
+import { downloadHref } from '@/lib/downloads'
+import { safeBookingUrl, safeCssColor, safeHttpsUrl, safePaymentLink, starterSitesUrl } from '@/lib/url-safety'
 
 export type RenderStep = {
   id: string; type: string; title: string; content: string; order?: number
@@ -139,7 +140,7 @@ function StepBody({ step, funnel, thanksHref, preview }: { step: RenderStep; fun
     }
     case 'thank-you': {
       const booking = safeBookingUrl(step.bookingUrl)
-      const download = safeDownloadUrl(step.downloadUrl)
+      const download = downloadHref(funnel.id, step)
       return (
         <div className="space-y-6">
           {download && (
