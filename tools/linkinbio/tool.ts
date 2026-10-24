@@ -7,5 +7,6 @@ export const linkinbioTool = {
   nav: [{ label: 'Link-in-bio', href: '/links', icon: 'link' }],
   accessKey: 'linkinbio',
   protectedPaths: ['/links'],
-  priceLabel: 'Included in All Access',
+  priceLabel: 'Included with every paid plan',
+  includedWithAnyPlan: true,
 } as const satisfies ToolDef

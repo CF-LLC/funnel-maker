@@ -15,7 +15,7 @@ export async function YourTools({ userId }: { userId: string }) {
       <h2 id="your-tools" className="text-lg font-semibold">Your tools</h2>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {TOOL_REGISTRY.map((t) => {
-          const on = all || active.has(t.accessKey)
+          const on = all || active.has(t.accessKey) || (!!(t as { includedWithAnyPlan?: boolean }).includedWithAnyPlan && active.size > 0)
           const Icon = TOOL_ICONS[t.nav[0]?.icon ?? 'box']
           return (
             <Link key={t.id} href={on ? t.route : '/pricing'} data-tool={t.id} data-access={on ? 'active' : 'locked'}
