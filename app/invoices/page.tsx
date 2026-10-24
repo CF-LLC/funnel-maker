@@ -83,13 +83,13 @@ export default function InvoicesHome() {
           <Button key={s} size="sm" variant={show === s ? 'default' : 'ghost'} onClick={() => setShow(s)}>{s[0].toUpperCase() + s.slice(1)}</Button>)}</div>
         {rows === null ? <p className="p-4 text-sm">Loading…</p> : list.length === 0 ? <p className="p-4 text-sm text-muted-foreground">No invoices here yet. <Link className="underline" href="/invoices/new">Create one</Link>.</p> :
           <div className="overflow-x-auto"><table className="w-full text-sm">
-            <thead><tr className="border-b text-left text-xs uppercase text-muted-foreground"><th className="p-3">Invoice</th><th>Client</th><th>Due</th><th className="text-right">Amount</th><th>Status</th><th></th></tr></thead>
+            <thead><tr className="border-b text-left text-xs uppercase text-muted-foreground"><th className="p-3">Invoice</th><th className="hidden sm:table-cell">Client</th><th>Due</th><th className="text-right">Amount</th><th>Status</th><th></th></tr></thead>
             <tbody>{list.map((r) => {
               const od = isOverdue(r, today)
               return (
                 <tr key={r.id} className="border-b last:border-0 align-middle">
-                  <td className="p-3 font-mono"><Link className="underline" href={`/invoices/${r.id}`}>{r.number}</Link></td>
-                  <td className="pr-2">{r.client_name}</td>
+                  <td className="p-3 font-mono whitespace-nowrap"><Link className="underline" href={`/invoices/${r.id}`}>{r.number}</Link></td>
+                  <td className="pr-2 hidden sm:table-cell">{r.client_name}</td>
                   <td className="pr-2 whitespace-nowrap">{r.due_date}{od && <span className="ml-2 rounded bg-red-100 px-1.5 py-0.5 text-xs font-semibold text-red-700">Overdue</span>}</td>
                   <td className="pr-2 text-right font-medium">{formatCurrency(r.total, r.currency)}</td>
                   <td className="pr-2"><button onClick={() => toggle(r)} className={`rounded-full px-2.5 py-1 text-xs font-semibold ${r.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`} title="Toggle paid/unpaid">{r.status === 'paid' ? 'Paid' : 'Unpaid'}</button></td>
