@@ -5,12 +5,13 @@ import { LeadForm } from '@/components/lead-form'
 import { CanvasField, useParallax, useScrollReveal } from '@/components/funnel/effects'
 import { themeFor, type ThemeId } from '@/data/templates'
 import { downloadHref } from '@/lib/downloads'
+import { formEmbedSrc } from '@/lib/forms/core'
 import { safeBookingUrl, safeCssColor, safeHttpsUrl, safePaymentLink, starterSitesUrl } from '@/lib/url-safety'
 
 export type RenderStep = {
   id: string; type: string; title: string; content: string; order?: number
   headline?: string; ctaText?: string; formFields?: string[]; priceLabel?: string; paymentLink?: string
-  bookingUrl?: string; downloadUrl?: string; downloadLabel?: string; imageUrl?: string
+  bookingUrl?: string; formEmbed?: string; downloadUrl?: string; downloadLabel?: string; imageUrl?: string
   backgroundColor?: string; textColor?: string
   affiliateLinks?: { id: string; url: string; buttonText: string }[]
 }
@@ -87,6 +88,10 @@ export function FunnelRenderer({ funnel, mode, edit, preview = false }: {
                   {step.content}
                 </p>
                 <StepBody step={step} funnel={funnel} thanksHref={thanksHref} preview={preview || !!edit} />
+                {formEmbedSrc(step.formEmbed) && (
+                  <iframe src={formEmbedSrc(step.formEmbed)} title="Form" loading="lazy" className="w-full min-h-[560px] rounded-xl border bg-white"
+                    sandbox="allow-scripts allow-same-origin allow-forms allow-popups" />
+                )}
               </div>
             </section>
           )

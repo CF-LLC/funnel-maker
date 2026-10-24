@@ -3,7 +3,10 @@ const nextConfig = {
   output: 'standalone',
   // Link-in-bio public pages: /@handle -> /u/handle
   async rewrites() {
-    return [{ source: '/@:handle', destination: '/u/:handle' }]
+    return [
+      { source: '/@:handle', destination: '/u/:handle' },
+      { source: '/@:handle/:form', destination: '/u/:handle/f/:form' },
+    ]
   },
   // Funnel dashboard/builder moved under /funnels (SaaS Nation hub lives at /dashboard).
   async redirects() {

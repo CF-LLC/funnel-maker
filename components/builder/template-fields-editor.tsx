@@ -1,5 +1,6 @@
 'use client'
 import { STORAGE_PREFIX, isValidDownload } from '@/lib/downloads'
+import { formEmbedSrc } from '@/lib/forms/core'
 
 import { useState } from 'react'
 import { Input } from '@/components/ui/input'
@@ -17,7 +18,22 @@ function Hint({ value, ok, msg }: { value?: string; ok: boolean; msg: string }) 
   return <p className={`text-xs mt-1 ${ok ? 'text-green-700' : 'text-red-600'}`}>{ok ? '✓ Looks good' : msg}</p>
 }
 
-export function TemplateFieldsEditor({ step, onUpdate, userId, slug }: Props) {
+export function TemplateFieldsEditor(props: Props) {
+  const { step, onUpdate } = props
+  const s = step as FunnelStep & { formEmbed?: string }
+  return (
+    <>
+      <StepFields {...props} />
+      <div className="space-y-1 border-t pt-4">
+        <Label>Embed a form (optional)</Label>
+        <Input value={s.formEmbed || ''} placeholder="/@yourhandle/form-name" onChange={(e) => onUpdate({ ...step, formEmbed: e.target.value.trim() } as FunnelStep)} />
+        <Hint value={s.formEmbed} ok={!!formEmbedSrc(s.formEmbed)} msg="Paste the path of one of your published forms, like /@handle/form-name" />
+      </div>
+    </>
+  )
+}
+
+function StepFields({ step, onUpdate, userId, slug }: Props) {
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState('')
 
