@@ -348,7 +348,7 @@ export default function FunnelBuilderPage() {
               </div>
             </div>
             <div className="bg-muted/60 p-0 lg:p-4">
-              <div data-scroll-root className={`mx-auto overflow-y-auto overflow-x-hidden bg-white lg:rounded-xl lg:shadow-lg transition-[max-width] duration-300 h-[70svh] lg:h-[calc(100svh-12rem)] ${device === 'phone' ? 'max-w-[390px]' : 'max-w-full'}`}>
+              <div data-scroll-root className={`light-surface mx-auto overflow-y-auto overflow-x-hidden bg-white lg:rounded-xl lg:shadow-lg transition-[max-width] duration-300 h-[70svh] lg:h-[calc(100svh-12rem)] ${device === 'phone' ? 'max-w-[390px]' : 'max-w-full'}`}>
                 <FunnelRenderer funnel={{ ...funnel, name: funnelName, slug: funnelSlug, steps }} mode="all"
                   edit={{ selectedId, onSelect: (id) => setSelectedId(id), onChange: (id, p) => patchStep(id, p as Partial<FunnelStep>) }} />
               </div>

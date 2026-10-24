@@ -8,4 +8,11 @@ export const proposalsTool = {
   accessKey: 'proposals',
   protectedPaths: ['/proposals'],
   priceLabel: '$12/mo on its own, or included in All Access',
+  showcase: {
+    cardTagline: 'Send a quote, get a yes, get paid.',
+    rows: ['get-paid', 'coaches'],
+    colors: { from: '#0c4a6e', to: '#0891b2', accent: '#22d3ee' },
+    shot: '/shots/proposals.jpg',
+    order: 5,
+  },
 } as const satisfies ToolDef

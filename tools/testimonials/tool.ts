@@ -8,4 +8,11 @@ export const testimonialsTool = {
   accessKey: 'testimonials',
   protectedPaths: ['/testimonials'],
   priceLabel: '$12/mo on its own, or included in All Access',
+  showcase: {
+    cardTagline: 'Let happy clients sell for you.',
+    rows: ['creators', 'coaches'],
+    colors: { from: '#713f12', to: '#ca8a04', accent: '#facc15' },
+    shot: '/shots/testimonials.jpg',
+    order: 6,
+  },
 } as const satisfies ToolDef

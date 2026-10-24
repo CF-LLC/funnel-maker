@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#7c3aed',
+  themeColor: "#09090b",
 };
 
 export default function RootLayout({
@@ -40,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} noir antialiased`}
         suppressHydrationWarning
       >
         <SessionProvider>

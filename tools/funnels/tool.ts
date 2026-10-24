@@ -11,4 +11,11 @@ export const funnelsTool = {
   accessKey: 'funnels',
   protectedPaths: ['/dashboard', '/funnels'],
   priceLabel: 'Funnel Maker plans below',
+  showcase: {
+    cardTagline: 'Launch a page that sells, in minutes.',
+    rows: ['coaches', 'creators'],
+    colors: { from: '#7c2d12', to: '#ea580c', accent: '#fb923c' },
+    shot: '/shots/funnels.jpg',
+    order: 1,
+  },
 } as const satisfies ToolDef
