@@ -1,6 +1,7 @@
 import { Navbar } from '@/components/nav/navbar'
 import { Footer } from '@/components/nav/footer'
 import { PricingPlans } from '@/components/pricing-plans'
+import { ToolsList } from '@/components/tools/tools-list'
 
 export default function PricingPage() {
   return (
@@ -11,6 +12,7 @@ export default function PricingPage() {
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Simple pricing</h1>
           <p className="text-xl text-muted-foreground">One plan, everything included. Pick how you want to pay. 14-day money-back guarantee.</p>
         </div>
+        <ToolsList />
         <PricingPlans />
         <p className="text-center text-sm text-muted-foreground mt-10">
           Payments are handled securely by Stripe for CF LLC. Create your account, then pay with the same email.

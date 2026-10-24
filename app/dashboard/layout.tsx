@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Zap, LayoutTemplate, LogOut, Users, CreditCard, Shield, Menu, X, Plus, Receipt } from 'lucide-react'
+import { LayoutDashboard, Zap, LogOut, Users, CreditCard, Shield, Menu, X, Plus } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
+import { TOOL_REGISTRY } from '@/tools/registry'
+import { TOOL_ICONS } from '@/components/tools/tool-icons'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false) // mobile drawer; desktop sidebar is always shown
@@ -33,9 +35,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'My funnels', href: '/dashboard/funnels', icon: Zap },
-    { name: 'Templates', href: '/dashboard/templates', icon: LayoutTemplate },
-    { name: 'Invoices', href: '/invoices', icon: Receipt },
+    ...TOOL_REGISTRY.flatMap((t) => t.nav.map((n) => ({ name: n.label, href: n.href, icon: TOOL_ICONS[n.icon] }))),
     { name: 'Organizations', href: '/dashboard/organizations', icon: Users },
     { name: 'Billing', href: '/dashboard/billing', icon: CreditCard },
   ]
@@ -54,7 +54,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="flex items-center justify-between p-5">
         <Link href="/dashboard" className="flex items-center gap-2 text-lg font-extrabold">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-white"><Zap className="h-4 w-4" /></span>
-          Funnel Maker
+          SaaS Nation
         </Link>
         <button onClick={() => setOpen(false)} aria-label="Close menu" className="press flex h-11 w-11 items-center justify-center rounded-lg hover:bg-muted lg:hidden"><X className="h-5 w-5" /></button>
       </div>
@@ -97,7 +97,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="lg:pl-64">
         <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-background/80 px-2 backdrop-blur lg:hidden">
           <button onClick={() => setOpen(true)} aria-label="Open menu" className="press flex h-11 w-11 items-center justify-center rounded-lg hover:bg-muted"><Menu className="h-5 w-5" /></button>
-          <Link href="/dashboard" className="flex min-h-[44px] items-center px-1 font-bold">Funnel Maker</Link>
+          <Link href="/dashboard" className="flex min-h-[44px] items-center px-1 font-bold">SaaS Nation</Link>
         </header>
         <main className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8">{children}</main>
       </div>

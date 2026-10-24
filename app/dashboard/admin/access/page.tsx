@@ -5,15 +5,16 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 type U = { id: string; email: string; approved: boolean; plan: string | null; wish_tool: string | null }
-type A = { user_id: string; tool: 'funnels' | 'invoices' | 'all'; plan: string | null; source: string; active: boolean; founding_lapsed: boolean; created_at: string }
-const TOOLS = ['funnels', 'invoices', 'all'] as const
+import { ACCESS_KEYS, getTool, type ToolId, type ALL_ACCESS } from '@/tools/registry'
+type A = { user_id: string; tool: ToolId | typeof ALL_ACCESS; plan: string | null; source: string; active: boolean; founding_lapsed: boolean; created_at: string }
+const TOOLS = ACCESS_KEYS
 type Filter = 'all' | 'active' | 'inactive' | 'none'
 
 export default function AccessPage() {
   const [users, setUsers] = useState<U[] | null>(null)
   const [access, setAccess] = useState<A[]>([])
   const [error, setError] = useState('')
-  const [tool, setTool] = useState<(typeof TOOLS)[number]>('funnels')
+  const [tool, setTool] = useState<(typeof TOOLS)[number]>(TOOLS[0])
   const [filter, setFilter] = useState<Filter>('all')
   const [q, setQ] = useState('')
 
@@ -58,7 +59,7 @@ export default function AccessPage() {
             Approving an account on the Approvals page grants funnels access (and founding invoices while INVOICES_FOUNDING_OPEN isn&apos;t &quot;false&quot;).
           </div>
           <div className="flex flex-wrap gap-2 items-center text-sm">
-            {TOOLS.map((t) => <Button key={t} size="sm" variant={tool === t ? 'default' : 'outline'} onClick={() => setTool(t)}>{t}</Button>)}
+            {TOOLS.map((t) => <Button key={t} size="sm" variant={tool === t ? 'default' : 'outline'} onClick={() => setTool(t)}>{getTool(t)?.name ?? 'All Access'}</Button>)}
             <select aria-label="filter" className="border rounded px-2 py-1" value={filter} onChange={(e) => setFilter(e.target.value as Filter)}>
               <option value="all">All users</option><option value="active">Active</option><option value="inactive">Inactive</option><option value="none">No access row</option>
             </select>
