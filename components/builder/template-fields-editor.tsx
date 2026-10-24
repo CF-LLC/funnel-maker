@@ -1,10 +1,11 @@
 'use client'
+import { STORAGE_PREFIX, isValidDownload } from '@/lib/downloads'
 
 import { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { createClient } from '@/lib/supabase'
-import { safeBookingUrl, safeDownloadUrl, safePaymentLink } from '@/lib/url-safety'
+import { safeBookingUrl, safePaymentLink } from '@/lib/url-safety'
 import type { FunnelStep } from '@/data/templates'
 
 type Props = { step: FunnelStep; onUpdate: (s: FunnelStep) => void; userId: string; slug: string }
@@ -31,8 +32,8 @@ export function TemplateFieldsEditor({ step, onUpdate, userId, slug }: Props) {
     const { error } = await supabase.storage.from('fm-downloads').upload(path, file, { contentType: 'application/pdf', upsert: false })
     setUploading(false)
     if (error) return setUploadError(error.message || 'Upload failed')
-    const { data } = supabase.storage.from('fm-downloads').getPublicUrl(path)
-    onUpdate({ ...step, downloadUrl: data.publicUrl })
+    // Private bucket: store a storage reference; visitors get it via the access-checked download route.
+    onUpdate({ ...step, downloadUrl: `${STORAGE_PREFIX}${path}` })
   }
 
   if (step.type === 'sales') {
@@ -69,7 +70,7 @@ export function TemplateFieldsEditor({ step, onUpdate, userId, slug }: Props) {
         <div>
           <Label>Download link</Label>
           <Input value={step.downloadUrl || ''} placeholder="https://... or upload a PDF below" onChange={(e) => onUpdate({ ...step, downloadUrl: e.target.value.trim() })} />
-          <Hint value={step.downloadUrl} ok={!!safeDownloadUrl(step.downloadUrl)} msg="Must be an https link" />
+          <Hint value={step.downloadUrl} ok={isValidDownload(step.downloadUrl)} msg="Must be an https link or an uploaded PDF" />
         </div>
         <div>
           <Label>…or upload a PDF (max 10 MB)</Label>
