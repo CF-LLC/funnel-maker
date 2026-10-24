@@ -45,11 +45,6 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/" className="hover:text-foreground">
-                  Blog
-                </Link>
-              </li>
-              <li>
                 <a href={`mailto:${SUPPORT_EMAIL}`} className="hover:text-foreground">
                   Support
                 </a>
@@ -66,7 +61,7 @@ export function Footer() {
               </li>
               <li>
                 <a href={`mailto:${SUPPORT_EMAIL}`} className="hover:text-foreground">
-                  Contact
+                  Support
                 </a>
               </li>
               <li>
@@ -89,7 +84,7 @@ export function Footer() {
           <div>
             <h3 className="font-bold mb-4">SaaS Nation</h3>
             <p className="text-sm text-muted-foreground">
-              Build high-converting sales funnels with our drag-and-drop builder.
+              Funnels, invoices, Link-in-bio, forms, proposals and testimonials for small businesses. Support: <a href={`mailto:${SUPPORT_EMAIL}`} className="underline hover:text-foreground">{SUPPORT_EMAIL}</a>
             </p>
           </div>
         </div>
