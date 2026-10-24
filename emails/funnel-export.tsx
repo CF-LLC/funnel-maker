@@ -53,7 +53,7 @@ export const FunnelExportEmail: React.FC<FunnelExportEmailProps> = ({
     <hr style={{ border: 'none', borderTop: '1px solid #e5e5e5', margin: '40px 0' }} />
     
     <p style={{ fontSize: '12px', color: '#999' }}>
-      Funnel Maker · Made with ❤️
+      SaaS Nation · Made with ❤️
     </p>
   </div>
 )

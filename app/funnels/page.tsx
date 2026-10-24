@@ -22,7 +22,7 @@ export default async function FunnelsPage() {
           <h1 className="text-2xl sm:text-3xl font-bold">My Funnels</h1>
           <p className="text-sm sm:text-base text-muted-foreground">Manage all your funnels</p>
         </div>
-        <Link href="/dashboard/templates" className="w-full sm:w-auto">
+        <Link href="/funnels/templates" className="w-full sm:w-auto">
           <Button size="lg" className="gap-2 w-full sm:w-auto">
             <Plus className="w-4 h-4" />
             New Funnel
@@ -38,7 +38,7 @@ export default async function FunnelsPage() {
             <p className="text-sm sm:text-base text-muted-foreground mb-4 text-center">
               Pick a template, change the words, publish. It takes about two minutes.
             </p>
-            <Link href="/dashboard/templates">
+            <Link href="/funnels/templates">
               <Button size="lg">Pick a template</Button>
             </Link>
           </CardContent>
@@ -64,7 +64,7 @@ export default async function FunnelsPage() {
                   </p>
                 )}
                 <div className="flex gap-2">
-                  <Link href={`/dashboard/funnels/${funnel.id}`} className="flex-1">
+                  <Link href={`/funnels/${funnel.id}`} className="flex-1">
                     <Button variant="outline" className="w-full">Edit</Button>
                   </Link>
                   {funnel.is_public && (

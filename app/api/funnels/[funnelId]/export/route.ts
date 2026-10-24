@@ -44,7 +44,7 @@ export async function GET(
     // Create README
     const readme = `# ${funnel.name}
 
-This is an exported funnel from Funnel Maker.
+This is an exported funnel from Funnel Maker by SaaS Nation.
 
 ## Files:
 - index.html - Overview of all funnel steps
@@ -160,7 +160,7 @@ function generateStepHTML(step: any, stepNumber: number, funnelName: string): st
     <div class="content">${step.content}</div>
     <a href="#" class="cta">Take Action</a>
     <footer>
-      <p>Powered by Funnel Maker</p>
+      <p>Made with SaaS Nation</p>
     </footer>
   </div>
 </body>

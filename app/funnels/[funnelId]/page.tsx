@@ -25,7 +25,7 @@ import { templates, type FunnelStep } from '@/data/templates'
 import { RealtimeCollaboration, Collaborator } from '@/lib/realtime-collaboration'
 
 type SaveState = 'idle' | 'dirty' | 'saving' | 'saved' | 'error'
-const SITE = (process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://funnels.saasnation.site').replace(/\/$/, '')
+const SITE = (process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://saasnation.site').replace(/\/$/, '')
 
 function sanitizeSlug(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
@@ -206,7 +206,7 @@ export default function FunnelBuilderPage() {
     const { error } = await supabase.from('funnels').delete().eq('id', funnelId)
     if (error) return toast(`Could not delete: ${error.message}`, 'error')
     toast('Funnel deleted', 'info')
-    router.push('/dashboard/funnels')
+    router.push('/funnels')
   }
 
   if (notFound) {
@@ -214,7 +214,7 @@ export default function FunnelBuilderPage() {
       <div className="mx-auto max-w-md py-20 text-center">
         <h1 className="text-2xl font-bold">Funnel not found</h1>
         <p className="mt-2 text-muted-foreground">It may have been deleted, or you may not have access.</p>
-        <Button asChild className="mt-6"><Link href="/dashboard/funnels">Back to my funnels</Link></Button>
+        <Button asChild className="mt-6"><Link href="/funnels">Back to my funnels</Link></Button>
       </div>
     )
   }
@@ -226,7 +226,7 @@ export default function FunnelBuilderPage() {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-        <Button asChild variant="ghost" size="icon" aria-label="Back to funnels"><Link href="/dashboard/funnels"><ArrowLeft /></Link></Button>
+        <Button asChild variant="ghost" size="icon" aria-label="Back to funnels"><Link href="/funnels"><ArrowLeft /></Link></Button>
         <div className="min-w-0 flex-1">
           <Input aria-label="Funnel name" value={funnelName} onChange={(e) => setFunnelName(e.target.value)}
             className="h-auto border-transparent bg-transparent px-2 py-1 text-xl font-bold shadow-none hover:border-input sm:text-2xl" placeholder="Name your funnel" />
@@ -237,7 +237,7 @@ export default function FunnelBuilderPage() {
           <DropdownMenuTrigger asChild><Button variant="outline" size="icon" aria-label="More actions"><MoreHorizontal /></Button></DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={exportFunnel} disabled={exporting}><Download className="mr-2 h-4 w-4" />{exporting ? 'Exporting…' : 'Export HTML'}</DropdownMenuItem>
-            <DropdownMenuItem asChild><Link href={`/dashboard/funnels/${funnelId}/analytics`}><Globe className="mr-2 h-4 w-4" />Analytics</Link></DropdownMenuItem>
+            <DropdownMenuItem asChild><Link href={`/funnels/${funnelId}/analytics`}><Globe className="mr-2 h-4 w-4" />Analytics</Link></DropdownMenuItem>
             <DropdownMenuItem onClick={deleteFunnel} className="text-red-600 focus:text-red-700"><Trash2 className="mr-2 h-4 w-4" />Delete funnel</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -274,7 +274,7 @@ export default function FunnelBuilderPage() {
                 <p className="mt-1 text-sm text-muted-foreground">Add a page, or start again from a ready-made template.</p>
                 <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-center">
                   <Button onClick={() => setShowStepTypeDialog(true)}><Plus /> Add a page</Button>
-                  <Button asChild variant="outline"><Link href="/dashboard/templates">Browse templates</Link></Button>
+                  <Button asChild variant="outline"><Link href="/funnels/templates">Browse templates</Link></Button>
                 </div>
               </div>
             ) : (

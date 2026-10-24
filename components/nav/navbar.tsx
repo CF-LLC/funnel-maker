@@ -40,7 +40,7 @@ useEffect(() => {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-4 sm:gap-8">
           <Link href="/" className="flex items-center gap-2 text-xl font-extrabold">
-            <span aria-hidden className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-white text-sm">✦</span>Funnel Maker
+            <span aria-hidden className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-white text-sm">✦</span>SaaS Nation
           </Link>
           <div className="hidden md:flex gap-6">
             <Link href="/#features" className="text-sm hover:text-primary">

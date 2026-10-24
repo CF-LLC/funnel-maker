@@ -1,8 +1,12 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { isProtectedPath } from '@/tools/registry'
+import { legacyHostRedirect } from '@/lib/legacy-host'
 
 export async function middleware(request: NextRequest) {
+  const legacy = legacyHostRedirect(request.headers.get('x-forwarded-host') || request.headers.get('host'), request.nextUrl.pathname, request.nextUrl.search)
+  if (legacy) return NextResponse.redirect(legacy, 301)
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,

@@ -77,7 +77,7 @@ export function reminderIcs(o: { uid: string; number: string; clientName: string
   const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')
   return [
     'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//SaaS Nation//Invoices//EN', 'CALSCALE:GREGORIAN', 'BEGIN:VEVENT',
-    `UID:${o.uid}@funnels.saasnation.site`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${d}`, `DTEND;VALUE=DATE:${next}`,
+    `UID:${o.uid}@saasnation.site`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${d}`, `DTEND;VALUE=DATE:${next}`,
     `SUMMARY:${icsEsc(`Invoice ${o.number} due: ${o.clientName} (${o.amount})`)}`,
     `DESCRIPTION:${icsEsc(`Check payment for invoice ${o.number}. ${o.link}`)}`, `URL:${o.link}`,
     'BEGIN:VALARM', 'ACTION:DISPLAY', 'TRIGGER:-PT0M', `DESCRIPTION:${icsEsc(`Invoice ${o.number} due`)}`, 'END:VALARM',

@@ -11,7 +11,7 @@ export default function TemplatesPage() {
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">Templates that <span className="text-brand">wow</span></h1>
           <p className="mt-4 text-lg text-muted-foreground">Animated gradients, starfields, glass and parallax. Fast on every phone, and calm for people who prefer less motion.</p>
         </div>
-        <TemplatePicker returnTo="/dashboard/templates" />
+        <TemplatePicker returnTo="/funnels/templates" />
       </section>
       <Footer />
     </div>

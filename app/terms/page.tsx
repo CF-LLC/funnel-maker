@@ -7,7 +7,7 @@ export const metadata = { title: `Terms of Service | ${PRODUCT}` }
 export default function TermsPage() {
   return (
     <LegalPage title="Terms of Service">
-      <p>These terms cover your use of {PRODUCT} (funnels.saasnation.site), operated by {COMPANY}, {COMPANY_LOCATION}. By creating an account or paying for a plan you agree to them.</p>
+      <p>These terms cover your use of {PRODUCT} (saasnation.site), including its tools (Funnel Maker, Invoices, Link-in-bio), operated by {COMPANY}, {COMPANY_LOCATION}. By creating an account or paying for a plan you agree to them.</p>
       <h2>Accounts</h2>
       <ul>
         <li>You must give a real email address and keep your password private. You are responsible for activity on your account.</li>

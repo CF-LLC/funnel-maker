@@ -7,7 +7,7 @@ interface WelcomeEmailProps {
 export const WelcomeEmail: React.FC<WelcomeEmailProps> = ({ email }) => (
   <div style={{ fontFamily: 'Arial, sans-serif', maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
     <h1 style={{ color: '#000', fontSize: '32px', marginBottom: '20px' }}>
-      Welcome to Funnel Maker! 🎉
+      Welcome to SaaS Nation! 🎉
     </h1>
     
     <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#333' }}>
@@ -52,9 +52,9 @@ export const WelcomeEmail: React.FC<WelcomeEmailProps> = ({ email }) => (
     <hr style={{ border: 'none', borderTop: '1px solid #e5e5e5', margin: '40px 0' }} />
     
     <p style={{ fontSize: '12px', color: '#999' }}>
-      You received this email because you signed up for Funnel Maker.
+      You received this email because you signed up for SaaS Nation.
       <br />
-      Funnel Maker · Made with ❤️
+      SaaS Nation · Made with ❤️
     </p>
   </div>
 )

@@ -14,7 +14,7 @@ services:
         NEXT_PUBLIC_STRIPE_LINK_FOUNDING: ${NEXT_PUBLIC_STRIPE_LINK_FOUNDING:-}
     env_file: .env
     restart: unless-stopped
-    # Only reachable from the host; Cloudflare Tunnel routes funnels.saasnation.site here.
+    # Only reachable from the host; Cloudflare Tunnel routes saasnation.site (and funnels.saasnation.site during transition) here.
     ports:
       - "127.0.0.1:3010:3000"
     mem_limit: 512m
