@@ -16,4 +16,6 @@ export type ToolDef = {
   protectedPaths: string[]
   /** Short price line for the pricing page tool list. */
   priceLabel: string
+  /** Included with every paid plan: any active app_access row grants it; not sold separately. */
+  includedWithAnyPlan?: boolean
 }

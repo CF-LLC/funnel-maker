@@ -3,9 +3,10 @@ import { TOOL_ICONS } from '@/components/tools/tool-icons'
 
 /** Pricing page: tools listed from the single registry. */
 export function ToolsList() {
+  const included = TOOL_REGISTRY.filter((t) => (t as { includedWithAnyPlan?: boolean }).includedWithAnyPlan)
   return (
     <div className="max-w-5xl mx-auto mb-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {TOOL_REGISTRY.map((t) => {
+      {TOOL_REGISTRY.filter((t) => !(t as { includedWithAnyPlan?: boolean }).includedWithAnyPlan).map((t) => {
         const Icon = TOOL_ICONS[t.nav[0]?.icon ?? 'box']
         return (
           <div key={t.id} data-tool={t.id} className="rounded-xl border p-4">
@@ -17,6 +18,7 @@ export function ToolsList() {
       })}
       <div className="rounded-xl border border-primary p-4 sm:col-span-2 lg:col-span-3 text-center text-sm">
         <strong>All Access</strong> covers every tool above, including new ones as they launch.
+        {included.length > 0 && <span className="block mt-1 text-muted-foreground">Included with every paid plan: {included.map((t) => t.name).join(', ')}.</span>}
       </div>
     </div>
   )

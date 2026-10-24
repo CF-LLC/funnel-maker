@@ -1,7 +1,7 @@
 // Stripe webhook logic, kept free of Next/Supabase imports so it can be unit-tested with a fake store.
 import type Stripe from 'stripe'
 
-import { ACCESS_KEYS, type ToolId, type ALL_ACCESS } from '@/tools/registry'
+import { SOLD_ACCESS_KEYS as ACCESS_KEYS, type ToolId, type ALL_ACCESS } from '@/tools/registry'
 export type MapTool = ToolId | typeof ALL_ACCESS
 export type PriceMap = Record<string, { tool: MapTool; plan?: string }>
 

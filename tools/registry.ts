@@ -12,6 +12,11 @@ export const TOOL_IDS = TOOL_REGISTRY.map((t) => t.id) as ToolId[]
 export const ALL_ACCESS = 'all' as const
 export const ACCESS_KEYS = [...TOOL_IDS, ALL_ACCESS] as (ToolId | typeof ALL_ACCESS)[]
 
+/** Tools that can be priced/granted on their own (STRIPE_PRICE_MAP, admin tabs). */
+export const SOLD_TOOL_IDS = (TOOL_REGISTRY as readonly ToolDef[]).filter((t) => !t.includedWithAnyPlan).map((t) => t.id) as ToolId[]
+export const SOLD_ACCESS_KEYS = [...SOLD_TOOL_IDS, ALL_ACCESS] as (ToolId | typeof ALL_ACCESS)[]
+export const isIncludedTool = (id: string) => !!(TOOL_REGISTRY as readonly ToolDef[]).find((t) => t.id === id)?.includedWithAnyPlan
+
 export function getTool(id: string): ToolDef | undefined {
   return (TOOL_REGISTRY as readonly ToolDef[]).find((t) => t.id === id)
 }

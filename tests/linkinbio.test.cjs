@@ -40,3 +40,15 @@ test('migration: allowed tools extended, owner RLS, click fn service-only, no de
   const page = fs.readFileSync(path.join(root, 'app/u/[handle]/page.tsx'), 'utf8')
   assert.match(page, /page.badge &&/); assert.match(page, /Made with SaaS Nation/); assert.match(page, /href="\/pricing"/)
 })
+
+test('link-in-bio included with any paid plan; not sold separately', () => {
+  const reg = jiti('../tools/registry.ts')
+  assert.ok(reg.isIncludedTool('linkinbio')); assert.ok(!reg.isIncludedTool('invoices'))
+  assert.ok(!reg.SOLD_ACCESS_KEYS.includes('linkinbio')); assert.ok(reg.SOLD_ACCESS_KEYS.includes('all'))
+  const { parsePriceMap } = jiti('../lib/stripe-webhook.ts')
+  assert.throws(() => parsePriceMap(JSON.stringify({ price_x: { tool: 'linkinbio' } })))
+  const sql = fs.readFileSync(path.join(root, 'supabase/migrations/20261024_linkinbio_included.sql'), 'utf8')
+  assert.match(sql, /where user_id = uid and active\)/)
+  assert.match(fs.readFileSync(path.join(root, 'lib/access.ts'), 'utf8'), /isIncludedTool\(tool\)/)
+  assert.match(fs.readFileSync(path.join(root, 'components/tools/tools-list.tsx'), 'utf8'), /!\(t as \{ includedWithAnyPlan/)
+})

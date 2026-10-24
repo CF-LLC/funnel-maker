@@ -23,7 +23,7 @@ export default async function LinkInBioLayout({ children }: { children: React.Re
         {allowed ? children : (
           <div className="mx-auto max-w-lg rounded-xl border bg-background p-6 text-center">
             <h1 className="text-xl font-bold">Link-in-bio isn&apos;t on your plan yet</h1>
-            <p className="mt-2 text-sm text-muted-foreground">Link-in-bio is included in All Access. If you just paid, your access is turned on by hand shortly.</p>
+            <p className="mt-2 text-sm text-muted-foreground">Link-in-bio is included with every paid plan. If you just paid, your access is turned on by hand shortly.</p>
             <Link href="/pricing" className="mt-4 inline-block rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white">See pricing</Link>
           </div>
         )}

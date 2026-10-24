@@ -1,7 +1,7 @@
 // SaaS Nation per-tool access. One row per (user, tool) in public.app_access; writes are admin-only (service role).
 import { createServerClient } from '@/lib/supabase'
 
-import { TOOL_IDS, ACCESS_KEYS, type ToolId, type ALL_ACCESS } from '@/tools/registry'
+import { isIncludedTool, TOOL_IDS, ACCESS_KEYS, type ToolId, type ALL_ACCESS } from '@/tools/registry'
 
 /** Derived from tools/registry.ts. */
 export const TOOLS: readonly ToolId[] = TOOL_IDS
@@ -24,8 +24,10 @@ export function isAccessTool(v: unknown): v is AccessTool {
 export async function hasAccess(user: { id: string } | null | undefined, tool: Tool): Promise<boolean> {
   if (!user?.id) return false
   const supabase = await createServerClient()
-  const { data } = await (supabase as any)
-    .from('app_access').select('tool').eq('user_id', user.id).in('tool', [tool, 'all']).eq('active', true).limit(1)
+  let q = (supabase as any).from('app_access').select('tool').eq('user_id', user.id).eq('active', true)
+  // Included tools (Link-in-bio): any active row on any tool counts.
+  if (!isIncludedTool(tool)) q = q.in('tool', [tool, 'all'])
+  const { data } = await q.limit(1)
   return Array.isArray(data) && data.length > 0
 }
 
