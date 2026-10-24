@@ -1,6 +1,7 @@
 'use client'
 import { STORAGE_PREFIX, isValidDownload } from '@/lib/downloads'
 import { formEmbedSrc } from '@/lib/forms/core'
+import { testimonialsEmbedSrc } from '@/lib/testimonials/core'
 
 import { useState } from 'react'
 import { Input } from '@/components/ui/input'
@@ -20,7 +21,7 @@ function Hint({ value, ok, msg }: { value?: string; ok: boolean; msg: string }) 
 
 export function TemplateFieldsEditor(props: Props) {
   const { step, onUpdate } = props
-  const s = step as FunnelStep & { formEmbed?: string }
+  const s = step as FunnelStep & { formEmbed?: string; testimonialsEmbed?: string }
   return (
     <>
       <StepFields {...props} />
@@ -28,6 +29,11 @@ export function TemplateFieldsEditor(props: Props) {
         <Label>Embed a form (optional)</Label>
         <Input value={s.formEmbed || ''} placeholder="/@yourhandle/form-name" onChange={(e) => onUpdate({ ...step, formEmbed: e.target.value.trim() } as FunnelStep)} />
         <Hint value={s.formEmbed} ok={!!formEmbedSrc(s.formEmbed)} msg="Paste the path of one of your published forms, like /@handle/form-name" />
+      </div>
+      <div className="space-y-1 border-t pt-4">
+        <Label>Embed testimonials (optional)</Label>
+        <Input value={s.testimonialsEmbed || ''} placeholder="/@yourhandle/reviews or /@yourhandle/reviews?layout=quote" onChange={(e) => onUpdate({ ...step, testimonialsEmbed: e.target.value.trim() } as FunnelStep)} />
+        <Hint value={s.testimonialsEmbed} ok={!!testimonialsEmbedSrc(s.testimonialsEmbed)} msg="Paste /@handle/reviews for a grid, or add ?layout=quote for a single quote" />
       </div>
     </>
   )

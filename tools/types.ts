@@ -1,5 +1,5 @@
 // Data-only tool definition (safe to import from middleware/edge, server and client code).
-export type ToolIcon = 'zap' | 'layout-template' | 'receipt' | 'link' | 'box' | 'clipboard' | 'file-check'
+export type ToolIcon = 'zap' | 'layout-template' | 'receipt' | 'link' | 'box' | 'clipboard' | 'file-check' | 'star'
 export type ToolNavItem = { label: string; href: string; icon: ToolIcon }
 export type ToolDef = {
   /** Stable id. Also the app_access.tool value and the STRIPE_PRICE_MAP tool value. */

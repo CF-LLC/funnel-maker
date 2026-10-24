@@ -5,7 +5,7 @@ import { safeHttpsUrl } from '@/lib/url-safety'
 export type PublicPage = {
   handle: string; display_name: string; bio: string; avatar_url: string | null
   links: PublicLink[]; funnels: { name: string; slug: string }[]
-  theme: Theme; socials: Partial<Record<Social, string>>; badge: boolean
+  theme: Theme; socials: Partial<Record<Social, string>>; badge: boolean; user_id: string
 }
 
 /** Read-only projection for /u/[handle]: published page AND owner has linkinbio (or all) access. */
@@ -34,7 +34,7 @@ export async function getPublicPage(raw: string): Promise<PublicPage | null> {
     theme: (THEMES as readonly string[]).includes(p.theme) ? p.theme : 'light',
     socials: socials.success ? socials.data : {},
     badge: showBadge(!!p.hide_badge, Array.isArray(allRow) && allRow.length > 0),
-    handle: p.handle, display_name: p.display_name, bio: p.bio, avatar_url: safeHttpsUrl(p.avatar_url) ?? null,
+    user_id: p.user_id, handle: p.handle, display_name: p.display_name, bio: p.bio, avatar_url: safeHttpsUrl(p.avatar_url) ?? null,
     links: orderLinks(links || []).filter((l: any) => safeHttpsUrl(l.url)).map((l: any) => ({ id: l.id, title: l.title, url: l.url, position: l.position })),
     funnels,
   }

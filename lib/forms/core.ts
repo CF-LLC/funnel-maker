@@ -6,6 +6,8 @@ export const FIELD_LABELS: Record<FieldType, string> = {
   short_text: 'Short text', long_text: 'Long text', email: 'Email', phone: 'Phone', dropdown: 'Dropdown', checkbox: 'Checkbox', date: 'Date',
 }
 export const MAX_FIELDS = 10
+/** Paths under /@handle used by other tools (Testimonials). */
+export const RESERVED_SLUGS = ['review', 'reviews', 'p']
 export const SLUG_RE = /^[a-z0-9][a-z0-9-]{0,59}$/
 
 export const fieldSchema = z.object({
@@ -18,7 +20,8 @@ export const fieldSchema = z.object({
 export type Field = z.infer<typeof fieldSchema>
 
 export const formSchema = z.object({
-  slug: z.string().trim().toLowerCase().regex(SLUG_RE, 'Form name: a-z, 0-9 and dashes'),
+  slug: z.string().trim().toLowerCase().regex(SLUG_RE, 'Form name: a-z, 0-9 and dashes')
+    .refine((v) => !RESERVED_SLUGS.includes(v), 'That form name is reserved, pick another'),
   title: z.string().trim().min(1).max(100),
   description: z.string().trim().max(500),
   submit_label: z.string().trim().min(1).max(40),
