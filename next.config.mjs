@@ -17,6 +17,8 @@ const nextConfig = {
       { source: '/dashboard/funnels', destination: '/funnels', permanent: true },
       { source: '/dashboard/funnels/:path*', destination: '/funnels/:path*', permanent: true },
       { source: '/dashboard/templates', destination: '/funnels/templates', permanent: true },
+      { source: '/login', destination: '/auth/login', permanent: true },
+      { source: '/signup', destination: '/auth/register', permanent: true },
     ]
   },
   eslint: {
