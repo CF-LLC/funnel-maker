@@ -5,6 +5,8 @@ const nextConfig = {
   async rewrites() {
     return [
       { source: '/@:handle', destination: '/u/:handle' },
+      { source: '/@:handle/review', destination: '/u/:handle/review' },
+      { source: '/@:handle/reviews', destination: '/u/:handle/reviews' },
       { source: '/@:handle/:form', destination: '/u/:handle/f/:form' },
       { source: '/@:handle/p/:id', destination: '/u/:handle/p/:id' },
     ]

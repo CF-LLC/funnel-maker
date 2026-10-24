@@ -4,6 +4,8 @@ import type { Metadata } from 'next'
 import { getPublicProposal } from '@/lib/proposals/public'
 import { effectiveStatus, STATUS_LABELS, STATUS_STYLES } from '@/lib/proposals/core'
 import { formatCurrency, totals } from '@/lib/invoices/core'
+import { getEmbed } from '@/lib/testimonials/public'
+import { ReviewList } from '@/components/testimonials/review-list'
 import { ProposalResponse } from '@/components/proposals/public-response'
 
 export const dynamic = 'force-dynamic'
@@ -21,6 +23,7 @@ export default async function PublicProposalPage({ params }: P) {
   if (!p) notFound()
   const s = effectiveStatus(p)
   const t = totals(p.lines, null)
+  const reviews = await getEmbed(p.user_id, p.handle, 'proposals_layout')
   const when = (iso: string) => new Date(iso).toLocaleDateString('en-US', { timeZone: 'America/Chicago', dateStyle: 'long' })
   return (
     <div className="min-h-screen bg-app flex flex-col items-center px-4 py-12">
@@ -46,6 +49,7 @@ export default async function PublicProposalPage({ params }: P) {
         {s === 'accepted' && <p role="status" className="rounded-xl border bg-green-50 p-4 text-green-900">Accepted by {p.accepted_name} on {when(p.responded_at!)}.</p>}
         {s === 'declined' && <p role="status" className="rounded-xl border bg-red-50 p-4 text-red-900">This proposal was declined on {when(p.responded_at!)}.</p>}
         {s === 'expired' && <p role="status" className="rounded-xl border bg-amber-50 p-4 text-amber-900">This proposal has expired. Contact the sender for an updated one.</p>}
+        {reviews && <section className="space-y-3"><h2 className="text-lg font-semibold">What clients say</h2><ReviewList reviews={reviews.reviews} layout={reviews.layout} handle={reviews.handle} /></section>}
       </main>
       <footer className="mt-12 text-xs text-muted-foreground"><Link href="/pricing" className="hover:underline">Made with SaaS Nation</Link></footer>
     </div>

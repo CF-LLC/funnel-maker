@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { Facebook, Github, Instagram, Linkedin, Music2, Twitter, Youtube, type LucideIcon } from 'lucide-react'
 import { getPublicPage } from '@/lib/linkinbio/public'
+import { getEmbed } from '@/lib/testimonials/public'
+import { ReviewList } from '@/components/testimonials/review-list'
 import { clickHref, type Social, type Theme } from '@/lib/linkinbio/core'
 
 export const dynamic = 'force-dynamic'
@@ -23,6 +25,7 @@ export default async function LinkInBioPage({ params }: { params: Promise<{ hand
   const page = await getPublicPage((await params).handle)
   if (!page) notFound()
   const t = THEME[page.theme]
+  const reviews = await getEmbed(page.user_id, page.handle, 'linkinbio_layout')
   const socials = Object.entries(page.socials) as [Social, string][]
   const btn = `press block rounded-xl border px-4 py-3 font-semibold transition ${t.btn}`
   return (
@@ -45,6 +48,7 @@ export default async function LinkInBioPage({ params }: { params: Promise<{ hand
           {page.links.map((l) => <li key={l.id}><a href={clickHref(page.handle, l.id)} rel="noopener nofollow" className={btn}>{l.title}</a></li>)}
           {page.funnels.map((f) => <li key={f.slug}><Link href={`/f/${f.slug}`} className={btn}>{f.name}</Link></li>)}
         </ul>
+        {reviews && <ReviewList reviews={reviews.reviews} layout={reviews.layout} handle={reviews.handle} />}
       </main>
       {page.badge && (
         <footer className={`mt-12 text-xs ${t.muted}`} data-badge>
