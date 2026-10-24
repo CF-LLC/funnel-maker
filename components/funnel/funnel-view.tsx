@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { DemoBanner } from '@/components/demo-banner'
 import { FunnelRenderer, type RenderFunnel } from '@/components/funnel/funnel-renderer'
 
 export function FunnelView({ slug, id, mode }: { slug?: string; id?: string; mode: 'main' | 'thanks' }) {
@@ -39,5 +38,5 @@ export function FunnelView({ slug, id, mode }: { slug?: string; id?: string; mod
       </div>
     )
   }
-  return <div className="min-h-screen flex flex-col">{funnel.demo && <DemoBanner />}<FunnelRenderer funnel={funnel} mode={mode} /></div>
+  return <div className="min-h-screen flex flex-col"><FunnelRenderer funnel={funnel} mode={mode} /></div>
 }
