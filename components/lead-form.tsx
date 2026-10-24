@@ -17,7 +17,7 @@ export function LeadForm({ slug, template, fields, ctaText, thanksHref, preview 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (preview) { setError('Preview only: the form works once your funnel is published.'); setState('error'); return }
-    if (demo) { setState('demo'); return }
+    if (demo) { setState('demo'); if (thanksHref) router.push(thanksHref); return }
     if (turnstileSiteKeySet && !token) { setError('Please complete the bot check'); setState('error'); return }
     setState('sending')
     const f = new FormData(e.currentTarget)

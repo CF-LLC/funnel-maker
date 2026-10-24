@@ -87,6 +87,7 @@ function StepFields({ step, onUpdate, userId, slug }: Props) {
           <Label>Calendly or Cal.com link</Label>
           <Input value={step.bookingUrl || ''} placeholder="https://calendly.com/you/intro" onChange={(e) => onUpdate({ ...step, bookingUrl: e.target.value.trim() })} />
           <Hint value={step.bookingUrl} ok={!!safeBookingUrl(step.bookingUrl)} msg="Must be an https link on calendly.com or cal.com" />
+          {!step.bookingUrl && <p className="text-xs text-amber-600 mt-1">Book a call funnels: add your Calendly or Cal.com link to finish. Without it visitors see a thank-you note instead of a calendar.</p>}
         </div>
         <h4 className="font-semibold text-sm pt-2">Download (Free download)</h4>
         <div>

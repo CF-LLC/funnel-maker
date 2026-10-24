@@ -123,7 +123,7 @@ function ParallaxHills() {
   )
 }
 
-function StepBody({ step, funnel, thanksHref, preview }: { step: RenderStep; funnel: RenderFunnel; thanksHref?: string; preview: boolean }) {
+function StepBody({ step, funnel, thanksHref, preview: previewMode }: { step: RenderStep; funnel: RenderFunnel; thanksHref?: string; preview: boolean }) {
   const slug = funnel.slug || ''
   switch (step.type) {
     case 'landing': {
@@ -133,7 +133,7 @@ function StepBody({ step, funnel, thanksHref, preview }: { step: RenderStep; fun
       ) : null
     }
     case 'lead-capture':
-      return <div id="form"><LeadForm slug={slug} template={funnel.template} fields={step.formFields} ctaText={step.ctaText} thanksHref={thanksHref} preview={preview} demo={!!funnel.demo} /></div>
+      return <div id="form"><LeadForm slug={slug} template={funnel.template} fields={step.formFields} ctaText={step.ctaText} thanksHref={thanksHref} preview={previewMode} demo={!!funnel.demo} /></div>
     case 'sales': {
       const link = safePaymentLink(step.paymentLink)
       return (
@@ -154,6 +154,7 @@ function StepBody({ step, funnel, thanksHref, preview }: { step: RenderStep; fun
       )
     }
     case 'thank-you': {
+      const preview = previewMode
       const booking = safeBookingUrl(step.bookingUrl)
       const download = downloadHref(funnel.id, step)
       return (
@@ -163,10 +164,24 @@ function StepBody({ step, funnel, thanksHref, preview }: { step: RenderStep; fun
               {step.downloadLabel || 'Download'}
             </a>
           )}
-          {booking && (
-            <iframe src={booking} title="Book a time" className="w-full h-[700px] border rounded-xl bg-white" loading="lazy"
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox" />
-          )}
+          {booking ? (
+            <div className="space-y-2 -mx-4 sm:mx-0">
+              <iframe src={booking} title="Book a time" className="w-full h-[760px] sm:h-[700px] border rounded-xl bg-white" loading="lazy"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox" />
+              <p className="text-center text-sm"><a href={booking} target="_blank" rel="noopener noreferrer" className="underline">Calendar not loading? Open it in a new tab</a></p>
+            </div>
+          ) : funnel.template === 'book-call' ? (
+            funnel.demo ? (
+              <div className="rounded-xl border-2 border-dashed p-10 text-center opacity-80">
+                <p className="font-semibold">Calendar appears here</p>
+                <p className="text-sm mt-1">This is a demo. On your funnel, visitors pick a time from your Calendly or Cal.com calendar.</p>
+              </div>
+            ) : preview ? (
+              <p className="rounded-xl border-2 border-dashed p-6 text-center text-sm">Add your Calendly or Cal.com link to finish this step.</p>
+            ) : (
+              <p className="text-center text-sm opacity-80">Thanks, we got your details and will be in touch to set up a time.</p>
+            )
+          ) : null}
         </div>
       )
     }
