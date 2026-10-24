@@ -29,7 +29,7 @@ All tools live in this repo and share one core. A new tool needs exactly three t
    (take a backup of `app_access` first, see the repo rules), e.g.
    ```sql
    alter table public.app_access drop constraint app_access_tool_check;
-   alter table public.app_access add constraint app_access_tool_check check (tool in ('funnels','invoices','<id>','all'));
+   alter table public.app_access add constraint app_access_tool_check check (tool in ('funnels','invoices','linkinbio','<id>','all'));
    ```
    Tables for the tool use a short prefix (`inv_`, `lib_`, ...) with owner-only RLS, plus a
    `<prefix>_has_access()` SQL helper that checks `app_access` for `<id>` or `all`.
