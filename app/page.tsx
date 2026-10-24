@@ -19,7 +19,7 @@ export default function Home() {
           colors={hero.showcase.colors}
           shot={hero.showcase.shot}
           primary={{ href: '/auth/register', label: 'Start building' }}
-          secondary={{ href: '/templates', label: 'See it' }}
+          secondary={{ href: '/f/riverside-strategy-call', label: 'See it' }}
         />
         <div id="tools" className="relative z-10 -mt-10 space-y-2 pb-16 sm:-mt-16">
           {HOME_ROWS.map((r) => (
