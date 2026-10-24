@@ -3,6 +3,7 @@ import { serviceClient } from '@/lib/server/admin-client'
 import { rateLimit, clientIp } from '@/lib/server/rate-limit'
 import { verifyTurnstile } from '@/lib/turnstile'
 import { getReviewOwner } from '@/lib/testimonials/public'
+import { isDemoUser } from '@/lib/demo'
 import { PHOTO_BUCKET, PHOTO_MAX_BYTES, photoExt, sniffImage, submitSchema } from '@/lib/testimonials/core'
 
 export const dynamic = 'force-dynamic'
@@ -23,6 +24,7 @@ export async function POST(request: Request) {
   if (!owner) return unavailable()
   if (!owner.accepting) return NextResponse.json({ error: 'This page isn\u2019t taking reviews right now.' }, { status: 409 })
 
+  if (isDemoUser(owner.user_id)) return NextResponse.json({ ok: true, demo: true })
   const db = serviceClient() as any
   let photo_path: string | null = null
   const photo = fd.get('photo')

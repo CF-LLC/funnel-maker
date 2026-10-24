@@ -4,15 +4,17 @@ import { useState } from 'react'
 import { Turnstile } from '@/components/turnstile'
 import type { Field } from '@/lib/forms/core'
 
-export function PublicFormView({ handle, slug, fields, submitLabel }: { handle: string; slug: string; fields: Field[]; submitLabel: string }) {
+export function PublicFormView({ handle, slug, fields, submitLabel, demo = false }: { handle: string; slug: string; fields: Field[]; submitLabel: string; demo?: boolean }) {
   const [data, setData] = useState<Record<string, string | boolean>>({})
   const [token, setToken] = useState('')
-  const [state, setState] = useState<'idle' | 'sending' | 'done'>('idle')
+  const [state, setState] = useState<'idle' | 'sending' | 'done' | 'demo'>('idle')
   const [error, setError] = useState('')
   const set = (id: string, v: string | boolean) => setData((d) => ({ ...d, [id]: v }))
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault(); setError(''); setState('sending')
+    e.preventDefault(); setError('')
+    if (demo) return setState('demo')
+    setState('sending')
     const website = (e.currentTarget.elements.namedItem('website') as HTMLInputElement | null)?.value
     const res = await fetch('/api/forms/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ handle, slug, data, turnstileToken: token, website }) })
     if (res.ok) return setState('done')
@@ -20,6 +22,7 @@ export function PublicFormView({ handle, slug, fields, submitLabel }: { handle: 
     setError(j.error || 'Something went wrong'); setState('idle')
   }
 
+  if (state === 'demo') return <p role="status" className="rounded-xl border bg-amber-50 p-4 text-amber-900">This is a demo, nothing was sent.</p>
   if (state === 'done') return <p role="status" className="rounded-xl border bg-green-50 p-4 text-green-900">Thanks! Your response was sent.</p>
   const input = 'w-full rounded-lg border bg-background px-3 py-2'
   return (
@@ -42,7 +45,7 @@ export function PublicFormView({ handle, slug, fields, submitLabel }: { handle: 
         </div>
       ))}
       <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
-      <Turnstile onToken={setToken} />
+      {!demo && <Turnstile onToken={setToken} />}
       {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
       <button type="submit" disabled={state === 'sending'} className="press w-full rounded-xl bg-brand px-4 py-3 font-semibold text-white disabled:opacity-60">{state === 'sending' ? 'Sending…' : submitLabel}</button>
     </form>

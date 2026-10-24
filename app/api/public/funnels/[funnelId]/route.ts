@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
+import { isDemoUser } from '@/lib/demo'
 
 const UNAVAILABLE = 'This page is unavailable.'
 export const dynamic = 'force-dynamic'
@@ -17,8 +18,8 @@ export async function GET(
 
     // Check if looking up by slug or ID
     const query = bySlug
-      ? (supabase.from('funnels') as any).select('id, name, slug, template, steps').eq('slug', funnelId).eq('is_public', true)
-      : (supabase.from('funnels') as any).select('id, name, slug, template, steps').eq('id', funnelId).eq('is_public', true)
+      ? (supabase.from('funnels') as any).select('id, name, slug, template, steps, user_id').eq('slug', funnelId).eq('is_public', true)
+      : (supabase.from('funnels') as any).select('id, name, slug, template, steps, user_id').eq('id', funnelId).eq('is_public', true)
 
     const { data: funnel, error } = await query.single()
 
@@ -27,7 +28,8 @@ export async function GET(
       return NextResponse.json({ error: UNAVAILABLE }, { status: 404, headers: { 'Cache-Control': 'no-store' } })
     }
 
-    return NextResponse.json({ funnel }, { headers: { 'Cache-Control': 'no-store' } })
+    const { user_id, ...pub } = funnel
+    return NextResponse.json({ funnel: { ...pub, demo: isDemoUser(user_id) } }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (error: any) {
     return NextResponse.json({ error: 'Something went wrong' }, { status: 500 })
   }

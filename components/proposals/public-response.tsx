@@ -3,15 +3,17 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Turnstile } from '@/components/turnstile'
 
-export function ProposalResponse({ handle, id }: { handle: string; id: string }) {
+export function ProposalResponse({ handle, id, demo = false }: { handle: string; id: string; demo?: boolean }) {
   const router = useRouter()
   const [name, setName] = useState('')
   const [token, setToken] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [demoDone, setDemoDone] = useState(false)
   async function respond(action: 'accept' | 'decline') {
     setError('')
     if (action === 'accept' && name.trim().length < 2) return setError('Type your full name to accept')
+    if (demo) return setDemoDone(true)
     if (action === 'decline' && !confirm('Decline this proposal?')) return
     setBusy(true)
     const res = await fetch('/api/proposals/respond', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ handle, id, action, name: name.trim(), turnstileToken: token }) })
@@ -20,12 +22,13 @@ export function ProposalResponse({ handle, id }: { handle: string; id: string })
     const j = await res.json().catch(() => ({}))
     setError(j.error || 'Something went wrong')
   }
+  if (demoDone) return <p role="status" className="rounded-xl border bg-amber-50 p-4 text-amber-900">This is a demo, nothing was sent.</p>
   return (
     <div className="space-y-3 rounded-xl border p-4">
       <label className="block space-y-1"><span className="text-sm font-medium">Your full name</span>
         <input className="w-full rounded-lg border bg-background px-3 py-2" maxLength={200} value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" /></label>
       <p className="text-xs text-muted-foreground">Typing your name and clicking Accept records your acceptance and today&apos;s date.</p>
-      <Turnstile onToken={setToken} />
+      {!demo && <Turnstile onToken={setToken} />}
       {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
       <div className="flex gap-3">
         <button type="button" disabled={busy} onClick={() => respond('accept')} className="press flex-1 rounded-xl bg-brand px-4 py-3 font-semibold text-white disabled:opacity-60">Accept</button>

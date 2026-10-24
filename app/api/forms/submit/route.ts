@@ -4,6 +4,7 @@ import { rateLimit, clientIp } from '@/lib/server/rate-limit'
 import { verifyTurnstile } from '@/lib/turnstile'
 import { getPublicForm } from '@/lib/forms/public'
 import { validateSubmission } from '@/lib/forms/core'
+import { isDemoUser } from '@/lib/demo'
 
 export const dynamic = 'force-dynamic'
 const unavailable = () => NextResponse.json({ error: 'This page is unavailable.' }, { status: 404 })
@@ -24,6 +25,7 @@ export async function POST(request: Request) {
   if (!form) return unavailable()
   const v = validateSubmission(form.fields, body.data)
   if (!v.ok) return NextResponse.json({ error: v.error }, { status: 400 })
+  if (isDemoUser(form.user_id)) return NextResponse.json({ ok: true, demo: true }, { status: 200 })
   const { error } = await (serviceClient() as any).from('frm_responses').insert({ form_id: form.id, user_id: '00000000-0000-0000-0000-000000000000', data: v.values })
   if (error) return NextResponse.json({ error: 'Could not save, please try again' }, { status: 500 })
   return NextResponse.json({ ok: true }, { status: 201 })

@@ -3,6 +3,7 @@ import { serviceClient } from '@/lib/server/admin-client'
 import { rateLimit, clientIp } from '@/lib/server/rate-limit'
 import { verifyTurnstile } from '@/lib/turnstile'
 import { getPublicProposal } from '@/lib/proposals/public'
+import { isDemoUser } from '@/lib/demo'
 import { canRespond, respondSchema, todayChicago } from '@/lib/proposals/core'
 
 export const dynamic = 'force-dynamic'
@@ -20,6 +21,7 @@ export async function POST(request: Request) {
   if (!(await verifyTurnstile(body.turnstileToken, ip))) return NextResponse.json({ error: 'Bot check failed, please try again' }, { status: 403 })
   const p = await getPublicProposal(v.data.handle, v.data.id)
   if (!p) return unavailable()
+  if (isDemoUser(p.user_id)) return NextResponse.json({ ok: true, demo: true })
   const today = todayChicago()
   if (!canRespond(p, today)) return NextResponse.json({ error: 'This proposal can no longer be answered.' }, { status: 409 })
   const accept = v.data.action === 'accept'

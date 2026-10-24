@@ -1,4 +1,7 @@
 import Link from 'next/link'
+import { DemoBanner } from '@/components/demo-banner'
+import { isDemoUser } from '@/lib/demo'
+
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getApprovedReviews, getReviewOwner } from '@/lib/testimonials/public'
@@ -23,6 +26,7 @@ export default async function ReviewWall({ params, searchParams }: P) {
   const reviews = await getApprovedReviews(o.user_id, embed ? (layout === 'quote' ? 1 : 6) : 60)
   if (embed) return <div className="bg-white p-2"><ReviewList reviews={reviews} layout={layout} handle={o.handle} more={false} /></div>
   return (
+    <>{isDemoUser(o.user_id) && <DemoBanner />}
     <div className="min-h-screen bg-app flex flex-col items-center px-4 py-12">
       <main className="mx-auto w-full max-w-3xl space-y-6">
         <div className="text-center">
@@ -33,5 +37,6 @@ export default async function ReviewWall({ params, searchParams }: P) {
       </main>
       <footer className="mt-12 text-xs text-muted-foreground"><Link href="/pricing" className="hover:underline">Made with SaaS Nation</Link></footer>
     </div>
+    </>
   )
 }
