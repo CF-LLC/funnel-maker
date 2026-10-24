@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Zap, BarChart3, TrendingUp, Plus, ArrowRight } from 'lucide-react'
 import { templates } from '@/data/templates'
+import { YourTools } from '@/components/tools/your-tools'
 
 export default async function DashboardPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const sp = await searchParams
@@ -42,6 +43,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           </Button>
         </Link>
       </div>
+
+      <YourTools userId={user!.id} />
 
       {checkoutSuccess && (
         <Card className="border-green-500 bg-green-50" role="status">

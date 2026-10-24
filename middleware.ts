@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { isProtectedPath } from '@/tools/registry'
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
@@ -50,7 +51,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Protected routes that require authentication
-  if (request.nextUrl.pathname.startsWith('/dashboard') || request.nextUrl.pathname.startsWith('/invoices')) {
+  if (isProtectedPath(request.nextUrl.pathname)) {
     if (!user) {
       const redirectUrl = request.nextUrl.clone()
       redirectUrl.pathname = '/auth/login'

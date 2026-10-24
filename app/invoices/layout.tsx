@@ -27,7 +27,7 @@ export default async function InvoicesLayout({ children }: { children: React.Rea
           {allowed && <nav className="flex flex-wrap gap-1 text-sm" aria-label="Invoices">
             {NAV.map((n) => <Link key={n.href} href={n.href} className="rounded-lg px-3 py-2 hover:bg-muted">{n.label}</Link>)}
           </nav>}
-          <Link href="/dashboard" className="ml-auto text-sm text-muted-foreground hover:underline">← Funnel Maker</Link>
+          <Link href="/dashboard" className="ml-auto text-sm text-muted-foreground hover:underline">← Dashboard</Link>
         </div>
       </header>
       <main className="mx-auto w-full max-w-6xl p-4 sm:p-6">

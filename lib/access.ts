@@ -1,14 +1,17 @@
 // SaaS Nation per-tool access. One row per (user, tool) in public.app_access; writes are admin-only (service role).
 import { createServerClient } from '@/lib/supabase'
 
-export const TOOLS = ['funnels', 'invoices'] as const
-export type Tool = (typeof TOOLS)[number]
+import { TOOL_IDS, ACCESS_KEYS, type ToolId, type ALL_ACCESS } from '@/tools/registry'
+
+/** Derived from tools/registry.ts. */
+export const TOOLS: readonly ToolId[] = TOOL_IDS
+export type Tool = ToolId
 export const ACCESS_SOURCES = ['founding', 'single', 'all_access', 'manual'] as const
 export type AccessSource = (typeof ACCESS_SOURCES)[number]
 
 /** 'all' = All Access: one row that covers every tool, including future ones. */
-export const ACCESS_TOOLS = ['funnels', 'invoices', 'all'] as const
-export type AccessTool = (typeof ACCESS_TOOLS)[number]
+export const ACCESS_TOOLS: readonly (ToolId | typeof ALL_ACCESS)[] = ACCESS_KEYS
+export type AccessTool = ToolId | typeof ALL_ACCESS
 
 export function isTool(v: unknown): v is Tool {
   return typeof v === 'string' && (TOOLS as readonly string[]).includes(v)

@@ -1,7 +1,8 @@
 // Stripe webhook logic, kept free of Next/Supabase imports so it can be unit-tested with a fake store.
 import type Stripe from 'stripe'
 
-export type MapTool = 'funnels' | 'invoices' | 'all'
+import { ACCESS_KEYS, type ToolId, type ALL_ACCESS } from '@/tools/registry'
+export type MapTool = ToolId | typeof ALL_ACCESS
 export type PriceMap = Record<string, { tool: MapTool; plan?: string }>
 
 /** STRIPE_PRICE_MAP JSON: keys are price ids (price_...) or payment link ids (plink_...). */
@@ -11,7 +12,7 @@ export function parsePriceMap(raw: string | undefined): PriceMap {
   try { obj = JSON.parse(raw) } catch { throw new Error('STRIPE_PRICE_MAP is not valid JSON') }
   const out: PriceMap = {}
   for (const [k, v] of Object.entries(obj as Record<string, any>)) {
-    if (!v || !['funnels', 'invoices', 'all'].includes(v.tool)) throw new Error(`STRIPE_PRICE_MAP[${k}].tool must be funnels|invoices|all`)
+    if (!v || !(ACCESS_KEYS as string[]).includes(v.tool)) throw new Error(`STRIPE_PRICE_MAP[${k}].tool must be ${ACCESS_KEYS.join('|')}`)
     out[k] = { tool: v.tool, plan: typeof v.plan === 'string' ? v.plan.slice(0, 40) : undefined }
   }
   return out
