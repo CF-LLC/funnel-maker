@@ -17,7 +17,7 @@ export type RenderStep = {
   affiliateLinks?: { id: string; url: string; buttonText: string }[]
 }
 
-export type RenderFunnel = { id: string; name: string; slug: string | null; template: string | null; steps: RenderStep[] }
+export type RenderFunnel = { id: string; name: string; slug: string | null; template: string | null; steps: RenderStep[]; demo?: boolean }
 
 /** Inline editing hooks used by the builder's live preview. */
 export type EditHooks = {
@@ -133,18 +133,23 @@ function StepBody({ step, funnel, thanksHref, preview }: { step: RenderStep; fun
       ) : null
     }
     case 'lead-capture':
-      return <div id="form"><LeadForm slug={slug} template={funnel.template} fields={step.formFields} ctaText={step.ctaText} thanksHref={thanksHref} preview={preview} /></div>
+      return <div id="form"><LeadForm slug={slug} template={funnel.template} fields={step.formFields} ctaText={step.ctaText} thanksHref={thanksHref} preview={preview} demo={!!funnel.demo} /></div>
     case 'sales': {
       const link = safePaymentLink(step.paymentLink)
       return (
         <div className="space-y-4">
           {step.priceLabel && <div className="text-5xl font-bold">{step.priceLabel}</div>}
-          {link ? (
+          {funnel.demo ? (
+            <>
+              <button type="button" disabled className="fm-cta cursor-not-allowed opacity-60">Demo only, no charge</button>
+              <p className="text-xs opacity-70">This is a demo.</p>
+            </>
+          ) : link ? (
             <a href={link} rel="noopener" className="fm-cta">{step.ctaText || 'Buy now'}</a>
           ) : (
             <p className="text-sm opacity-70">Checkout isn&apos;t set up yet.</p>
           )}
-          {link && <p className="text-xs opacity-70">Secure checkout by Stripe</p>}
+          {link && !funnel.demo && <p className="text-xs opacity-70">Secure checkout by Stripe</p>}
         </div>
       )
     }

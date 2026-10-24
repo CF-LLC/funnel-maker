@@ -1,4 +1,14 @@
 import { NextResponse } from 'next/server'
+import { serviceClient } from '@/lib/server/admin-client'
+import { demoUserIds } from '@/lib/demo'
+
+/** Demo accounts' funnels accept the form but store nothing. */
+async function isDemoSlug(slug: string) {
+  const ids = demoUserIds()
+  if (!ids.size) return false
+  const { data } = await (serviceClient() as any).from('funnels').select('user_id').eq('slug', slug).eq('is_public', true).maybeSingle()
+  return !!data && ids.has(String(data.user_id).toLowerCase())
+}
 import { createClient } from '@supabase/supabase-js'
 import { validateLead } from '@/lib/leads'
 import { rateLimit, clientIp } from '@/lib/server/rate-limit'
@@ -39,6 +49,7 @@ export async function POST(request: Request, context: { params: Promise<{ slug: 
   }
 
   const v = validateLead(body)
+  if (v.ok && (await isDemoSlug(slug))) return NextResponse.json({ ok: true, demo: true }, { status: 200 })
   if (!v.ok) return NextResponse.json({ error: v.error }, { status: 400 })
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL

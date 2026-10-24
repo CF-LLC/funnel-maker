@@ -7,6 +7,8 @@ import { formatCurrency, totals } from '@/lib/invoices/core'
 import { getEmbed } from '@/lib/testimonials/public'
 import { ReviewList } from '@/components/testimonials/review-list'
 import { ProposalResponse } from '@/components/proposals/public-response'
+import { DemoBanner } from '@/components/demo-banner'
+import { isDemoUser } from '@/lib/demo'
 
 export const dynamic = 'force-dynamic'
 type P = { params: Promise<{ handle: string; id: string }> }
@@ -21,11 +23,13 @@ export default async function PublicProposalPage({ params }: P) {
   const { handle, id } = await params
   const p = await getPublicProposal(handle, id)
   if (!p) notFound()
+  const demo = isDemoUser(p.user_id)
   const s = effectiveStatus(p)
   const t = totals(p.lines, null)
   const reviews = await getEmbed(p.user_id, p.handle, 'proposals_layout')
   const when = (iso: string) => new Date(iso).toLocaleDateString('en-US', { timeZone: 'America/Chicago', dateStyle: 'long' })
   return (
+    <>{demo && <DemoBanner />}
     <div className="min-h-screen bg-app flex flex-col items-center px-4 py-12">
       <main className="mx-auto w-full max-w-2xl space-y-6 rounded-xl border bg-background p-6">
         <div className="flex flex-wrap items-start justify-between gap-2">
@@ -45,7 +49,7 @@ export default async function PublicProposalPage({ params }: P) {
           <tfoot><tr><td colSpan={3} className="py-2 text-right font-semibold">Total</td><td className="py-2 text-right font-bold">{formatCurrency(t.total, p.currency)}</td></tr></tfoot>
         </table>
         {p.expires_on && <p className="text-sm text-muted-foreground">Valid through {when(p.expires_on + 'T12:00:00Z')}.</p>}
-        {s === 'sent' && <ProposalResponse handle={p.handle} id={p.id} />}
+        {s === 'sent' && <ProposalResponse handle={p.handle} id={p.id} demo={demo} />}
         {s === 'accepted' && <p role="status" className="rounded-xl border bg-green-50 p-4 text-green-900">Accepted by {p.accepted_name} on {when(p.responded_at!)}.</p>}
         {s === 'declined' && <p role="status" className="rounded-xl border bg-red-50 p-4 text-red-900">This proposal was declined on {when(p.responded_at!)}.</p>}
         {s === 'expired' && <p role="status" className="rounded-xl border bg-amber-50 p-4 text-amber-900">This proposal has expired. Contact the sender for an updated one.</p>}
@@ -53,5 +57,6 @@ export default async function PublicProposalPage({ params }: P) {
       </main>
       <footer className="mt-12 text-xs text-muted-foreground"><Link href="/pricing" className="hover:underline">Made with SaaS Nation</Link></footer>
     </div>
+    </>
   )
 }

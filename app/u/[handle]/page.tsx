@@ -1,4 +1,7 @@
 import Link from 'next/link'
+import { DemoBanner } from '@/components/demo-banner'
+import { isDemoUser } from '@/lib/demo'
+
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { Facebook, Github, Instagram, Linkedin, Music2, Twitter, Youtube, type LucideIcon } from 'lucide-react'
@@ -29,6 +32,7 @@ export default async function LinkInBioPage({ params }: { params: Promise<{ hand
   const socials = Object.entries(page.socials) as [Social, string][]
   const btn = `press block rounded-xl border px-4 py-3 font-semibold transition ${t.btn}`
   return (
+    <>{isDemoUser(page.user_id) && <DemoBanner />}
     <div className={`min-h-screen flex flex-col items-center px-4 py-12 ${t.page}`} data-theme={page.theme}>
       <main className="w-full max-w-md flex-1 space-y-6 text-center">
         {page.avatar_url && (
@@ -56,5 +60,6 @@ export default async function LinkInBioPage({ params }: { params: Promise<{ hand
         </footer>
       )}
     </div>
+    </>
   )
 }

@@ -4,11 +4,11 @@ import { useCallback, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Turnstile, turnstileSiteKeySet } from '@/components/turnstile'
 
-type Props = { slug: string; template?: string | null; fields?: string[]; ctaText?: string; thanksHref?: string; preview?: boolean }
+type Props = { slug: string; template?: string | null; fields?: string[]; ctaText?: string; thanksHref?: string; preview?: boolean; demo?: boolean }
 
-export function LeadForm({ slug, template, fields, ctaText, thanksHref, preview = false }: Props) {
+export function LeadForm({ slug, template, fields, ctaText, thanksHref, preview = false, demo = false }: Props) {
   const router = useRouter()
-  const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
+  const [state, setState] = useState<'idle' | 'sending' | 'done' | 'demo' | 'error'>('idle')
   const [error, setError] = useState('')
   const [token, setToken] = useState('')
   const onToken = useCallback((t: string) => setToken(t), [])
@@ -17,6 +17,7 @@ export function LeadForm({ slug, template, fields, ctaText, thanksHref, preview 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (preview) { setError('Preview only: the form works once your funnel is published.'); setState('error'); return }
+    if (demo) { setState('demo'); return }
     if (turnstileSiteKeySet && !token) { setError('Please complete the bot check'); setState('error'); return }
     setState('sending')
     const f = new FormData(e.currentTarget)
@@ -41,6 +42,7 @@ export function LeadForm({ slug, template, fields, ctaText, thanksHref, preview 
     setState('error')
   }
 
+  if (state === 'demo') return <p role="status" className="text-xl font-semibold mt-6">This is a demo, nothing was sent.</p>
   if (state === 'done' && !thanksHref) return <p role="status" className="text-xl font-semibold mt-6">Thanks! We got your details.</p>
 
   return (
@@ -51,7 +53,7 @@ export function LeadForm({ slug, template, fields, ctaText, thanksHref, preview 
       {show('message') && <textarea name="message" placeholder="Message (optional)" maxLength={2000} className="fm-input" />}
       {/* Honeypot: hidden from people, filled by bots */}
       <input name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
-      {!preview && <Turnstile onToken={onToken} />}
+      {!preview && !demo && <Turnstile onToken={onToken} />}
       <button disabled={state === 'sending'} className="fm-cta w-full">
         {state === 'sending' ? 'Sending…' : ctaText || 'Submit'}
       </button>
