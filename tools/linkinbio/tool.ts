@@ -9,4 +9,11 @@ export const linkinbioTool = {
   protectedPaths: ['/links'],
   priceLabel: 'Included with every paid plan',
   includedWithAnyPlan: true,
+  showcase: {
+    cardTagline: 'One link for everything you sell.',
+    rows: ['creators'],
+    colors: { from: '#1e3a8a', to: '#2563eb', accent: '#60a5fa' },
+    shot: '/shots/linkinbio.jpg',
+    order: 3,
+  },
 } as const satisfies ToolDef

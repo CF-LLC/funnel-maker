@@ -12,7 +12,7 @@ export function InvoicePreview({ d }: { d: PreviewData }) {
   const t = totals(d.lines, d.tax_rate)
   const f = (c: number) => formatCurrency(c, d.currency)
   return (
-    <div className="rounded-xl border bg-white p-6 sm:p-8 text-sm text-slate-800 shadow-sm">
+    <div className="invoice-paper rounded-xl border bg-white p-6 sm:p-8 text-sm text-slate-800 shadow-sm">
       <div className="flex flex-wrap justify-between gap-4">
         <div>
           <div className="text-2xl font-extrabold tracking-tight">{d.seller_name || 'Your business'}</div>

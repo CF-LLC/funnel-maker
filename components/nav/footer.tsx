@@ -3,15 +3,15 @@ import { COMPANY, COMPANY_LOCATION, SUPPORT_EMAIL } from '@/lib/site'
 
 export function Footer() {
   return (
-    <footer className="border-t bg-muted/50 mt-20">
+    <footer className="border-t border-white/5 bg-zinc-950">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <h3 className="font-bold mb-4">Product</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link href="/#features" className="hover:text-foreground">
-                  Features
+                <Link href="/#tools" className="hover:text-foreground">
+                  Tools
                 </Link>
               </li>
               <li>

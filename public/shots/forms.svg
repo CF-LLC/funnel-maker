@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" font-family="system-ui,sans-serif">
+  <rect width="1280" height="800" fill="#0a0a0b"/>
+  <rect width="1280" height="60" fill="#111113"/><text x="80" y="38" fill="#fff" font-size="22" font-weight="800">Forms</text>
+  <text x="1110" y="38" fill="#a1a1aa" font-size="16">← Dashboard</text>
+  <text x="80" y="130" fill="#fff" font-size="34" font-weight="800">New client intake</text>
+  <text x="80" y="165" fill="#a1a1aa" font-size="18">Public link · 12 responses · CSV export</text>
+  <rect x="80" y="200" width="640" height="540" rx="16" fill="#18181b" stroke="#27272a"/>
+  <g font-size="16" fill="#e4e4e7">
+    <text x="112" y="250">Your name</text><rect x="112" y="262" width="576" height="48" rx="10" fill="#0a0a0b" stroke="#3f3f46"/>
+    <text x="112" y="350">Email</text><rect x="112" y="362" width="576" height="48" rx="10" fill="#0a0a0b" stroke="#3f3f46"/>
+    <text x="112" y="450">What do you want help with?</text><rect x="112" y="462" width="576" height="110" rx="10" fill="#0a0a0b" stroke="#3f3f46"/>
+    <rect x="112" y="600" width="22" height="22" rx="5" fill="#7c3aed"/><path d="M117 611l5 5 8-10" stroke="#fff" stroke-width="3" fill="none"/>
+    <text x="146" y="617">Send me the prep checklist</text>
+  </g>
+  <rect x="112" y="660" width="200" height="52" rx="10" fill="#8b5cf6"/><text x="212" y="693" text-anchor="middle" fill="#fff" font-size="18" font-weight="700">Submit</text>
+  <rect x="760" y="200" width="440" height="540" rx="16" fill="#18181b" stroke="#27272a"/>
+  <text x="792" y="248" fill="#fff" font-size="20" font-weight="700">Latest responses</text>
+  <g font-size="15">
+    <rect x="792" y="275" width="376" height="72" rx="10" fill="#0a0a0b"/><text x="812" y="305" fill="#fff">Jordan P.</text><text x="812" y="330" fill="#a1a1aa">Opening prep for a 1400 player</text>
+    <rect x="792" y="361" width="376" height="72" rx="10" fill="#0a0a0b"/><text x="812" y="391" fill="#fff">Sam R.</text><text x="812" y="416" fill="#a1a1aa">Weekly lessons for my daughter</text>
+    <rect x="792" y="447" width="376" height="72" rx="10" fill="#0a0a0b"/><text x="812" y="477" fill="#fff">Taylor K.</text><text x="812" y="502" fill="#a1a1aa">Tournament prep in November</text>
+  </g>
+</svg>

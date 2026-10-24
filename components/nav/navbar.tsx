@@ -36,15 +36,15 @@ useEffect(() => {
   }
 
   return (
-    <nav className="border-b bg-background/80 backdrop-blur sticky top-0 z-50">
+    <nav className="sticky top-0 z-50 border-b border-white/5 bg-zinc-950/80 backdrop-blur">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-4 sm:gap-8">
           <Link href="/" className="flex items-center gap-2 text-xl font-extrabold">
             <span aria-hidden className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-white text-sm">✦</span>SaaS Nation
           </Link>
           <div className="hidden md:flex gap-6">
-            <Link href="/#features" className="text-sm hover:text-primary">
-              Features
+            <Link href="/#tools" className="text-sm hover:text-primary">
+              Tools
             </Link>
             <Link href="/templates" className="text-sm hover:text-primary">
               Templates
@@ -70,7 +70,7 @@ useEffect(() => {
                 <Button variant="ghost" size="sm" className="sm:size-default">Login</Button>
               </Link>
               <Link href="/auth/register">
-                <Button size="sm" className="sm:size-default">Start Free</Button>
+                <Button size="sm" className="sm:size-default">Start building</Button>
               </Link>
             </>
           )}
@@ -92,11 +92,11 @@ useEffect(() => {
         <div className="sm:hidden border-t bg-background">
           <div className="container mx-auto px-4 py-4 space-y-3">
             <Link 
-              href="/#features" 
+              href="/#tools" 
               className="block py-2 hover:text-primary"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Features
+              Tools
             </Link>
             <Link 
               href="/templates" 
@@ -134,7 +134,7 @@ useEffect(() => {
                   </Link>
                   <Link href="/auth/register" onClick={() => setMobileMenuOpen(false)}>
                     <Button className="w-full">
-                      Start Building Free
+                      Start building
                     </Button>
                   </Link>
                 </>

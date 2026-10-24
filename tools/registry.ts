@@ -27,3 +27,18 @@ export const PROTECTED_PATHS: string[] = Array.from(new Set((TOOL_REGISTRY as re
 export function isProtectedPath(pathname: string): boolean {
   return PROTECTED_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'))
 }
+
+export type { ToolRow } from './types'
+/** Rows on the public home, in order. Driven by each tool's showcase.rows. */
+export const HOME_ROWS: { id: 'all' | import('./types').ToolRow; title: string }[] = [
+  { id: 'all', title: 'All tools' },
+  { id: 'coaches', title: 'For coaches' },
+  { id: 'creators', title: 'For creators' },
+  { id: 'get-paid', title: 'Get paid' },
+]
+export function toolsInRow(row: 'all' | import('./types').ToolRow): ToolDef[] {
+  const list = [...(TOOL_REGISTRY as readonly ToolDef[])].sort((a, b) => a.showcase.order - b.showcase.order)
+  return row === 'all' ? list : list.filter((t) => t.showcase.rows.includes(row))
+}
+/** Tool featured in the public home hero. */
+export const HERO_TOOL_ID = 'funnels'

@@ -8,4 +8,11 @@ export const formsTool = {
   accessKey: 'forms',
   protectedPaths: ['/forms'],
   priceLabel: 'Included in All Access',
+  showcase: {
+    cardTagline: 'Know your client before the first call.',
+    rows: ['coaches'],
+    colors: { from: '#4c1d95', to: '#7c3aed', accent: '#a78bfa' },
+    shot: '/shots/forms.svg',
+    order: 4,
+  },
 } as const satisfies ToolDef

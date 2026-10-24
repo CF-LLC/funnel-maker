@@ -163,6 +163,106 @@
 .toast-in { animation: toast-in .25s cubic-bezier(.2,.8,.2,1) both; }
 @keyframes toast-in { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: none; } }
 
+/* ---------- Noir theme (Netflix-style): near-black, one accent, big type ---------- */
+.noir {
+  --background: 240 6% 4%;
+  --foreground: 0 0% 96%;
+  --card: 240 5% 9%;
+  --card-foreground: 0 0% 96%;
+  --popover: 240 5% 10%;
+  --popover-foreground: 0 0% 96%;
+  --primary: 262 83% 64%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 4% 16%;
+  --secondary-foreground: 0 0% 96%;
+  --muted: 240 4% 14%;
+  --muted-foreground: 240 5% 66%;
+  --accent: 240 4% 16%;
+  --accent-foreground: 0 0% 96%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 4% 18%;
+  --input: 240 4% 22%;
+  --ring: 262 83% 64%;
+  --brand-gradient: linear-gradient(0deg, hsl(262 83% 60%), hsl(262 83% 60%));
+  color-scheme: dark;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+.noir .bg-app { background: hsl(var(--background)); }
+.noir .lift:hover { box-shadow: 0 18px 40px -18px rgba(0,0,0,.9); }
+.noir .skeleton { background: linear-gradient(90deg, #18181b 25%, #27272a 50%, #18181b 75%); background-size: 200% 100%; }
+/* Pastel status tints from the light theme, remapped for dark surfaces */
+.noir .bg-green-50:not(.light-surface *, .fm-theme *, .invoice-paper *), .noir .bg-green-100:not(.light-surface *, .fm-theme *, .invoice-paper *) { background-color: rgba(34,197,94,.12); }
+.noir .bg-amber-50:not(.light-surface *, .fm-theme *, .invoice-paper *) { background-color: rgba(245,158,11,.12); }
+.noir .bg-red-50:not(.light-surface *, .fm-theme *, .invoice-paper *) { background-color: rgba(239,68,68,.12); }
+.noir .bg-violet-50:not(.light-surface *, .fm-theme *, .invoice-paper *), .noir .bg-violet-100:not(.light-surface *, .fm-theme *, .invoice-paper *), .noir .bg-pink-100:not(.light-surface *, .fm-theme *, .invoice-paper *), .noir .bg-fuchsia-100:not(.light-surface *, .fm-theme *, .invoice-paper *) { background-color: rgba(139,92,246,.16); }
+.noir .bg-gray-200:not(.light-surface *, .fm-theme *, .invoice-paper *) { background-color: #27272a; }
+.noir .text-green-900:not(.light-surface *, .fm-theme *, .invoice-paper *), .noir .text-green-800:not(.light-surface *, .fm-theme *, .invoice-paper *), .noir .text-green-700:not(.light-surface *, .fm-theme *, .invoice-paper *) { color: #86efac; }
+.noir .text-amber-900:not(.light-surface *, .fm-theme *, .invoice-paper *), .noir .text-amber-800:not(.light-surface *, .fm-theme *, .invoice-paper *), .noir .text-amber-700:not(.light-surface *, .fm-theme *, .invoice-paper *) { color: #fcd34d; }
+.noir .text-red-900:not(.light-surface *, .fm-theme *, .invoice-paper *), .noir .text-red-800:not(.light-surface *, .fm-theme *, .invoice-paper *), .noir .text-red-700:not(.light-surface *, .fm-theme *, .invoice-paper *) { color: #fca5a5; }
+.noir .text-violet-900:not(.light-surface *, .fm-theme *, .invoice-paper *), .noir .text-violet-800:not(.light-surface *, .fm-theme *, .invoice-paper *), .noir .text-violet-700:not(.light-surface *, .fm-theme *, .invoice-paper *), .noir .text-fuchsia-700:not(.light-surface *, .fm-theme *, .invoice-paper *), .noir .text-pink-700:not(.light-surface *, .fm-theme *, .invoice-paper *) { color: #c4b5fd; }
+.noir .text-gray-900:not(.light-surface *, .fm-theme *, .invoice-paper *), .noir .text-gray-700:not(.light-surface *, .fm-theme *, .invoice-paper *) { color: #f4f4f5; }
+.noir .text-gray-600:not(.light-surface *, .fm-theme *, .invoice-paper *) { color: #a1a1aa; }
+.noir .border-green-500:not(.light-surface *, .fm-theme *, .invoice-paper *), .noir .border-green-200:not(.light-surface *, .fm-theme *, .invoice-paper *) { border-color: rgba(34,197,94,.45); }
+.noir .border-amber-400:not(.light-surface *, .fm-theme *, .invoice-paper *) { border-color: rgba(245,158,11,.45); }
+.noir .border-violet-200:not(.light-surface *, .fm-theme *, .invoice-paper *) { border-color: rgba(139,92,246,.35); }
+
+.noir .bg-amber-100:not(.light-surface *, .fm-theme *, .invoice-paper *), .noir .bg-orange-100:not(.light-surface *, .fm-theme *, .invoice-paper *) { background-color: rgba(245,158,11,.16); }
+.noir .bg-red-100:not(.light-surface *, .fm-theme *, .invoice-paper *) { background-color: rgba(239,68,68,.16); }
+.noir .bg-blue-100:not(.light-surface *, .fm-theme *, .invoice-paper *) { background-color: rgba(59,130,246,.16); }
+.noir .bg-emerald-50:not(.light-surface *, .fm-theme *, .invoice-paper *) { background-color: rgba(16,185,129,.12); }
+.noir .bg-purple-100:not(.light-surface *, .fm-theme *, .invoice-paper *) { background-color: rgba(139,92,246,.16); }
+.noir .bg-zinc-200:not(.light-surface *, .fm-theme *, .invoice-paper *) { background-color: #3f3f46; }
+.noir .text-blue-800:not(.light-surface *, .fm-theme *, .invoice-paper *), .noir .text-blue-700:not(.light-surface *, .fm-theme *, .invoice-paper *) { color: #93c5fd; }
+.noir .text-emerald-700:not(.light-surface *, .fm-theme *, .invoice-paper *) { color: #6ee7b7; }
+.noir .text-orange-700:not(.light-surface *, .fm-theme *, .invoice-paper *) { color: #fdba74; }
+.noir .text-purple-700:not(.light-surface *, .fm-theme *, .invoice-paper *) { color: #c4b5fd; }
+
+/* Light islands inside noir: published funnels, invoice paper, public client pages, previews */
+.light-surface, .noir .fm-theme, .noir .invoice-paper {
+  --background: 0 0% 100%; --foreground: 250 30% 8%; --card: 0 0% 100%; --card-foreground: 0 0% 3.9%;
+  --popover: 0 0% 100%; --popover-foreground: 0 0% 3.9%; --primary: 262 83% 52%; --primary-foreground: 0 0% 100%;
+  --secondary: 262 60% 96%; --secondary-foreground: 262 60% 22%; --muted: 250 40% 97%; --muted-foreground: 250 10% 38%;
+  --accent: 300 70% 96%; --accent-foreground: 300 60% 25%; --border: 250 25% 90%; --input: 250 20% 86%; --ring: 262 83% 52%;
+  --brand-gradient: linear-gradient(120deg, #7c3aed 0%, #c026d3 50%, #db2777 100%);
+  color-scheme: light;
+  color: hsl(var(--foreground));
+}
+.light-surface .bg-app {
+  background:
+    radial-gradient(60rem 30rem at 0% -10%, rgba(124,58,237,.10), transparent 60%),
+    radial-gradient(50rem 25rem at 100% 0%, rgba(219,39,119,.08), transparent 60%),
+    hsl(var(--background));
+}
+
+/* Rows, cards, hover previews, bottom sheet */
+.nf-scroller { scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+.nf-scroller::-webkit-scrollbar { display: none; }
+.nf-arrow {
+  position: absolute; top: 2rem; bottom: 2rem; z-index: 20; display: none; width: 3rem; align-items: center; justify-content: center;
+  color: #fff; --tw-gradient-from: rgba(9,9,11,.9); --tw-gradient-to: transparent; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  opacity: 0; transition: opacity .2s ease;
+}
+.group\/row:hover .nf-arrow, .nf-arrow:focus-visible { opacity: 1; }
+.nf-card { transition: transform .25s cubic-bezier(.2,.7,.2,1), z-index 0s .25s; transform-origin: center top; }
+.nf-preview {
+  position: absolute; inset: 0; z-index: 2; overflow: hidden; border-radius: .5rem; background: #18181b; flex-direction: column;
+  box-shadow: 0 24px 50px -12px rgba(0,0,0,.9); opacity: 0; transform: scale(.98); pointer-events: none;
+  transition: opacity .2s ease, transform .25s ease; display: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .nf-arrow { display: flex; }
+  .nf-preview { display: flex; }
+  .nf-card:hover, .nf-card:focus-within { transform: scale(1.08); z-index: 30; transition: transform .25s cubic-bezier(.2,.7,.2,1); }
+  .nf-card:hover .nf-preview, .nf-card:focus-within .nf-preview { opacity: 1; transform: none; pointer-events: auto; }
+}
+.nf-fade-up { animation: nf-up .6s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes nf-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .nf-card, .nf-card:hover, .nf-card:focus-within { transform: none !important; }
+}
+
 /* ---------- Published funnel themes ---------- */
 .fm-theme { --cta-bg: #111827; --cta-fg: #fff; background: #fff; }
 .fm-cta {
