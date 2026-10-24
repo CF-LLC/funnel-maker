@@ -5,8 +5,9 @@ import { funnelsTool } from './funnels/tool'
 import { invoicesTool } from './invoices/tool'
 import { linkinbioTool } from './linkinbio/tool'
 import { formsTool } from './forms/tool'
+import { proposalsTool } from './proposals/tool'
 
-export const TOOL_REGISTRY = [funnelsTool, invoicesTool, linkinbioTool, formsTool] as const satisfies readonly ToolDef[]
+export const TOOL_REGISTRY = [funnelsTool, invoicesTool, linkinbioTool, formsTool, proposalsTool] as const satisfies readonly ToolDef[]
 export type ToolId = (typeof TOOL_REGISTRY)[number]['id']
 export const TOOL_IDS = TOOL_REGISTRY.map((t) => t.id) as ToolId[]
 /** 'all' = All Access, one app_access row covering every tool. */
