@@ -6,6 +6,7 @@ const nextConfig = {
     return [
       { source: '/@:handle', destination: '/u/:handle' },
       { source: '/@:handle/:form', destination: '/u/:handle/f/:form' },
+      { source: '/@:handle/p/:id', destination: '/u/:handle/p/:id' },
     ]
   },
   // Funnel dashboard/builder moved under /funnels (SaaS Nation hub lives at /dashboard).
