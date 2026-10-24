@@ -87,14 +87,14 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h3 className="font-bold mb-4">Funnel Maker</h3>
+            <h3 className="font-bold mb-4">SaaS Nation</h3>
             <p className="text-sm text-muted-foreground">
               Build high-converting sales funnels with our drag-and-drop builder.
             </p>
           </div>
         </div>
         <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} Funnel Maker by {COMPANY}, {COMPANY_LOCATION}. All rights reserved.
+          © {new Date().getFullYear()} SaaS Nation by {COMPANY}, {COMPANY_LOCATION}. All rights reserved.
         </div>
       </div>
     </footer>

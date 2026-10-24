@@ -107,7 +107,7 @@ export default function LoginPage() {
         <div className="h-1.5 bg-brand" />
         <CardHeader>
           <CardTitle className="text-2xl">Welcome back</CardTitle>
-          <CardDescription>Sign in to your Funnel Maker account</CardDescription>
+          <CardDescription>Sign in to your SaaS Nation account</CardDescription>
         </CardHeader>
         <form onSubmit={handleLogin}>
           <CardContent className="space-y-4">

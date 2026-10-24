@@ -59,7 +59,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <button onClick={() => setOpen(false)} aria-label="Close menu" className="press flex h-11 w-11 items-center justify-center rounded-lg hover:bg-muted lg:hidden"><X className="h-5 w-5" /></button>
       </div>
       <div className="px-3">
-        <Link href="/dashboard/templates" className="press flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-brand text-sm font-semibold text-white shadow-md hover:brightness-110">
+        <Link href="/funnels/templates" className="press flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-brand text-sm font-semibold text-white shadow-md hover:brightness-110">
           <Plus className="h-4 w-4" /> New funnel
         </Link>
       </div>

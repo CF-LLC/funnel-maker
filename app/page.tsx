@@ -14,7 +14,7 @@ export default function Home() {
         <div aria-hidden className="pointer-events-none absolute -top-32 left-1/2 h-[28rem] w-[46rem] max-w-[140vw] -translate-x-1/2 rounded-full bg-brand opacity-20 blur-3xl" />
         <div className="container relative mx-auto px-4 pb-16 pt-16 text-center sm:pb-24 sm:pt-24">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-200 bg-white/80 px-3 py-1 text-xs font-semibold text-violet-800 shadow-sm">
-            <Sparkles className="h-3.5 w-3.5" /> New: 5 animated templates
+            <Sparkles className="h-3.5 w-3.5" /> SaaS Nation · Funnel Maker, Invoices &amp; Link-in-bio
           </span>
           <h1 className="mx-auto mt-6 max-w-4xl text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl">
             Funnels that look <span className="text-brand">amazing</span> on every screen

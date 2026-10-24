@@ -5,6 +5,14 @@ const nextConfig = {
   async rewrites() {
     return [{ source: '/@:handle', destination: '/u/:handle' }]
   },
+  // Funnel dashboard/builder moved under /funnels (SaaS Nation hub lives at /dashboard).
+  async redirects() {
+    return [
+      { source: '/dashboard/funnels', destination: '/funnels', permanent: true },
+      { source: '/dashboard/funnels/:path*', destination: '/funnels/:path*', permanent: true },
+      { source: '/dashboard/templates', destination: '/funnels/templates', permanent: true },
+    ]
+  },
   eslint: {
     ignoreDuringBuilds: false,
   },

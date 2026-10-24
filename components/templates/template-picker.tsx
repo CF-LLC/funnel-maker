@@ -55,7 +55,7 @@ export function TemplatePicker({ returnTo }: { returnTo: string }) {
       const id = (data?.[0] as any)?.id
       if (!id) throw new Error('No funnel id returned')
       toast(`${template.name} created. Click any text to edit it.`)
-      router.push(`/dashboard/funnels/${id}?new=1`)
+      router.push(`/funnels/${id}?new=1`)
     } catch (e: any) {
       toast(`Could not create the funnel: ${e?.message || 'unknown error'}`, 'error')
       setBusy(null)

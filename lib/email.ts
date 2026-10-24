@@ -16,9 +16,9 @@ function getResend(): Resend {
 export async function sendWelcomeEmail(email: string) {
   try {
     const { data, error } = await getResend().emails.send({
-      from: 'Funnel Maker <onboarding@funnelmaker.app>',
+      from: 'SaaS Nation <onboarding@funnelmaker.app>',
       to: [email],
-      subject: 'Welcome to Funnel Maker! 🎉',
+      subject: 'Welcome to SaaS Nation! 🎉',
       react: WelcomeEmail({ email }),
     })
 
@@ -41,7 +41,7 @@ export async function sendFunnelExportEmail(
 ) {
   try {
     const { data, error } = await getResend().emails.send({
-      from: 'Funnel Maker <exports@funnelmaker.app>',
+      from: 'SaaS Nation <exports@funnelmaker.app>',
       to: [email],
       subject: `Your funnel "${funnelName}" is ready to download`,
       react: FunnelExportEmail({ funnelName, downloadUrl }),
@@ -67,13 +67,13 @@ export async function sendTeamInviteEmail(
 ) {
   try {
     const { data, error } = await getResend().emails.send({
-      from: 'Funnel Maker <team@funnelmaker.app>',
+      from: 'SaaS Nation <team@funnelmaker.app>',
       to: [email],
-      subject: `You've been invited to join ${orgName} on Funnel Maker`,
+      subject: `You've been invited to join ${orgName} on SaaS Nation`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h1>You've been invited!</h1>
-          <p>${inviterName} has invited you to join <strong>${orgName}</strong> on Funnel Maker.</p>
+          <p>${inviterName} has invited you to join <strong>${orgName}</strong> on SaaS Nation.</p>
           <p>Click the link below to accept the invitation:</p>
           <a href="${inviteLink}" style="display: inline-block; background: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0;">
             Accept Invitation
