@@ -18,7 +18,7 @@ test('403 on wrong/missing token or Cloudflare headers; 200 on exact token', () 
   assert.equal(S.allowSummary(H({}), env), 403)
   assert.equal(S.allowSummary(H({ 'x-internal-token': TOK + 'y' }), env), 403)
   assert.equal(S.allowSummary(H({ 'x-internal-token': TOK, 'cf-connecting-ip': '1.2.3.4' }), env), 403)
-  assert.equal(S.allowSummary(H({ 'x-internal-token': TOK, 'x-forwarded-for': '1.2.3.4' }), env), 403)
+  assert.equal(S.allowSummary(H({ 'x-internal-token': TOK, 'x-forwarded-for': '172.18.0.1' }), env), 200) // Next adds XFF itself; cf-* is the tunnel signal
   assert.equal(S.allowSummary(H({ 'x-internal-token': TOK }), env), 200)
 })
 test('loadCounts returns numbers only and excludes demo users', async () => {
