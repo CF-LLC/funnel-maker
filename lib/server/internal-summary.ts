@@ -3,7 +3,7 @@ import { timingSafeEqual } from 'node:crypto'
 /**
  * Aggregates-only summary for HQ (hq.spockshop.com) on spock-server. Counts only: no names, emails, tokens or amounts
  * per customer. Fails closed: 404 unless INTERNAL_SUMMARY_TOKEN (>= 32 chars) is set and the caller sends it in
- * x-internal-token; anything that arrived through Cloudflare (cf-* / x-forwarded-for headers) is refused, so the
+ * x-internal-token; anything that arrived through Cloudflare (any cf-* header, which the tunnel always adds; Next itself sets x-forwarded-for, so that can't be used) is refused, so the
  * public hostnames can never serve it even with the token.
  */
 export const MIN_TOKEN = 32
@@ -11,7 +11,7 @@ export const MIN_TOKEN = 32
 export function allowSummary(headers: Headers, env: Record<string, string | undefined> = process.env): 200 | 403 | 404 {
   const want = (env.INTERNAL_SUMMARY_TOKEN ?? '').trim()
   if (want.length < MIN_TOKEN) return 404
-  for (const k of headers.keys()) if (k.startsWith('cf-') || k === 'x-forwarded-for') return 403
+  for (const k of headers.keys()) if (k.startsWith('cf-')) return 403
   const got = Buffer.from((headers.get('x-internal-token') ?? '').trim())
   const exp = Buffer.from(want)
   if (got.length !== exp.length || !timingSafeEqual(got, exp)) return 403
