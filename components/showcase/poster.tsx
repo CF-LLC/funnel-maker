@@ -16,6 +16,8 @@ function Motif({ id, accent }: { id: string; accent: string }) {
       return (<g {...s}><path d="M55 20h70l30 30v110H55z" /><path d="M125 20v30h30" /><path d="M75 115l15 15 30-35" /></g>)
     case 'testimonials':
       return (<g {...s}><path d="M100 30l12 26 28 3-21 19 6 28-25-14-25 14 6-28-21-19 28-3z" /><path d="M40 130c20 10 100 10 120 0M60 155h80" /></g>)
+    case 'booking':
+      return (<g {...s}><rect x="35" y="35" width="130" height="120" rx="10" /><path d="M35 65h130M70 25v20M130 25v20" /><path d="M75 105l15 15 35-35" /></g>)
     default:
       return (<g {...s}><circle cx="100" cy="90" r="50" /></g>)
   }

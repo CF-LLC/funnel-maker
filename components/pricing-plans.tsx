@@ -8,7 +8,7 @@ import { ALL_ACCESS_PRICE, TOOL_PRICE, paymentLinkUrl, type Billing, type SoldKe
 
 const SINGLE: { id: Exclude<SoldKey, 'all'>; name: string }[] = [
   { id: 'funnels', name: 'Funnels' }, { id: 'invoices', name: 'Invoices' }, { id: 'forms', name: 'Forms' },
-  { id: 'proposals', name: 'Proposals' }, { id: 'testimonials', name: 'Testimonials' },
+  { id: 'proposals', name: 'Proposals' }, { id: 'testimonials', name: 'Testimonials' }, { id: 'booking', name: 'Booking' },
 ]
 
 export function PricingPlans() {
@@ -52,7 +52,7 @@ export function PricingPlans() {
             {SINGLE.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
           </select>
           <ul className="my-6 flex-1 space-y-3 text-sm">
-            {['Full access to one paid tool: Funnels, Invoices, Forms, Proposals or Testimonials', 'Link-in-bio included free (shows a small "Made with SaaS Nation" badge)', 'Email support'].map((f) => (
+            {['Full access to one paid tool: Funnels, Invoices, Forms, Proposals, Testimonials or Booking', 'Link-in-bio included free (shows a small "Made with SaaS Nation" badge)', 'Email support'].map((f) => (
               <li key={f} className="flex gap-2"><Check className="h-5 w-5 shrink-0 text-primary" />{f}</li>
             ))}
           </ul>
@@ -65,7 +65,7 @@ export function PricingPlans() {
           <div className="mt-4"><span className="text-4xl font-bold">{ALL_ACCESS_PRICE[billing]}</span><span className="text-muted-foreground">{per}</span></div>
           <p className="text-xs text-muted-foreground h-4">{billing === 'yearly' ? 'Save $99 vs $348 paid monthly' : 'or $249/yr'}</p>
           <ul className="my-6 flex-1 space-y-3 text-sm">
-            {['Funnels, Invoices, Forms, Proposals and Testimonials', 'Link-in-bio with no SaaS Nation badge', 'New tools included automatically, at no extra cost', 'Email support'].map((f) => (
+            {['Funnels, Invoices, Forms, Proposals, Testimonials and Booking', 'Link-in-bio with no SaaS Nation badge', 'New tools included automatically, at no extra cost', 'Email support'].map((f) => (
               <li key={f} className="flex gap-2"><Check className="h-5 w-5 shrink-0 text-primary" />{f}</li>
             ))}
           </ul>
