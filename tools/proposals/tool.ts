@@ -7,7 +7,7 @@ export const proposalsTool = {
   nav: [{ label: 'Proposals', href: '/proposals', icon: 'file-check' }],
   accessKey: 'proposals',
   protectedPaths: ['/proposals'],
-  priceLabel: '$12/mo on its own, or included in All Access',
+  priceLabel: '$12/mo or $99/yr, or included in All Access',
   showcase: {
     cardTagline: 'Send a quote, get a yes, get paid.',
     rows: ['get-paid', 'coaches'],

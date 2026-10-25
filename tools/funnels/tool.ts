@@ -10,7 +10,7 @@ export const funnelsTool = {
   ],
   accessKey: 'funnels',
   protectedPaths: ['/dashboard', '/funnels'],
-  priceLabel: 'Funnel Maker plans below',
+  priceLabel: '$12/mo or $99/yr, or included in All Access',
   showcase: {
     cardTagline: 'Launch a page that sells, in minutes.',
     rows: ['coaches', 'creators'],
