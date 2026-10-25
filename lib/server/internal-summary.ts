@@ -39,7 +39,7 @@ export async function loadCounts(sb: any, demoIds: Set<string>, now = Date.now()
   }
   const n = async (p: PromiseLike<CountQ>) => { const r = await p; if (r.error) throw new Error(`count failed: ${(r.error as any).code ?? ''} ${String((r.error as any).message ?? '').slice(0, 120)}`); return r.count ?? 0 }
   const [users, users7d, paidAccess, bookingsUpcoming, bookings30d, invoicesUnpaid, invoicesOverdue, invoicesPaid30d, invoices30d] = await Promise.all([
-    n(c('users', 'id')), n(c('users', 'id').gte('created_at', d7)),
+    n(c('users', 'id')), n(c('users', 'id').gte('approved_at', d7)),
     n(c('app_access').eq('active', true).neq('source', 'manual')),
     n(c('bk_bookings').eq('status', 'confirmed').gte('starts_at', nowIso)),
     n(c('bk_bookings').gte('created_at', d30)),
