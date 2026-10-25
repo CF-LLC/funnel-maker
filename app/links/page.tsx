@@ -1,3 +1,4 @@
+import { isDemoUser } from '@/lib/demo'
 import { createServerClient } from '@/lib/supabase'
 import { LinkInBioEditor } from '@/components/linkinbio/editor'
 
@@ -18,5 +19,5 @@ export default async function LinksHome() {
     ...(funnels || []).map((f: any) => ({ title: f.name, path: `/f/${f.slug}` })),
     ...(invoices || []).map((i: any) => ({ title: `Invoice ${i.number}`, path: `/i/${i.public_token}` })),
   ]
-  return <LinkInBioEditor userId={user!.id} initialProfile={profile} initialLinks={links || []} canHideBadge={(allRow || []).length > 0} quickAdd={quick} />
+  return <LinkInBioEditor userId={user!.id} initialProfile={profile} initialLinks={links || []} canHideBadge={(allRow || []).length > 0} quickAdd={quick} demo={isDemoUser(user!.id)} />
 }
