@@ -24,6 +24,6 @@ test('home rows: All tools, coaches, creators, Get paid (Invoices + Proposals); 
 
 test('card taglines match the approved copy', () => {
   const want = { funnels: 'Launch a page that sells, in minutes.', invoices: 'Bill clients. Get paid. Done.', linkinbio: 'One link for everything you sell.',
-    forms: 'Know your client before the first call.', proposals: 'Send a quote, get a yes, get paid.', testimonials: 'Let happy clients sell for you.' }
+    forms: 'Know your client before the first call.', proposals: 'Send a quote, get a yes, get paid.', testimonials: 'Let happy clients sell for you.', booking: 'Let clients pick a time without the back-and-forth.' }
   for (const t of TOOL_REGISTRY) assert.equal(t.showcase.cardTagline, want[t.id])
 })

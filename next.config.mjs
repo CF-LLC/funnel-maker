@@ -7,6 +7,8 @@ const nextConfig = {
       { source: '/@:handle', destination: '/u/:handle' },
       { source: '/@:handle/review', destination: '/u/:handle/review' },
       { source: '/@:handle/reviews', destination: '/u/:handle/reviews' },
+      { source: '/@:handle/book', destination: '/u/:handle/book' },
+      { source: '/@:handle/book/:type', destination: '/u/:handle/book/:type' },
       { source: '/@:handle/:form', destination: '/u/:handle/f/:form' },
       { source: '/@:handle/p/:id', destination: '/u/:handle/p/:id' },
     ]
