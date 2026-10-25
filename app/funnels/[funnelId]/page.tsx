@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { ImageInput } from '@/components/uploads/image-input'
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core'
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { ArrowLeft, Check, Copy, Download, ExternalLink, Globe, Loader2, Monitor, MoreHorizontal, Plus, Smartphone, Trash2, Eye, Pencil, Rocket } from 'lucide-react'
@@ -20,7 +21,6 @@ import { LandingEditor, LeadCaptureEditor, SalesEditor, ThankYouEditor, Affiliat
 import { Stepper } from '@/components/builder/stepper'
 import { FunnelRenderer, headlineOf } from '@/components/funnel/funnel-renderer'
 import { toast } from '@/components/ui/toast'
-import { safeHttpsUrl } from '@/lib/url-safety'
 import { templates, type FunnelStep } from '@/data/templates'
 import { RealtimeCollaboration, Collaborator } from '@/lib/realtime-collaboration'
 
@@ -314,9 +314,7 @@ export default function FunnelBuilderPage() {
                 </div>
               )}
               <div className="space-y-1.5">
-                <Label htmlFor="f-img">Image (optional)</Label>
-                <Input id="f-img" inputMode="url" value={selectedStep.imageUrl || ''} onChange={(e) => patchStep(selectedStep.id, { imageUrl: e.target.value.trim() })} placeholder="https://…/photo.jpg" />
-                {selectedStep.imageUrl && !safeHttpsUrl(selectedStep.imageUrl) && <p className="text-xs text-red-600">Use an https:// image link</p>}
+                <ImageInput id="f-img" label="Image (optional)" kind="funnel" value={selectedStep.imageUrl || ''} onChange={(url) => patchStep(selectedStep.id, { imageUrl: url })} />
               </div>
               <TemplateFieldsEditor step={selectedStep} onUpdate={updateStep} userId={userId} slug={funnelSlug} />
               <details className="group rounded-xl border p-3">

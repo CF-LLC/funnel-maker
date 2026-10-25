@@ -8,13 +8,14 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { ImageInput } from '@/components/uploads/image-input'
 import { linkSchema, MAX_LINKS, profileSchema, publicPath, SOCIALS, THEMES, type Theme } from '@/lib/linkinbio/core'
 
 type Profile = { handle: string; display_name: string; bio: string; avatar_url: string | null; show_funnels: boolean; published: boolean; theme: Theme; socials: Record<string, string>; hide_badge: boolean }
 type LinkRow = { id: string; title: string; url: string; position: number; clicks: number }
 
-export function LinkInBioEditor({ userId, initialProfile, initialLinks, canHideBadge, quickAdd }: {
-  userId: string; initialProfile: Profile | null; initialLinks: LinkRow[]; canHideBadge: boolean; quickAdd: { title: string; path: string }[]
+export function LinkInBioEditor({ userId, initialProfile, initialLinks, canHideBadge, quickAdd, demo = false }: {
+  demo?: boolean; userId: string; initialProfile: Profile | null; initialLinks: LinkRow[]; canHideBadge: boolean; quickAdd: { title: string; path: string }[]
 }) {
   const supabase = createClient()
   const [p, setP] = useState<Profile>(initialProfile ?? { handle: '', display_name: '', bio: '', avatar_url: '', show_funnels: true, published: true, theme: 'light', socials: {}, hide_badge: false })
@@ -77,7 +78,7 @@ export function LinkInBioEditor({ userId, initialProfile, initialLinks, canHideB
         <div><Label htmlFor="h">Handle</Label><Input id="h" value={p.handle} onChange={set('handle')} placeholder="yourname" /></div>
         <div><Label htmlFor="n">Name</Label><Input id="n" value={p.display_name} onChange={set('display_name')} maxLength={60} /></div>
         <div><Label htmlFor="b">Bio</Label><Textarea id="b" value={p.bio} onChange={set('bio')} maxLength={160} rows={2} /></div>
-        <div><Label htmlFor="a">Avatar image URL (https)</Label><Input id="a" value={p.avatar_url || ''} onChange={set('avatar_url')} placeholder="https://..." /></div>
+        <ImageInput id="a" label="Avatar" kind="avatar" round demo={demo} value={p.avatar_url || ''} onChange={(url) => setP({ ...p, avatar_url: url })} />
         <div><Label>Theme</Label>
           <div className="flex gap-2">{THEMES.map((t) => <Button key={t} type="button" size="sm" variant={p.theme === t ? 'default' : 'outline'} onClick={() => setP({ ...p, theme: t })}>{t}</Button>)}</div>
         </div>
