@@ -8,7 +8,7 @@ import { ArrowUpRight, CalendarDays, Facebook, Github, Instagram, Linkedin, Musi
 import { getPublicPage } from '@/lib/linkinbio/public'
 import { getEmbed } from '@/lib/testimonials/public'
 import { ReviewList } from '@/components/testimonials/review-list'
-import { clickHref, type Social, type Theme } from '@/lib/linkinbio/core'
+import { clickHref, dedupeBooking, type Social, type Theme } from '@/lib/linkinbio/core'
 import { Backdrop, Monogram } from '@/components/booking/backdrop'
 import { getBookingOwner } from '@/lib/booking/public'
 import { bookPath } from '@/lib/booking/core'
@@ -34,6 +34,8 @@ export default async function LinkInBioPage({ params }: { params: Promise<{ hand
   const reviews = await getEmbed(page.user_id, page.handle, 'linkinbio_layout')
   const socials = Object.entries(page.socials) as [Social, string][]
   const booking = await getBookingOwner(page.handle).catch(() => null)
+  const showBooking = !!booking && booking.types.length > 0
+  const { links, funnels } = dedupeBooking(showBooking, page.links, page.funnels)
   const name = page.display_name || `@${page.handle}`
   const card = `cine-card group flex items-center gap-3 rounded-2xl border px-5 py-4 text-left font-semibold ${t.btn}`
   return (
@@ -56,17 +58,17 @@ export default async function LinkInBioPage({ params }: { params: Promise<{ hand
           )}
         </div>
         <ul className="mt-8 space-y-3">
-          {booking && booking.types.length > 0 && (
+          {showBooking && (
             <li className="cine-rise cine-rise-1">
-              <Link href={bookPath(page.handle)} className="cine-card group flex items-center gap-4 overflow-hidden rounded-2xl bg-gradient-to-r from-violet-600 via-fuchsia-600 to-rose-600 px-5 py-5 text-white shadow-[0_20px_50px_-20px_rgba(192,38,211,.9)]">
+              <Link href={bookPath(page.handle)} aria-label="Book a call" className="cine-card group flex items-center gap-4 overflow-hidden rounded-2xl bg-gradient-to-r from-violet-600 via-fuchsia-600 to-rose-600 px-5 py-5 text-white shadow-[0_20px_50px_-20px_rgba(192,38,211,.9)]">
                 <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/20"><CalendarDays className="h-6 w-6" /></span>
                 <span className="flex-1"><span className="block text-lg font-extrabold">Book a call</span><span className="block text-sm text-white/85">Pick a time that works for you</span></span>
                 <ArrowUpRight className="cine-arrow h-5 w-5" />
               </Link>
             </li>
           )}
-          {page.links.map((l) => <li key={l.id} className="cine-rise cine-rise-2"><a href={clickHref(page.handle, l.id)} rel="noopener nofollow" className={card}><span className="flex-1">{l.title}</span><ArrowUpRight className="cine-arrow h-4 w-4 opacity-60" /></a></li>)}
-          {page.funnels.map((f) => <li key={f.slug} className="cine-rise cine-rise-2"><Link href={`/f/${f.slug}`} className={card}><span className="flex-1">{f.name}</span><ArrowUpRight className="cine-arrow h-4 w-4 opacity-60" /></Link></li>)}
+          {links.map((l) => <li key={l.id} className="cine-rise cine-rise-2"><a href={clickHref(page.handle, l.id)} rel="noopener nofollow" className={card}><span className="flex-1">{l.title}</span><ArrowUpRight className="cine-arrow h-4 w-4 opacity-60" /></a></li>)}
+          {funnels.map((f) => <li key={f.slug} className="cine-rise cine-rise-2"><Link href={`/f/${f.slug}`} className={card}><span className="flex-1">{f.name}</span><ArrowUpRight className="cine-arrow h-4 w-4 opacity-60" /></Link></li>)}
         </ul>
         {reviews && <div className="mt-10"><ReviewList reviews={reviews.reviews} layout={reviews.layout} handle={reviews.handle} /></div>}
       </main>
