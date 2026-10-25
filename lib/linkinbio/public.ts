@@ -4,7 +4,7 @@ import { safeHttpsUrl } from '@/lib/url-safety'
 
 export type PublicPage = {
   handle: string; display_name: string; bio: string; avatar_url: string | null
-  links: PublicLink[]; funnels: { name: string; slug: string }[]
+  links: PublicLink[]; funnels: { name: string; slug: string; template: string | null }[]
   theme: Theme; socials: Partial<Record<Social, string>>; badge: boolean; user_id: string
 }
 
@@ -19,13 +19,13 @@ export async function getPublicPage(raw: string): Promise<PublicPage | null> {
   const { data: ok } = await db.rpc('lib_has_access' as any, { uid: p.user_id } as any)
   if (ok !== true) return null
   const { data: links } = await (db as any).from('lib_links').select('id, title, url, position, created_at').eq('user_id', p.user_id)
-  let funnels: { name: string; slug: string }[] = []
+  let funnels: { name: string; slug: string; template: string | null }[] = []
   if (p.show_funnels) {
     const { data: fa } = await db.rpc('fm_has_funnels_access' as any, { uid: p.user_id } as any)
     if (fa === true) {
-      const { data: f } = await (db as any).from('funnels').select('name, slug, created_at')
+      const { data: f } = await (db as any).from('funnels').select('name, slug, template, created_at')
         .eq('user_id', p.user_id).eq('is_public', true).not('slug', 'is', null).order('created_at', { ascending: false }).limit(20)
-      funnels = (f || []).map((x: any) => ({ name: x.name, slug: x.slug }))
+      funnels = (f || []).map((x: any) => ({ name: x.name, slug: x.slug, template: x.template ?? null }))
     }
   }
   const { data: allRow } = await (db as any).from('app_access').select('id').eq('user_id', p.user_id).eq('tool', 'all').eq('active', true).limit(1)

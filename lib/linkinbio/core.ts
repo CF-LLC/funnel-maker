@@ -41,3 +41,20 @@ export type PublicLink = { id: string; title: string; url: string; position: num
 export const orderLinks = <T extends { position: number; created_at?: string }>(l: T[]) =>
   [...l].sort((a, b) => a.position - b.position || String(a.created_at ?? '').localeCompare(String(b.created_at ?? '')))
 export const clickHref = (handle: string, linkId: string) => `/u/${encodeURIComponent(handle)}/l/${encodeURIComponent(linkId)}`
+
+const BOOKING_LABEL = /^\s*book\s+(a\s+)?(call|session|meeting|time)\b/i
+/** True if a profile item points at a booking flow (Booking page, book-call funnel, or a "Book a call" label). */
+export function isBookingItem(i: { title?: string; name?: string; url?: string; slug?: string; template?: string | null }): boolean {
+  if (i.template === 'book-call') return true
+  const label = i.title ?? i.name ?? ''
+  if (BOOKING_LABEL.test(label)) return true
+  const target = i.url ?? (i.slug ? `/f/${i.slug}` : '')
+  return /\/@[^/]+\/book(\/|$|\?)|\/u\/[^/]+\/book(\/|$|\?)/i.test(target)
+}
+/** When the built-in Booking button is shown, drop links/funnels that would be a second booking button. */
+export function dedupeBooking<L extends { title: string; url: string }, F extends { name: string; slug: string; template?: string | null }>(
+  bookingShown: boolean, links: L[], funnels: F[],
+): { links: L[]; funnels: F[] } {
+  if (!bookingShown) return { links, funnels }
+  return { links: links.filter((l) => !isBookingItem(l)), funnels: funnels.filter((f) => !isBookingItem(f)) }
+}
