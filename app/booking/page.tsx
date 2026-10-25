@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createServerClient } from '@/lib/supabase'
 import { bookPath, weeklySchema } from '@/lib/booking/core'
+import { emailConfigured } from '@/lib/booking/email'
 import { BookingSettings, BookingsList, TypesManager } from '@/components/booking/dashboard'
 
 export const dynamic = 'force-dynamic'
@@ -27,8 +28,8 @@ export default async function BookingHome() {
       ) : <p className="rounded-xl border border-amber-400 bg-amber-50 p-3 text-sm text-amber-900">Your booking page uses your handle (saasnation.site/@handle/book). <Link href="/links" className="underline">Set your handle in Link-in-bio</Link>.</p>}
       <BookingSettings initial={{ timezone: settings?.timezone ?? 'America/Chicago', published: settings?.published ?? false }} exists={!!settings} weekly={weekly.success ? weekly.data : []} weeklyExists={!!av} />
       <TypesManager types={types || []} />
-      <BookingsList bookings={bookings || []} types={types || []} timezone={settings?.timezone ?? 'America/Chicago'} />
-      <p className="text-xs text-muted-foreground">Email confirmations are off for now. Visitors see their confirmation on screen and can download a calendar file (.ics).</p>
+      <BookingsList bookings={bookings || []} types={types || []} timezone={settings?.timezone ?? 'America/Chicago'} emailOn={emailConfigured()} />
+      <p className="text-xs text-muted-foreground">{emailConfigured() ? 'New bookings email you and send the visitor a confirmation with a calendar invite. Cancelling emails them a notice.' : 'Email is not set up yet. Visitors see their confirmation on screen and can download a calendar file (.ics).'}</p>
     </div>
   )
 }

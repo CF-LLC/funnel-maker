@@ -39,6 +39,8 @@ export const bookSchema = z.object({
   name: z.string().trim().min(1, 'Please enter your name').max(100),
   email: z.string().trim().email('Please enter a valid email').max(254),
   notes: z.string().trim().max(1000).optional(),
+  tz: z.string().max(64).optional(),
+  turnstileToken: z.string().max(4096).optional(),
 })
 
 /** Offset (ms) of tz from UTC at instant t. */

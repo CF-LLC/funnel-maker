@@ -114,7 +114,7 @@ export function TypesManager({ types }: { types: TypeRow[] }) {
 
 type BookingRow = { id: string; type_id: string; starts_at: string; ends_at: string; name: string; email: string; notes: string | null; status: 'confirmed' | 'cancelled' }
 
-export function BookingsList({ bookings, types, timezone }: { bookings: BookingRow[]; types: TypeRow[]; timezone: string }) {
+export function BookingsList({ bookings, types, timezone, emailOn }: { bookings: BookingRow[]; types: TypeRow[]; timezone: string; emailOn: boolean }) {
   const router = useRouter()
   const [msg, setMsg] = useState('')
   const now = Date.now()
@@ -122,9 +122,9 @@ export function BookingsList({ bookings, types, timezone }: { bookings: BookingR
   const past = bookings.filter((b) => Date.parse(b.ends_at) < now).reverse()
   const when = (iso: string) => new Date(iso).toLocaleString('en-US', { timeZone: timezone, dateStyle: 'medium', timeStyle: 'short' })
   async function cancel(b: BookingRow) {
-    if (!confirm(`Cancel the booking with ${b.name}? They are not emailed automatically, so let them know.`)) return
-    const { error } = await (createClient() as any).from('bk_bookings').update({ status: 'cancelled' }).eq('id', b.id)
-    if (error) return setMsg('Could not cancel the booking.')
+    if (!confirm(`Cancel the booking with ${b.name}?${emailOn ? ' They will get a cancellation email.' : ' Email is not set up yet, so let them know yourself.'}`)) return
+    const res = await fetch('/api/booking/cancel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: b.id }) })
+    if (!res.ok) return setMsg('Could not cancel the booking.')
     router.refresh()
   }
   const row = (b: BookingRow) => (
