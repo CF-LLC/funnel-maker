@@ -14,7 +14,8 @@ export async function GET(request: Request) {
   try {
     if (!cache || Date.now() - cache.at > 60_000) cache = { at: Date.now(), body: { v: 1, generatedAt: new Date().toISOString(), ...(await loadCounts(serviceClient(), demoUserIds())) } }
     return Response.json(cache.body, { headers: head })
-  } catch {
+  } catch (err) {
+    console.error('healthz/summary unavailable:', err instanceof Error ? err.message.slice(0, 200) : 'unknown')
     return Response.json({ error: 'unavailable' }, { status: 503, headers: head })
   }
 }
