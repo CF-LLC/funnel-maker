@@ -9,6 +9,7 @@ import { ALL_ACCESS_PRICE, TOOL_PRICE, paymentLinkUrl, type Billing, type SoldKe
 const SINGLE: { id: Exclude<SoldKey, 'all'>; name: string }[] = [
   { id: 'funnels', name: 'Funnels' }, { id: 'invoices', name: 'Invoices' }, { id: 'forms', name: 'Forms' },
   { id: 'proposals', name: 'Proposals' }, { id: 'testimonials', name: 'Testimonials' }, { id: 'booking', name: 'Booking' },
+  { id: 'dataremoval', name: 'Data Removal' },
 ]
 
 export function PricingPlans() {
@@ -52,7 +53,7 @@ export function PricingPlans() {
             {SINGLE.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
           </select>
           <ul className="my-6 flex-1 space-y-3 text-sm">
-            {['Full access to one paid tool: Funnels, Invoices, Forms, Proposals, Testimonials or Booking', 'Link-in-bio included free (shows a small "Made with SaaS Nation" badge)', 'Email support'].map((f) => (
+            {['Full access to one paid tool: Funnels, Invoices, Forms, Proposals, Testimonials, Booking or Data Removal', 'Link-in-bio included free (shows a small "Made with SaaS Nation" badge)', 'Email support'].map((f) => (
               <li key={f} className="flex gap-2"><Check className="h-5 w-5 shrink-0 text-primary" />{f}</li>
             ))}
           </ul>

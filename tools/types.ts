@@ -1,8 +1,8 @@
 // Data-only tool definition (safe to import from middleware/edge, server and client code).
-export type ToolIcon = 'zap' | 'layout-template' | 'receipt' | 'link' | 'box' | 'clipboard' | 'file-check' | 'star' | 'calendar'
+export type ToolIcon = 'zap' | 'layout-template' | 'receipt' | 'link' | 'box' | 'clipboard' | 'file-check' | 'star' | 'calendar' | 'shield'
 export type ToolNavItem = { label: string; href: string; icon: ToolIcon }
 /** Home/dashboard rows a tool appears in (besides "All tools"). */
-export type ToolRow = 'coaches' | 'creators' | 'get-paid'
+export type ToolRow = 'coaches' | 'creators' | 'get-paid' | 'everyone'
 /** Netflix-style poster + card metadata. Colors are plain hex; art is CSS/SVG in components/tools/poster.tsx. */
 export type ToolShowcase = {
   /** One-line card tagline. */
