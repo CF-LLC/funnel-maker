@@ -7,7 +7,7 @@ export const formsTool = {
   nav: [{ label: 'Forms', href: '/forms', icon: 'clipboard' }],
   accessKey: 'forms',
   protectedPaths: ['/forms'],
-  priceLabel: 'Included in All Access',
+  priceLabel: '$12/mo or $99/yr, or included in All Access',
   showcase: {
     cardTagline: 'Know your client before the first call.',
     rows: ['coaches'],

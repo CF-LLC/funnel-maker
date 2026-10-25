@@ -7,7 +7,7 @@ export const testimonialsTool = {
   nav: [{ label: 'Testimonials', href: '/testimonials', icon: 'star' }],
   accessKey: 'testimonials',
   protectedPaths: ['/testimonials'],
-  priceLabel: '$12/mo on its own, or included in All Access',
+  priceLabel: '$12/mo or $99/yr, or included in All Access',
   showcase: {
     cardTagline: 'Let happy clients sell for you.',
     rows: ['creators', 'coaches'],

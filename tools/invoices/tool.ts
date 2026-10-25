@@ -7,7 +7,7 @@ export const invoicesTool = {
   nav: [{ label: 'Invoices', href: '/invoices', icon: 'receipt' }],
   accessKey: 'invoices',
   protectedPaths: ['/invoices'],
-  priceLabel: '$12/mo on its own, or included in All Access',
+  priceLabel: '$12/mo or $99/yr, or included in All Access',
   showcase: {
     cardTagline: 'Bill clients. Get paid. Done.',
     rows: ['get-paid', 'coaches'],
