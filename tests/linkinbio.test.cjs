@@ -50,5 +50,5 @@ test('link-in-bio included with any paid plan; not sold separately', () => {
   const sql = fs.readFileSync(path.join(root, 'supabase/migrations/20261024_linkinbio_included.sql'), 'utf8')
   assert.match(sql, /where user_id = uid and active\)/)
   assert.match(fs.readFileSync(path.join(root, 'lib/access.ts'), 'utf8'), /isIncludedTool\(tool\)/)
-  assert.match(fs.readFileSync(path.join(root, 'components/tools/tools-list.tsx'), 'utf8'), /!\(t as \{ includedWithAnyPlan/)
+  assert.match(fs.readFileSync(path.join(root, 'components/tools/tools-list.tsx'), 'utf8'), /filter\(\(t\) => !t\.includedWithAnyPlan\)/)
 })

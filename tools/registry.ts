@@ -8,8 +8,9 @@ import { formsTool } from './forms/tool'
 import { proposalsTool } from './proposals/tool'
 import { testimonialsTool } from './testimonials/tool'
 import { bookingTool } from './booking/tool'
+import { dataremovalTool } from './dataremoval/tool'
 
-export const TOOL_REGISTRY = [funnelsTool, invoicesTool, linkinbioTool, formsTool, proposalsTool, testimonialsTool, bookingTool] as const satisfies readonly ToolDef[]
+export const TOOL_REGISTRY = [funnelsTool, invoicesTool, linkinbioTool, formsTool, proposalsTool, testimonialsTool, bookingTool, dataremovalTool] as const satisfies readonly ToolDef[]
 export type ToolId = (typeof TOOL_REGISTRY)[number]['id']
 export const TOOL_IDS = TOOL_REGISTRY.map((t) => t.id) as ToolId[]
 /** 'all' = All Access, one app_access row covering every tool. */
@@ -36,6 +37,7 @@ export const HOME_ROWS: { id: 'all' | import('./types').ToolRow; title: string }
   { id: 'coaches', title: 'For coaches' },
   { id: 'creators', title: 'For creators' },
   { id: 'get-paid', title: 'Get paid' },
+  { id: 'everyone', title: 'For everyone' },
 ]
 export function toolsInRow(row: 'all' | import('./types').ToolRow): ToolDef[] {
   const list = [...(TOOL_REGISTRY as readonly ToolDef[])].sort((a, b) => a.showcase.order - b.showcase.order)
