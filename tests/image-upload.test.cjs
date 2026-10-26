@@ -40,3 +40,9 @@ test('paths: per-user and only own uploads deletable', () => {
   assert.equal(I.ownedObjectPath('https://evil.com/a.png', uid, base), null)
   assert.equal(I.ownedObjectPath(`${base}/storage/v1/object/public/user-images/${uid}/../x.png`, uid, base), null)
 })
+
+test('upload route checks auth before parsing the form body', () => {
+  const src = require('node:fs').readFileSync(require('node:path').join(__dirname, '../app/api/uploads/image/route.ts'), 'utf8')
+  const post = src.slice(src.indexOf('export async function POST'))
+  assert.ok(post.indexOf('signedIn()') > -1 && post.indexOf('signedIn()') < post.indexOf('formData()'))
+})
