@@ -1,0 +1,31 @@
+const test = require('node:test');
+const assert = require('node:assert');
+const fs = require('node:fs');
+const path = require('node:path');
+const root = path.join(__dirname, '..');
+const SKIP = new Set(['node_modules', '.next', '.git', 'tests']);
+function walk(dir, out = []) {
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (SKIP.has(e.name)) continue;
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) walk(p, out);
+    else if (/\.(tsx?|mjs|cjs|js)$/.test(e.name)) out.push(p);
+  }
+  return out;
+}
+const used = new Set();
+for (const f of walk(root)) for (const m of fs.readFileSync(f, 'utf8').matchAll(/NEXT_PUBLIC_[A-Z0-9_]+/g)) used.add(m[0]);
+const dockerfile = fs.readFileSync(path.join(root, 'Dockerfile'), 'utf8');
+const compose = fs.readFileSync(path.join(root, 'docker-compose.yml'), 'utf8');
+
+test('code uses the per-tool Stripe links', () => {
+  for (const t of ['INVOICES', 'FORMS', 'PROPOSALS', 'TESTIMONIALS', 'ALL', 'BOOKING', 'DATAREMOVAL'])
+    for (const p of ['MONTHLY', 'YEARLY']) assert.ok(used.has(`NEXT_PUBLIC_STRIPE_LINK_${t}_${p}`), `${t}_${p}`);
+});
+test('every NEXT_PUBLIC_* used in code is an ARG+ENV in the Dockerfile and a build arg in compose', () => {
+  for (const n of used) {
+    assert.match(dockerfile, new RegExp(`^ARG ${n}$`, 'm'), `Dockerfile ARG ${n}`);
+    assert.match(dockerfile, new RegExp(`${n}=\\$\\{${n}\\}`), `Dockerfile ENV ${n}`);
+    assert.match(compose, new RegExp(`^\\s+${n}: \\$\\{${n}(:-)?\\}$`, 'm'), `compose arg ${n}`);
+  }
+});
