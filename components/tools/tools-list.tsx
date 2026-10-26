@@ -1,4 +1,4 @@
-import { TOOL_REGISTRY } from '@/tools/registry'
+import { PUBLIC_TOOLS as TOOL_REGISTRY } from '@/tools/registry'
 import type { ToolDef } from '@/tools/types'
 import { TOOL_ICONS } from '@/components/tools/tool-icons'
 

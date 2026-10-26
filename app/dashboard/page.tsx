@@ -1,6 +1,6 @@
 import { createServerClient } from '@/lib/supabase'
 import { Card, CardContent } from '@/components/ui/card'
-import { TOOL_REGISTRY, ALL_ACCESS, getTool } from '@/tools/registry'
+import { PUBLIC_TOOLS as TOOL_REGISTRY, ALL_ACCESS, getTool } from '@/tools/registry'
 import type { ToolDef } from '@/tools/types'
 import { Hero } from '@/components/showcase/hero'
 import { ToolRow } from '@/components/showcase/tool-row'

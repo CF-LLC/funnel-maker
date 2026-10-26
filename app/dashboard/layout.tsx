@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LayoutDashboard, Zap, LogOut, Users, CreditCard, Shield, Menu, X, Plus } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
-import { TOOL_REGISTRY } from '@/tools/registry'
+import { PUBLIC_TOOLS as TOOL_REGISTRY } from '@/tools/registry'
 import { TOOL_ICONS } from '@/components/tools/tool-icons'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {

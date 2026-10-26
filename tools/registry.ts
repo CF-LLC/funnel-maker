@@ -9,8 +9,9 @@ import { proposalsTool } from './proposals/tool'
 import { testimonialsTool } from './testimonials/tool'
 import { bookingTool } from './booking/tool'
 import { dataremovalTool } from './dataremoval/tool'
+import { crmTool } from './crm/tool'
 
-export const TOOL_REGISTRY = [funnelsTool, invoicesTool, linkinbioTool, formsTool, proposalsTool, testimonialsTool, bookingTool, dataremovalTool] as const satisfies readonly ToolDef[]
+export const TOOL_REGISTRY = [funnelsTool, invoicesTool, linkinbioTool, formsTool, proposalsTool, testimonialsTool, bookingTool, dataremovalTool, crmTool] as const satisfies readonly ToolDef[]
 export type ToolId = (typeof TOOL_REGISTRY)[number]['id']
 export const TOOL_IDS = TOOL_REGISTRY.map((t) => t.id) as ToolId[]
 /** 'all' = All Access, one app_access row covering every tool. */
@@ -21,6 +22,16 @@ export const ACCESS_KEYS = [...TOOL_IDS, ALL_ACCESS] as (ToolId | typeof ALL_ACC
 export const SOLD_TOOL_IDS = (TOOL_REGISTRY as readonly ToolDef[]).filter((t) => !t.includedWithAnyPlan).map((t) => t.id) as ToolId[]
 export const SOLD_ACCESS_KEYS = [...SOLD_TOOL_IDS, ALL_ACCESS] as (ToolId | typeof ALL_ACCESS)[]
 export const isIncludedTool = (id: string) => !!(TOOL_REGISTRY as readonly ToolDef[]).find((t) => t.id === id)?.includedWithAnyPlan
+
+/** Launch flags. NEXT_PUBLIC_* must be referenced literally so Next inlines them. Default off. */
+export const LAUNCH_FLAGS: Record<'crm', boolean> = {
+  crm: ['1', 'true'].includes(String(process.env.NEXT_PUBLIC_CRM_ENABLED || '').toLowerCase()),
+}
+export function isToolLaunched(t: Pick<ToolDef, 'launchFlag'>, flags: Record<string, boolean> = LAUNCH_FLAGS): boolean {
+  return !t.launchFlag || !!flags[t.launchFlag]
+}
+/** Tools shown on public/dashboard surfaces (home rows, dashboard cards and nav, tool lists). */
+export const PUBLIC_TOOLS: readonly ToolDef[] = (TOOL_REGISTRY as readonly ToolDef[]).filter((t) => isToolLaunched(t))
 
 export function getTool(id: string): ToolDef | undefined {
   return (TOOL_REGISTRY as readonly ToolDef[]).find((t) => t.id === id)
@@ -40,7 +51,7 @@ export const HOME_ROWS: { id: 'all' | import('./types').ToolRow; title: string }
   { id: 'everyone', title: 'For everyone' },
 ]
 export function toolsInRow(row: 'all' | import('./types').ToolRow): ToolDef[] {
-  const list = [...(TOOL_REGISTRY as readonly ToolDef[])].sort((a, b) => a.showcase.order - b.showcase.order)
+  const list = [...PUBLIC_TOOLS].sort((a, b) => a.showcase.order - b.showcase.order)
   return row === 'all' ? list : list.filter((t) => t.showcase.rows.includes(row))
 }
 /** Tool featured in the public home hero. */
