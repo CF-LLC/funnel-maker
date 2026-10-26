@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Lock } from 'lucide-react'
 import { createServerClient } from '@/lib/supabase'
-import { TOOL_REGISTRY, ALL_ACCESS } from '@/tools/registry'
+import { PUBLIC_TOOLS as TOOL_REGISTRY, ALL_ACCESS } from '@/tools/registry'
 import { TOOL_ICONS } from '@/components/tools/tool-icons'
 
 /** Shared dashboard home section: every registered tool with the user's access / locked state. */

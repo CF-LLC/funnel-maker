@@ -1,5 +1,5 @@
 // Data-only tool definition (safe to import from middleware/edge, server and client code).
-export type ToolIcon = 'zap' | 'layout-template' | 'receipt' | 'link' | 'box' | 'clipboard' | 'file-check' | 'star' | 'calendar' | 'shield'
+export type ToolIcon = 'zap' | 'layout-template' | 'receipt' | 'link' | 'box' | 'clipboard' | 'file-check' | 'star' | 'calendar' | 'shield' | 'users'
 export type ToolNavItem = { label: string; href: string; icon: ToolIcon }
 /** Home/dashboard rows a tool appears in (besides "All tools"). */
 export type ToolRow = 'coaches' | 'creators' | 'get-paid' | 'everyone'
@@ -32,5 +32,7 @@ export type ToolDef = {
   priceLabel: string
   /** Included with every paid plan: any active app_access row grants it; not sold separately. */
   includedWithAnyPlan?: boolean
+  /** Pre-launch: hidden from every public surface unless its flag is on (see isToolLaunched). */
+  launchFlag?: 'crm'
   showcase: ToolShowcase
 }
