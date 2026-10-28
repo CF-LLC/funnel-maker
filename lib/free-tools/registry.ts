@@ -31,6 +31,17 @@ export const FREE_TOOLS: FreeTool[] = [
     colors: ['#7c3aed', '#db2777'],
     emoji: '🧾',
   },
+  {
+    slug: 'hourly-rate-calculator',
+    name: 'Hourly rate calculator',
+    title: 'Freelance Hourly Rate Calculator – Free, No Signup',
+    h1: 'Freelance hourly rate calculator',
+    description: 'Free freelance hourly rate calculator: enter your target income, expenses, taxes and time off to get your hourly, day and project rates. No signup.',
+    blurb: 'Income, expenses, taxes, time off in. Hourly, day and project rates out.',
+    feeds: { name: 'Proposals & Invoices', href: '/pricing' },
+    colors: ['#0891b2', '#7c3aed'],
+    emoji: '⏱️',
+  },
 ]
 
 export const freeToolPath = (slug: string) => `${FREE_TOOLS_PATH}/${slug}`

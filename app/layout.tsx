@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SITE_URL } from "@/lib/free-tools/site-url";
 import localFont from "next/font/local";
 import "./globals.css";
 import { SessionProvider } from "@/components/session-provider";
@@ -16,7 +17,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://saasnation.site"),
+  metadataBase: new URL(SITE_URL),
   title: { default: "SaaS Nation - Simple tools for solo businesses", template: "%s · SaaS Nation" },
   applicationName: "SaaS Nation",
   description: "SaaS Nation: simple tools for solo businesses. Funnel Maker, Invoices and Link-in-bio in one account.",
