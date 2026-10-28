@@ -1,0 +1,1 @@
+export default function StoreLayout({ children }: { children: React.ReactNode }) { return <div className="min-h-screen bg-[#050507] text-white" style={{ ['--cine-fade' as string]: '#050507' }}>{children}</div> }
