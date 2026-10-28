@@ -64,6 +64,17 @@ export const FREE_TOOLS: FreeTool[] = [
     colors: ['#f59e0b', '#ef4444'],
     emoji: '🔳',
   },
+  {
+    slug: 'email-signature-generator',
+    name: 'Email signature generator',
+    title: 'Email Signature Generator – Free for Gmail & Outlook',
+    h1: 'Email signature generator',
+    description: 'Free email signature generator. Pick a template and color, add your details, logo and social links, then copy it into Gmail, Outlook or Apple Mail. No signup.',
+    blurb: 'Five clean templates that paste straight into Gmail, Outlook and Apple Mail.',
+    feeds: { name: 'Email list & CRM', href: '/pricing' },
+    colors: ['#06b6d4', '#6366f1'],
+    emoji: '✍️',
+  },
 ]
 
 export const freeToolPath = (slug: string) => `${FREE_TOOLS_PATH}/${slug}`
