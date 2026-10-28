@@ -2,6 +2,8 @@ import { Navbar } from '@/components/nav/navbar'
 import { Footer } from '@/components/nav/footer'
 import { TemplatePicker } from '@/components/templates/template-picker'
 
+export const metadata = { title: 'Templates', alternates: { canonical: '/templates' } }
+
 export default function TemplatesPage() {
   return (
     <div className="min-h-screen flex flex-col bg-app">

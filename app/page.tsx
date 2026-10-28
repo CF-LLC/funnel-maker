@@ -6,6 +6,8 @@ import { Hero } from '@/components/showcase/hero'
 import { ToolRow } from '@/components/showcase/tool-row'
 import { toolCard } from '@/components/showcase/cards'
 
+export const metadata = { alternates: { canonical: '/' } }
+
 // Runtime launch flags (feature_flags) are re-read at most once a minute.
 export const revalidate = 60
 

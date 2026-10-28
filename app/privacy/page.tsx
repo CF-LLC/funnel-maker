@@ -1,7 +1,7 @@
 import { LegalPage } from '@/components/legal/legal-page'
 import { COMPANY, COMPANY_LOCATION, PRODUCT, SUPPORT_EMAIL } from '@/lib/site'
 
-export const metadata = { title: `Privacy Policy | ${PRODUCT}` }
+export const metadata = { title: `Privacy Policy | ${PRODUCT}`, alternates: { canonical: '/privacy' } }
 
 export default function PrivacyPage() {
   return (

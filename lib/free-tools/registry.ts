@@ -53,6 +53,17 @@ export const FREE_TOOLS: FreeTool[] = [
     colors: ['#059669', '#0ea5e9'],
     emoji: '🔗',
   },
+  {
+    slug: 'qr-code-generator',
+    name: 'QR code generator',
+    title: 'QR Code Generator – Free, No Signup, PNG & SVG',
+    h1: 'QR code generator',
+    description: 'Free QR code generator for links, text, Wi-Fi, email, phone and contact cards. Pick colors, size and margin, then download PNG or SVG. No signup.',
+    blurb: 'Links, Wi-Fi, contacts and more. Custom colors, PNG or SVG, made in your browser.',
+    feeds: { name: 'Link-in-bio', href: '/pricing' },
+    colors: ['#f59e0b', '#ef4444'],
+    emoji: '🔳',
+  },
 ]
 
 export const freeToolPath = (slug: string) => `${FREE_TOOLS_PATH}/${slug}`
