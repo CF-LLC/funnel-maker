@@ -9,10 +9,21 @@ import { ALL_ACCESS_PRICE, TOOL_PRICE, paymentLinkUrl, type Billing, type SoldKe
 const SINGLE: { id: Exclude<SoldKey, 'all'>; name: string }[] = [
   { id: 'funnels', name: 'Funnels' }, { id: 'invoices', name: 'Invoices' }, { id: 'forms', name: 'Forms' },
   { id: 'proposals', name: 'Proposals' }, { id: 'testimonials', name: 'Testimonials' }, { id: 'booking', name: 'Booking' },
-  { id: 'dataremoval', name: 'Data Removal' },
+  { id: 'dataremoval', name: 'Data Removal' }, { id: 'crm', name: 'CRM' },
 ]
 
-export function PricingPlans() {
+/** Tools shown in the Single dropdown. CRM appears only when its launch flag (crm_public / NEXT_PUBLIC_CRM_ENABLED) is on. */
+export function singleTools(flags: { crm?: boolean } = {}) {
+  return SINGLE.filter((t) => t.id !== 'crm' || flags.crm)
+}
+
+function listNames(names: string[]) {
+  return names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} or ${names[names.length - 1]}`
+}
+
+export function PricingPlans({ flags = {} }: { flags?: { crm?: boolean } }) {
+  const tools = singleTools(flags)
+  const names = tools.map((t) => t.name)
   const [user, setUser] = useState<{ id: string; email?: string | null } | null>(null)
   const [billing, setBilling] = useState<Billing>('monthly')
   const [tool, setTool] = useState<Exclude<SoldKey, 'all'>>('funnels')
@@ -50,14 +61,14 @@ export function PricingPlans() {
           <label className="mt-4 text-sm font-medium" htmlFor="tool-pick">Choose a tool</label>
           <select id="tool-pick" value={tool} onChange={(e) => setTool(e.target.value as typeof tool)}
             className="mt-1 rounded-lg border border-white/15 bg-black/40 px-3 py-2">
-            {SINGLE.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+            {tools.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
           </select>
           <ul className="my-6 flex-1 space-y-3 text-sm">
-            {['Full access to one paid tool: Funnels, Invoices, Forms, Proposals, Testimonials, Booking or Data Removal', 'Link-in-bio included free (shows a small "Made with SaaS Nation" badge)', 'Email support'].map((f) => (
+            {[`Full access to one paid tool: ${listNames(names)}`, 'Link-in-bio included free (shows a small "Made with SaaS Nation" badge)', 'Email support'].map((f) => (
               <li key={f} className="flex gap-2"><Check className="h-5 w-5 shrink-0 text-primary" />{f}</li>
             ))}
           </ul>
-          {cta(tool, `Get ${SINGLE.find((t) => t.id === tool)!.name}`, false)}
+          {cta(tool, `Get ${(tools.find((t) => t.id === tool) ?? tools[0]).name}`, false)}
         </div>
         <div className="relative flex flex-col rounded-2xl border-2 border-primary bg-primary/10 p-6 shadow-[0_0_60px_-20px] shadow-primary">
           <span className="absolute -top-3 left-6 rounded-full bg-primary px-3 py-0.5 text-xs font-bold text-primary-foreground">Recommended</span>
@@ -66,7 +77,7 @@ export function PricingPlans() {
           <div className="mt-4"><span className="text-4xl font-bold">{ALL_ACCESS_PRICE[billing]}</span><span className="text-muted-foreground">{per}</span></div>
           <p className="text-xs text-muted-foreground h-4">{billing === 'yearly' ? 'Save $99 vs $348 paid monthly' : 'or $249/yr'}</p>
           <ul className="my-6 flex-1 space-y-3 text-sm">
-            {['Funnels, Invoices, Forms, Proposals, Testimonials and Booking', 'Link-in-bio with no SaaS Nation badge', 'New tools included automatically, at no extra cost', 'Email support'].map((f) => (
+            {[`${listNames(names).replace(/ or ([^,]+)$/, ' and $1')}`, 'Link-in-bio with no SaaS Nation badge', 'New tools included automatically, at no extra cost', 'Email support'].map((f) => (
               <li key={f} className="flex gap-2"><Check className="h-5 w-5 shrink-0 text-primary" />{f}</li>
             ))}
           </ul>

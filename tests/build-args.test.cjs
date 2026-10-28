@@ -19,7 +19,7 @@ const dockerfile = fs.readFileSync(path.join(root, 'Dockerfile'), 'utf8');
 const compose = fs.readFileSync(path.join(root, 'docker-compose.yml'), 'utf8');
 
 test('code uses the per-tool Stripe links', () => {
-  for (const t of ['INVOICES', 'FORMS', 'PROPOSALS', 'TESTIMONIALS', 'ALL', 'BOOKING', 'DATAREMOVAL'])
+  for (const t of ['INVOICES', 'FORMS', 'PROPOSALS', 'TESTIMONIALS', 'ALL', 'BOOKING', 'DATAREMOVAL', 'CRM'])
     for (const p of ['MONTHLY', 'YEARLY']) assert.ok(used.has(`NEXT_PUBLIC_STRIPE_LINK_${t}_${p}`), `${t}_${p}`);
 });
 test('every NEXT_PUBLIC_* used in code is an ARG+ENV in the Dockerfile and a build arg in compose', () => {
@@ -28,4 +28,12 @@ test('every NEXT_PUBLIC_* used in code is an ARG+ENV in the Dockerfile and a bui
     assert.match(dockerfile, new RegExp(`${n}=\\$\\{${n}\\}`), `Dockerfile ENV ${n}`);
     assert.match(compose, new RegExp(`^\\s+${n}: \\$\\{${n}(:-)?\\}$`, 'm'), `compose arg ${n}`);
   }
+});
+
+test('CRM is in plans and gated in the Single dropdown', () => {
+  const plans = fs.readFileSync(path.join(root, 'lib/plans.ts'), 'utf8');
+  assert.match(plans, /crm: \{ monthly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_CRM_MONTHLY, yearly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_CRM_YEARLY \}/);
+  const pp = fs.readFileSync(path.join(root, 'components/pricing-plans.tsx'), 'utf8');
+  assert.match(pp, /t\.id !== 'crm' \|\| flags\.crm/);
+  assert.match(fs.readFileSync(path.join(root, 'app/pricing/page.tsx'), 'utf8'), /<PricingPlans flags=\{flags\} \/>/);
 });
