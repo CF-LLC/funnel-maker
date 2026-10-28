@@ -1,6 +1,6 @@
 // Admin dashboard: pure helpers (no I/O) so they are easy to test.
 
-export type AccessRow = { user_id: string; tool: string; plan: string | null; source: string; active: boolean }
+export type AccessRow = { user_id: string; tool: string; plan: string | null; source: string; active: boolean; stripe_subscription_id?: string | null }
 export type AdminUser = {
   id: string
   email: string
@@ -20,6 +20,11 @@ export const LIST_PRICE_CENTS = {
 } as const
 /** Sources that are paid seats. founding (invoices perk) and manual (comped) count as $0. */
 export const PAID_SOURCES = ['single', 'all_access'] as const
+
+/** A seat is paid only when it is active, from a paid source, and backed by a real Stripe subscription ID. */
+export function isPaidSeat(r: AccessRow): boolean {
+  return !!r.active && (PAID_SOURCES as readonly string[]).includes(r.source) && !!(r.stripe_subscription_id && String(r.stripe_subscription_id).trim())
+}
 
 export function maskEmail(email: string | null | undefined): string {
   if (!email) return ''
@@ -68,7 +73,7 @@ export function seatsByPlan(rows: AccessRow[]): { tool: string; paid: number; co
   for (const r of rows) {
     if (!r.active) continue
     const e = m.get(r.tool) ?? { tool: r.tool, paid: 0, comped: 0 }
-    if ((PAID_SOURCES as readonly string[]).includes(r.source)) e.paid++
+    if (isPaidSeat(r)) e.paid++
     else e.comped++
     m.set(r.tool, e)
   }
@@ -79,7 +84,7 @@ export function seatsByPlan(rows: AccessRow[]): { tool: string; paid: number; co
 export function mrrEstimateCents(rows: AccessRow[]): number {
   let c = 0
   for (const r of rows) {
-    if (!r.active || !(PAID_SOURCES as readonly string[]).includes(r.source)) continue
+    if (!isPaidSeat(r)) continue
     const p = r.tool === 'all' ? LIST_PRICE_CENTS.all : LIST_PRICE_CENTS.tool
     const b = billingOf(r.plan)
     c += b === 'yearly' ? Math.round(p.yearly / 12) : p.monthly

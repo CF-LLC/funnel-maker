@@ -65,7 +65,7 @@ export type Mrr = { cents: number; source: 'stripe' | 'estimate'; note: string }
 
 /** Live MRR from Stripe only when STRIPE_SECRET_KEY already exists server-side; counts only SaaS Nation prices (STRIPE_PRICE_MAP). Read-only. */
 export async function loadMrr(access: AccessRow[]): Promise<Mrr> {
-  const estimate: Mrr = { cents: mrrEstimateCents(access), source: 'estimate', note: 'Estimate: active paid app_access rows × list price (yearly ÷ 12). Comped and founding seats count as $0.' }
+  const estimate: Mrr = { cents: mrrEstimateCents(access), source: 'estimate', note: 'Estimate: active paid app_access rows with a Stripe subscription ID × list price (yearly ÷ 12). Comped and founding seats count as $0.' }
   if (!process.env.STRIPE_SECRET_KEY) return { ...estimate, note: estimate.note + ' Stripe key not set on this server, so live MRR is unavailable.' }
   try {
     const map = parsePriceMap(process.env.STRIPE_PRICE_MAP)
@@ -92,7 +92,7 @@ export async function loadOverview(includeDemo = false) {
   const demoIds = [...demo]
   const users = await loadUsers(db)
   const counted = excludeDemo(users, demo, (u) => u.id, includeDemo)
-  const { data: accessRaw } = await db.from('app_access').select('user_id, tool, plan, source, active').limit(50000)
+  const { data: accessRaw } = await db.from('app_access').select('user_id, tool, plan, source, active, stripe_subscription_id').limit(50000)
   const access = excludeDemo((accessRaw ?? []) as AccessRow[], demo, (r) => r.user_id, includeDemo)
   const skipDemo = !includeDemo && demoIds.length > 0
   const dFunnels = skipDemo ? await demoFunnelIds(db, demoIds) : []

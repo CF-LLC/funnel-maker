@@ -71,11 +71,14 @@ test('helpers: series, counts, demo exclusion, status, masking, pagination', () 
 })
 
 test('seats and MRR estimate: paid sources only, yearly normalized, inactive ignored', () => {
-  const r = (tool, source, plan = null, active = true) => ({ user_id: 'u', tool, source, plan, active })
-  const rows = [r('funnels', 'single'), r('all', 'all_access', 'yearly'), r('invoices', 'founding'), r('crm', 'manual'), r('forms', 'single', null, false), r('booking', 'single', 'Yearly')]
+  const r = (tool, source, plan = null, active = true, sub = 'sub_x') => ({ user_id: 'u', tool, source, plan, active, stripe_subscription_id: sub })
+  const rows = [r('funnels', 'single'), r('funnels', 'single', null, true, null), r('proposals', 'all_access', null, true, ''), r('all', 'all_access', 'yearly'), r('invoices', 'founding'), r('crm', 'manual'), r('forms', 'single', null, false), r('booking', 'single', 'Yearly')]
   assert.equal(C.mrrEstimateCents(rows), 1200 + Math.round(24900 / 12) + Math.round(9900 / 12))
   const seats = C.seatsByPlan(rows)
   assert.deepEqual(seats.find((s) => s.tool === 'invoices'), { tool: 'invoices', paid: 0, comped: 1 })
+  assert.deepEqual(seats.find((s) => s.tool === 'funnels'), { tool: 'funnels', paid: 1, comped: 1 })
+  assert.deepEqual(seats.find((s) => s.tool === 'proposals'), { tool: 'proposals', paid: 0, comped: 1 })
+  assert.equal(C.isPaidSeat(r('funnels', 'single', null, true, null)), false)
   assert.equal(seats.find((s) => s.tool === 'forms'), undefined)
   assert.equal(C.monthlyCents(9900, 'year'), 825)
   assert.equal(C.monthlyCents(1200, 'month', 1, 2), 2400)
