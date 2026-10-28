@@ -103,3 +103,22 @@ test('hourly rate calculator never stores data', () => {
   const src = fs.readFileSync(path.join(root, 'components/free-tools/hourly-rate-calculator.tsx'), 'utf8') + fs.readFileSync(path.join(root, 'lib/free-tools/hourly-rate.ts'), 'utf8')
   assert.doesNotMatch(src, /localStorage|sessionStorage|indexedDB|fetch\(|supabase|document\.cookie/)
 })
+
+test('canonical site URL is the apex, never the funnels. app host', () => {
+  const { canonicalSiteUrl, SITE_URL } = jiti('../lib/free-tools/site-url.ts')
+  assert.equal(canonicalSiteUrl(undefined), 'https://saasnation.site')
+  assert.equal(canonicalSiteUrl(''), 'https://saasnation.site')
+  assert.equal(canonicalSiteUrl('https://funnels.saasnation.site/'), 'https://saasnation.site')
+  assert.equal(canonicalSiteUrl('http://www.saasnation.site'), 'https://saasnation.site')
+  assert.equal(canonicalSiteUrl('not a url'), 'https://saasnation.site')
+  const old = process.env.NEXT_PUBLIC_APP_URL
+  process.env.NEXT_PUBLIC_APP_URL = 'https://funnels.saasnation.site'
+  try { assert.equal(canonicalSiteUrl(), canonicalSiteUrl(process.env.NEXT_PUBLIC_SITE_URL)) } finally { if (old === undefined) delete process.env.NEXT_PUBLIC_APP_URL; else process.env.NEXT_PUBLIC_APP_URL = old }
+  if (!process.env.NEXT_PUBLIC_SITE_URL) {
+    assert.equal(SITE_URL, 'https://saasnation.site')
+    for (const e of sitemap()) assert.ok(e.url.startsWith('https://saasnation.site'), e.url)
+    assert.equal(robots().sitemap, 'https://saasnation.site/sitemap.xml')
+  }
+  const layout = fs.readFileSync(path.join(root, 'app/layout.tsx'), 'utf8')
+  assert.match(layout, /metadataBase: new URL\(SITE_URL\)/)
+})
