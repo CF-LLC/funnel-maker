@@ -176,3 +176,59 @@ test('utm builder never stores data', () => {
   const src = fs.readFileSync(path.join(root, 'components/free-tools/utm-builder.tsx'), 'utf8') + fs.readFileSync(path.join(root, 'lib/free-tools/utm.ts'), 'utf8')
   assert.doesNotMatch(src, /localStorage|sessionStorage|indexedDB|fetch\(|supabase|document\.cookie/)
 })
+
+const qr = jiti('../lib/free-tools/qr.ts')
+const jsQR = require('jsqr')
+const decode = (data, ecl = 'M', o = { fg: '#111111', bg: '#ffffff', margin: 4, px: 300 }) => {
+  const img = qr.matrixToRgba(qr.makeMatrix(data, ecl), o)
+  const r = jsQR(img.data, img.width, img.height)
+  return r && r.data
+}
+
+test('qr: payload formats for every content type', () => {
+  assert.equal(qr.buildPayload('url', { url: 'example.com/menu?x=1#a' }).data, 'https://example.com/menu?x=1#a')
+  assert.equal(qr.buildPayload('url', { url: 'javascript:alert(1)' }).ok, false)
+  assert.equal(qr.buildPayload('text', { text: '' }).ok, false)
+  assert.equal(qr.buildPayload('wifi', { ssid: 'My;Net', password: 'p:a,s"s\\', security: 'WPA' }).data, 'WIFI:T:WPA;S:My\\;Net;P:p\\:a\\,s\\"s\\\\;;')
+  assert.equal(qr.buildPayload('wifi', { ssid: 'Cafe', security: 'nopass', hidden: true }).data, 'WIFI:T:nopass;S:Cafe;H:true;;')
+  assert.equal(qr.buildPayload('wifi', { ssid: 'Cafe', security: 'WPA' }).ok, false)
+  assert.equal(qr.buildPayload('email', { email: 'a@b.co', subject: 'Hi there', body: 'A&B' }).data, 'mailto:a@b.co?subject=Hi%20there&body=A%26B')
+  assert.equal(qr.buildPayload('email', { email: 'nope' }).ok, false)
+  assert.equal(qr.buildPayload('phone', { phone: '+1 (555) 123-4567' }).data, 'tel:+15551234567')
+  const v = qr.buildPayload('vcard', { firstName: 'Ana', lastName: 'Ruiz, Jr', org: 'Acme; Co', vPhone: '+1 555 000', vEmail: 'ana@acme.co', website: 'acme.co' }).data
+  assert.equal(v, ['BEGIN:VCARD', 'VERSION:3.0', 'N:Ruiz\\, Jr;Ana;;;', 'FN:Ana Ruiz\\, Jr', 'ORG:Acme\\; Co', 'TEL;TYPE=CELL:+1555000', 'EMAIL:ana@acme.co', 'URL:https://acme.co/', 'END:VCARD'].join('\r\n'))
+  assert.equal(qr.buildPayload('vcard', {}).ok, false)
+})
+
+test('qr: generated codes decode back to the exact payload (jsQR), incl. UTF-8 and all ECC levels', () => {
+  for (const ecl of ['L', 'M', 'Q', 'H']) assert.equal(decode('https://saasnation.site/free-tools', ecl), 'https://saasnation.site/free-tools')
+  for (const s of ['WIFI:T:WPA;S:Cafe;P:secret;;', 'Café ☕ – naïve 日本', qr.buildPayload('vcard', { firstName: 'Ana', lastName: 'Ruiz' }).data, 'x'.repeat(800)]) assert.equal(decode(s), s)
+  assert.equal(decode('colored', 'M', { fg: '#1e3a8a', bg: '#fef3c7', margin: 2, px: 256 }), 'colored')
+})
+
+test('qr: svg output and contrast warnings', () => {
+  const m = qr.makeMatrix('hi', 'L')
+  assert.equal(m.size, 21)
+  const svg = qr.matrixToSvg(m, { fg: '#000000', bg: '#ffffff', margin: 4, px: 256 })
+  assert.match(svg, /^<svg xmlns="http:\/\/www.w3.org\/2000\/svg" width="256" height="256" viewBox="0 0 29 29"/)
+  assert.ok(qr.contrastRatio('#000000', '#ffffff') > 20)
+  assert.equal(qr.contrastWarning('#111111', '#ffffff'), null)
+  assert.match(qr.contrastWarning('#aaaaaa', '#bbbbbb'), /low/)
+  assert.match(qr.contrastWarning('#ffffff', '#000000'), /Light code/)
+  assert.match(qr.contrastWarning('zz', '#fff'), /hex/)
+  assert.throws(() => qr.makeMatrix('x'.repeat(4000), 'H'))
+})
+
+test('qr generator never stores data or calls an API', () => {
+  const src = fs.readFileSync(path.join(root, 'components/free-tools/qr-code-generator.tsx'), 'utf8') + fs.readFileSync(path.join(root, 'lib/free-tools/qr.ts'), 'utf8')
+  assert.doesNotMatch(src, /localStorage|sessionStorage|indexedDB|fetch\(|XMLHttpRequest|supabase|document\.cookie|api\.qrserver|chart\.googleapis/)
+})
+
+test('public marketing pages declare a canonical; signed-in pages untouched', () => {
+  const pages = { 'app/page.tsx': '/', 'app/pricing/page.tsx': '/pricing', 'app/templates/page.tsx': '/templates', 'app/terms/page.tsx': '/terms', 'app/privacy/page.tsx': '/privacy', 'app/refund/page.tsx': '/refund', 'app/data-removal/page.tsx': '/data-removal' }
+  for (const [f, c] of Object.entries(pages)) {
+    assert.ok(fs.readFileSync(path.join(root, f), 'utf8').includes(`alternates: { canonical: '${c}' }`), f)
+    assert.equal(isProtectedPath(c), false, c)
+  }
+  for (const f of ['app/dashboard/page.tsx']) if (fs.existsSync(path.join(root, f))) assert.ok(!fs.readFileSync(path.join(root, f), 'utf8').includes('canonical'), f)
+})

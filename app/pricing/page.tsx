@@ -9,7 +9,7 @@ import { publicTools } from '@/tools/registry'
 const countWord = (n: number) => ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'][n] ?? String(n)
 import { starterSitesUrl } from '@/lib/url-safety'
 
-export const metadata = { title: 'Pricing | SaaS Nation', description: 'Each tool $12/mo or $99/yr. All Access $29/mo or $249/yr.' }
+export const metadata = { title: 'Pricing | SaaS Nation', description: 'Each tool $12/mo or $99/yr. All Access $29/mo or $249/yr.', alternates: { canonical: '/pricing' } }
 
 const FAQ = [
   ['Can I cancel anytime?', "Yes. Cancel from your account whenever you like and your plan stays active until the end of the period you've paid for."],

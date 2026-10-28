@@ -6,7 +6,7 @@ import { Backdrop } from '@/components/booking/backdrop'
 import { VISIBLE_BROKERS } from '@/lib/dataremoval/brokers'
 import { Disclaimer } from '@/components/dataremoval/disclaimer'
 
-export const metadata = { title: 'Data Removal | SaaS Nation', description: 'A guided checklist for opting out of people-search and data-broker sites. $12/mo or included in All Access.' }
+export const metadata = { title: 'Data Removal | SaaS Nation', description: 'A guided checklist for opting out of people-search and data-broker sites. $12/mo or included in All Access.', alternates: { canonical: '/data-removal' } }
 
 const FEATURES = [
   { icon: ExternalLink, title: 'Direct opt-out links', body: 'Every site links straight to its opt-out page, with a last-checked date.' },
