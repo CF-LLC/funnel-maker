@@ -1,11 +1,13 @@
 import Link from 'next/link'
 import { Lock } from 'lucide-react'
 import { createServerClient } from '@/lib/supabase'
-import { PUBLIC_TOOLS as TOOL_REGISTRY, ALL_ACCESS } from '@/tools/registry'
+import { publicTools, ALL_ACCESS } from '@/tools/registry'
+import { getLaunchFlags } from '@/lib/flags'
 import { TOOL_ICONS } from '@/components/tools/tool-icons'
 
 /** Shared dashboard home section: every registered tool with the user's access / locked state. */
 export async function YourTools({ userId }: { userId: string }) {
+  const TOOL_REGISTRY = publicTools(await getLaunchFlags())
   const supabase = await createServerClient()
   const { data } = await (supabase as any).from('app_access').select('tool, active').eq('user_id', userId)
   const active = new Set<string>((data || []).filter((r: any) => r.active).map((r: any) => r.tool))

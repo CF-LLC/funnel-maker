@@ -3,6 +3,7 @@ import { Navbar } from '@/components/nav/navbar'
 import { Footer } from '@/components/nav/footer'
 import { PricingPlans } from '@/components/pricing-plans'
 import { ToolsList } from '@/components/tools/tools-list'
+import { getLaunchFlags } from '@/lib/flags'
 import { starterSitesUrl } from '@/lib/url-safety'
 
 export const metadata = { title: 'Pricing | SaaS Nation', description: 'Each tool $12/mo or $99/yr. All Access $29/mo or $249/yr.' }
@@ -15,7 +16,10 @@ const FAQ = [
   ['How fast can I start?', "Every account is approved by hand within 24 hours of signup. You'll get access as soon as it's approved."],
 ]
 
-export default function PricingPage() {
+export const revalidate = 60
+
+export default async function PricingPage() {
+  const flags = await getLaunchFlags()
   const starter = starterSitesUrl()
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -27,7 +31,7 @@ export default function PricingPage() {
         </div>
         <PricingPlans />
         <h2 className="mt-16 mb-6 text-center text-2xl font-bold">The tools</h2>
-        <ToolsList />
+        <ToolsList flags={flags} />
         <p className="text-center text-sm text-muted-foreground">More tools are on the way. All Access members get each one the day it launches.</p>
         <section className="mx-auto mt-16 max-w-3xl">
           <h2 className="mb-4 text-2xl font-bold">FAQ</h2>

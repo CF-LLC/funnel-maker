@@ -32,6 +32,10 @@ export function isToolLaunched(t: Pick<ToolDef, 'launchFlag'>, flags: Record<str
 }
 /** Tools shown on public/dashboard surfaces (home rows, dashboard cards and nav, tool lists). */
 export const PUBLIC_TOOLS: readonly ToolDef[] = (TOOL_REGISTRY as readonly ToolDef[]).filter((t) => isToolLaunched(t))
+/** Same, with runtime flags (lib/flags getLaunchFlags / useLaunchFlags). */
+export function publicTools(flags: Record<string, boolean> = LAUNCH_FLAGS): ToolDef[] {
+  return (TOOL_REGISTRY as readonly ToolDef[]).filter((t) => isToolLaunched(t, flags))
+}
 
 export function getTool(id: string): ToolDef | undefined {
   return (TOOL_REGISTRY as readonly ToolDef[]).find((t) => t.id === id)
@@ -50,8 +54,8 @@ export const HOME_ROWS: { id: 'all' | import('./types').ToolRow; title: string }
   { id: 'get-paid', title: 'Get paid' },
   { id: 'everyone', title: 'For everyone' },
 ]
-export function toolsInRow(row: 'all' | import('./types').ToolRow): ToolDef[] {
-  const list = [...PUBLIC_TOOLS].sort((a, b) => a.showcase.order - b.showcase.order)
+export function toolsInRow(row: 'all' | import('./types').ToolRow, flags: Record<string, boolean> = LAUNCH_FLAGS): ToolDef[] {
+  const list = publicTools(flags).sort((a, b) => a.showcase.order - b.showcase.order)
   return row === 'all' ? list : list.filter((t) => t.showcase.rows.includes(row))
 }
 /** Tool featured in the public home hero. */

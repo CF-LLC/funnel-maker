@@ -5,23 +5,24 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LayoutDashboard, Zap, LogOut, Users, CreditCard, Shield, Menu, X, Plus } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
-import { PUBLIC_TOOLS as TOOL_REGISTRY } from '@/tools/registry'
+import { publicTools, LAUNCH_FLAGS } from '@/tools/registry'
 import { TOOL_ICONS } from '@/components/tools/tool-icons'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false) // mobile drawer; desktop sidebar is always shown
   const [isAdmin, setIsAdmin] = useState(false)
   const [userEmail, setUserEmail] = useState('')
+  const [crmOn, setCrmOn] = useState(LAUNCH_FLAGS.crm)
   const pathname = usePathname()
   const supabase = createClient()
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user?.email) {
-        setUserEmail(user.email)
-        setIsAdmin(user.email === 'cooperfeatherstone13@gmail.com')
-      }
+      if (user?.email) setUserEmail(user.email)
+      // Admin link only for admin_users (fm_is_admin); /admin itself is enforced server-side.
+      if (user) (supabase as any).rpc('fm_is_admin', { uid: user.id }).then(({ data }: { data: unknown }) => setIsAdmin(data === true))
     })
+    if (!LAUNCH_FLAGS.crm) (supabase as any).rpc('fm_public_flag', { flag_key: 'crm_public' }).then(({ data }: { data: unknown }) => setCrmOn(data === true))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -35,7 +36,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    ...TOOL_REGISTRY.flatMap((t) => t.nav.map((n) => ({ name: n.label, href: n.href, icon: TOOL_ICONS[n.icon] }))),
+    ...publicTools({ crm: crmOn }).flatMap((t) => t.nav.map((n) => ({ name: n.label, href: n.href, icon: TOOL_ICONS[n.icon] }))),
     { name: 'Organizations', href: '/dashboard/organizations', icon: Users },
     { name: 'Billing', href: '/dashboard/billing', icon: CreditCard },
   ]
@@ -72,7 +73,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {isAdmin && (
           <>
             <div className="my-2 h-px bg-border" />
-            <Link href="/dashboard/admin" className={`${item(pathname.startsWith('/dashboard/admin'))} text-amber-700`}><Shield className="h-4 w-4" />Admin</Link>
+            <Link href="/admin" className={`${item(false)} text-amber-700`}><Shield className="h-4 w-4" />Admin dashboard</Link>
+            <Link href="/dashboard/admin" className={`${item(pathname.startsWith('/dashboard/admin'))} text-amber-700`}><Shield className="h-4 w-4" />Approvals &amp; access</Link>
           </>
         )}
       </nav>

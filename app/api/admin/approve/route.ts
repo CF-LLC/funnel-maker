@@ -1,12 +1,15 @@
 import { NextResponse } from 'next/server'
-import { currentAdminId, serviceClient } from '@/lib/server/admin-client'
+import { serviceClient } from '@/lib/server/admin-client'
+import { adminApiGuard } from '@/lib/admin/guard'
 import { syncApproval } from '@/lib/server/access-admin'
 
 export const dynamic = 'force-dynamic'
+export const fetchCache = 'force-no-store'
 
 // GET: accounts with approval + plan. POST {userId, approved?, plan?, paidUntil?}: admin updates.
 export async function GET() {
-  if (!(await currentAdminId())) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  const g = await adminApiGuard()
+  if (g.res) return g.res
   const { data, error } = await serviceClient()
     .from('users')
     .select('id, email, approved, approved_at, signup_template, plan, paid_until')
@@ -17,7 +20,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  if (!(await currentAdminId())) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  const g = await adminApiGuard()
+  if (g.res) return g.res
   const body = await request.json().catch(() => null)
   const userId = body?.userId
   if (typeof userId !== 'string' || !/^[0-9a-f-]{36}$/i.test(userId)) {

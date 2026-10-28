@@ -14,6 +14,18 @@ const nextConfig = {
     ]
   },
   // Funnel dashboard/builder moved under /funnels (SaaS Nation hub lives at /dashboard).
+  // Admin dashboard: never indexed, never cached.
+  async headers() {
+    const h = [
+      { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+      { key: 'Cache-Control', value: 'no-store, max-age=0' },
+    ]
+    return [
+      { source: '/admin', headers: h },
+      { source: '/admin/:path*', headers: h },
+      { source: '/api/admin/:path*', headers: h },
+    ]
+  },
   async redirects() {
     return [
       { source: '/dashboard/funnels', destination: '/funnels', permanent: true },

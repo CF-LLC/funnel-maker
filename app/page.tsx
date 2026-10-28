@@ -1,11 +1,16 @@
 import { Navbar } from '@/components/nav/navbar'
 import { Footer } from '@/components/nav/footer'
+import { getLaunchFlags } from '@/lib/flags'
 import { HOME_ROWS, HERO_TOOL_ID, getTool, toolsInRow } from '@/tools/registry'
 import { Hero } from '@/components/showcase/hero'
 import { ToolRow } from '@/components/showcase/tool-row'
 import { toolCard } from '@/components/showcase/cards'
 
-export default function Home() {
+// Runtime launch flags (feature_flags) are re-read at most once a minute.
+export const revalidate = 60
+
+export default async function Home() {
+  const flags = await getLaunchFlags()
   const hero = getTool(HERO_TOOL_ID)!
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -23,7 +28,7 @@ export default function Home() {
         />
         <div id="tools" className="relative z-10 -mt-10 space-y-2 pb-16 sm:-mt-16">
           {HOME_ROWS.map((r) => (
-            <ToolRow key={r.id} id={r.id} title={r.title} cards={toolsInRow(r.id).map((t) => toolCard(t))} />
+            <ToolRow key={r.id} id={r.id} title={r.title} cards={toolsInRow(r.id, flags).map((t) => toolCard(t))} />
           ))}
         </div>
       </main>

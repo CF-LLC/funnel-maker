@@ -1,6 +1,7 @@
 import { createServerClient } from '@/lib/supabase'
 import { Card, CardContent } from '@/components/ui/card'
-import { PUBLIC_TOOLS as TOOL_REGISTRY, ALL_ACCESS, getTool } from '@/tools/registry'
+import { publicTools, ALL_ACCESS, getTool } from '@/tools/registry'
+import { getLaunchFlags } from '@/lib/flags'
 import type { ToolDef } from '@/tools/types'
 import { Hero } from '@/components/showcase/hero'
 import { ToolRow } from '@/components/showcase/tool-row'
@@ -23,7 +24,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const approved = !!profile?.approved
   const active = new Set<string>((access || []).filter((r: any) => r.active).map((r: any) => r.tool))
   const all = active.has(ALL_ACCESS)
-  const tools = [...(TOOL_REGISTRY as readonly ToolDef[])].sort((a, b) => a.showcase.order - b.showcase.order)
+  const tools = [...publicTools(await getLaunchFlags())].sort((a, b) => a.showcase.order - b.showcase.order)
   const has = (t: ToolDef) => all || active.has(t.accessKey) || (!!t.includedWithAnyPlan && active.size > 0)
   const mine = tools.filter(has)
   const locked = tools.filter((t) => !has(t))

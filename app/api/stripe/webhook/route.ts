@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { logError } from '@/lib/server/log-error'
 import Stripe from 'stripe'
 import { handleEvent, parsePriceMap } from '@/lib/stripe-webhook'
 import { supabaseStore } from '@/lib/server/stripe-store'
@@ -24,6 +25,7 @@ export async function POST(request: Request) {
   let priceMap
   try { priceMap = parsePriceMap(process.env.STRIPE_PRICE_MAP) } catch (e: any) {
     console.error('[stripe-webhook]', e.message)
+    await logError('/api/stripe/webhook', e, { detail: { stage: 'price_map' } })
     return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 })
   }
   try {
@@ -37,6 +39,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ received: true, ...result })
   } catch (e: any) {
     console.error('[stripe-webhook] failed', event.type, event.id, e?.message)
+    await logError('/api/stripe/webhook', e, { detail: { type: event.type, id: event.id } })
     return NextResponse.json({ error: 'Processing failed' }, { status: 500 }) // Stripe retries
   }
 }
