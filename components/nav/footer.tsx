@@ -25,6 +25,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/free-tools" className="hover:text-foreground">
+                  Free tools
+                </Link>
+              </li>
+              <li>
                 <Link href="/pricing" className="hover:text-foreground">
                   Pricing
                 </Link>
