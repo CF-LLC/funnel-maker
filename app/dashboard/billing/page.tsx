@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { PricingPlans } from '@/components/pricing-plans'
 import { PLANS } from '@/lib/plans'
+import { getLaunchFlags } from '@/lib/flags'
 
 export const dynamic = 'force-dynamic'
 
@@ -41,7 +42,7 @@ export default async function BillingPage() {
           To cancel or change plans, reply to your Stripe receipt or email support. Stripe receipts are your invoices.
         </CardContent>
       </Card>
-      {!active && <PricingPlans />}
+      {!active && <PricingPlans flags={await getLaunchFlags()} />}
     </div>
   )
 }

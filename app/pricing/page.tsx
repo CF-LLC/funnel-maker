@@ -27,9 +27,9 @@ export default async function PricingPage() {
       <main className="container mx-auto flex-1 px-4 py-16 sm:py-20">
         <div className="mx-auto mb-10 max-w-3xl text-center">
           <h1 className="mb-4 text-4xl font-bold md:text-5xl">Simple tools for coaches and creators. One price, no bloat.</h1>
-          <p className="text-lg text-muted-foreground">Get the one tool you need, or all eight SaaS Nation tools for less than most single apps cost. Built for US online coaches, course creators and creators.</p>
+          <p className="text-lg text-muted-foreground">Get the one tool you need, or all {flags.crm ? 'nine' : 'eight'} SaaS Nation tools for less than most single apps cost. Built for US online coaches, course creators and creators.</p>
         </div>
-        <PricingPlans />
+        <PricingPlans flags={flags} />
         <h2 className="mt-16 mb-6 text-center text-2xl font-bold">The tools</h2>
         <ToolsList flags={flags} />
         <p className="text-center text-sm text-muted-foreground">More tools are on the way. All Access members get each one the day it launches.</p>
