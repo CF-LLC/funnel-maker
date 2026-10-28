@@ -20,6 +20,8 @@ function Motif({ id, accent }: { id: string; accent: string }) {
       return (<g {...s}><rect x="35" y="35" width="130" height="120" rx="10" /><path d="M35 65h130M70 25v20M130 25v20" /><path d="M75 105l15 15 35-35" /></g>)
     case 'dataremoval':
       return (<g {...s}><path d="M100 22l58 22v44c0 38-26 66-58 80-32-14-58-42-58-80V44z" /><path d="M72 92l20 20 38-40" /><path d="M30 170h140" strokeDasharray="6 8" /></g>)
+    case 'emaillist':
+      return (<g {...s}><rect x="30" y="45" width="140" height="95" rx="10" /><path d="M30 55l70 50 70-50" /><path d="M140 25l25 0M152 13v25" /><circle cx="60" cy="165" r="6" /><circle cx="100" cy="165" r="6" /><circle cx="140" cy="165" r="6" /></g>)
     default:
       return (<g {...s}><circle cx="100" cy="90" r="50" /></g>)
   }

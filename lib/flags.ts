@@ -1,6 +1,7 @@
 // Runtime feature flags (public.feature_flags). Default off.
 import { createClient } from '@supabase/supabase-js'
-import { LAUNCH_FLAGS } from '@/tools/registry'
+import { LAUNCH_FLAGS, LAUNCH_FLAG_KEYS } from '@/tools/registry'
+import type { LaunchFlag } from '@/tools/types'
 import { crmPublic } from '@/lib/admin/core'
 
 /** Reads a public (*_public) flag via the fm_public_flag RPC with the anon key. Any failure = false. */
@@ -18,6 +19,7 @@ export async function isFeatureEnabled(key: string): Promise<boolean> {
 }
 
 /** Effective launch flags: NEXT_PUBLIC_* build env OR the runtime public flag. */
-export async function getLaunchFlags(): Promise<Record<'crm', boolean>> {
-  return { crm: crmPublic(LAUNCH_FLAGS.crm, LAUNCH_FLAGS.crm ? true : await isFeatureEnabled('crm_public')) }
+export async function getLaunchFlags(): Promise<Record<LaunchFlag, boolean>> {
+  const vals = await Promise.all(LAUNCH_FLAG_KEYS.map(async (k) => crmPublic(LAUNCH_FLAGS[k], LAUNCH_FLAGS[k] ? true : await isFeatureEnabled(`${k}_public`))))
+  return Object.fromEntries(LAUNCH_FLAG_KEYS.map((k, i) => [k, vals[i]])) as Record<LaunchFlag, boolean>
 }
