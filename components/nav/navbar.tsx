@@ -49,6 +49,9 @@ useEffect(() => {
             <Link href="/templates" className="text-sm hover:text-primary">
               Templates
             </Link>
+            <Link href="/free-tools" className="text-sm hover:text-primary">
+              Free tools
+            </Link>
             <Link href="/pricing" className="text-sm hover:text-primary">
               Pricing
             </Link>
@@ -104,6 +107,13 @@ useEffect(() => {
               onClick={() => setMobileMenuOpen(false)}
             >
               Templates
+            </Link>
+            <Link 
+              href="/free-tools" 
+              className="block py-2 hover:text-primary"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Free tools
             </Link>
             <Link 
               href="/pricing" 
