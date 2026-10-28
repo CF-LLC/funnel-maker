@@ -20,6 +20,7 @@ export const USAGE_TABLES: { key: string; label: string; table: string; userCol:
   { key: 'dataremoval', label: 'Data removal users', table: 'dr_profiles', userCol: 'user_id' },
   { key: 'crm', label: 'CRM contacts', table: 'crm_contacts', userCol: 'user_id' },
   { key: 'emaillist', label: 'Email subscribers', table: 'el_subscribers', userCol: 'user_id' },
+  { key: 'downloads', label: 'Download products', table: 'dl_products', userCol: 'user_id' },
   { key: 'orgs', label: 'Organizations', table: 'organizations', userCol: 'owner_id' },
 ]
 

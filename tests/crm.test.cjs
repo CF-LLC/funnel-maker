@@ -84,7 +84,7 @@ test('registry: crm is a sold tool, protected, and hidden from public surfaces u
   }
   const pricing = fs.readFileSync(path.join(root, 'components/pricing-plans.tsx'), 'utf8')
   // CRM is sold at the standing price but only listed when the launch flag is on.
-  assert.match(pricing, /GATED: readonly string\[\] = \['crm', 'emaillist'\]/)
+  assert.match(pricing, /GATED: readonly string\[\] = \['crm', 'emaillist', 'downloads'\]/)
 })
 
 test('migration is additive with owner-only RLS', () => {

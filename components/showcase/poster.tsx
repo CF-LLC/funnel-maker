@@ -22,6 +22,8 @@ function Motif({ id, accent }: { id: string; accent: string }) {
       return (<g {...s}><path d="M100 22l58 22v44c0 38-26 66-58 80-32-14-58-42-58-80V44z" /><path d="M72 92l20 20 38-40" /><path d="M30 170h140" strokeDasharray="6 8" /></g>)
     case 'emaillist':
       return (<g {...s}><rect x="30" y="45" width="140" height="95" rx="10" /><path d="M30 55l70 50 70-50" /><path d="M140 25l25 0M152 13v25" /><circle cx="60" cy="165" r="6" /><circle cx="100" cy="165" r="6" /><circle cx="140" cy="165" r="6" /></g>)
+    case 'downloads':
+      return (<g {...s}><path d="M62 30h56l30 30v110H62z" /><path d="M118 30v30h30" /><path d="M105 80v55M85 117l20 20 20-20" /><path d="M40 180h120" /></g>)
     default:
       return (<g {...s}><circle cx="100" cy="90" r="50" /></g>)
   }
