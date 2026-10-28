@@ -19,7 +19,7 @@ export default function AccessPage() {
   const [q, setQ] = useState('')
 
   const load = () => fetch('/api/admin/access').then(async (r) => {
-    if (!r.ok) throw new Error(r.status === 403 ? 'Admins only' : 'Could not load')
+    if (!r.ok) throw new Error(r.status === 403 || r.status === 404 ? 'Admins only' : 'Could not load')
     const j = await r.json(); setUsers(j.users); setAccess(j.access)
   }).catch((e) => setError(e.message))
   useEffect(() => { load() }, [])

@@ -45,7 +45,8 @@ test('publish gate is enforced in the database, not just the UI', () => {
 
 test('admin approval endpoint requires an admin', () => {
   const src = read('app/api/admin/approve/route.ts')
-  assert.equal((src.match(/if \(!\(await currentAdminId\(\)\)\) return NextResponse\.json\(\{ error: 'Forbidden' \}, \{ status: 403 \}\)/g) || []).length, 2)
+  // Non-admins (and signed-out) get 404 via adminApiGuard (tests/admin.test.cjs covers the guard itself).
+  assert.equal((src.match(/const g = await adminApiGuard\(\)\n  if \(g\.res\) return g\.res/g) || []).length, 2)
 })
 
 test('welcome email route is auth-only and never takes an arbitrary address', () => {

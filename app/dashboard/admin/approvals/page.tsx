@@ -21,7 +21,7 @@ export default function ApprovalsPage() {
 
   const load = () =>
     fetch('/api/admin/approve').then(async (r) => {
-      if (!r.ok) throw new Error(r.status === 403 ? 'Admins only' : 'Could not load')
+      if (!r.ok) throw new Error(r.status === 403 || r.status === 404 ? 'Admins only' : 'Could not load')
       const list: U[] = (await r.json()).users
       setUsers(list)
       setDraft(Object.fromEntries(list.map((u) => [u.id, { plan: u.plan || '', paidUntil: u.paid_until || '' }])))

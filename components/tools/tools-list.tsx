@@ -1,4 +1,4 @@
-import { PUBLIC_TOOLS as TOOL_REGISTRY } from '@/tools/registry'
+import { publicTools } from '@/tools/registry'
 import type { ToolDef } from '@/tools/types'
 import { TOOL_ICONS } from '@/components/tools/tool-icons'
 
@@ -14,8 +14,8 @@ function Card({ t }: { t: ToolDef }) {
 }
 
 /** Pricing page: tools listed from the single registry. Tools in the 'everyone' row get their own "For everyone" row. */
-export function ToolsList() {
-  const all = TOOL_REGISTRY as readonly ToolDef[]
+export function ToolsList({ flags }: { flags?: Record<string, boolean> }) {
+  const all = publicTools(flags)
   const included = all.filter((t) => t.includedWithAnyPlan)
   const sold = all.filter((t) => !t.includedWithAnyPlan)
   const everyone = sold.filter((t) => t.showcase.rows.includes('everyone'))

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { logError } from '@/lib/server/log-error'
 import { isDemoFunnel } from '@/lib/server/demo-funnel'
 import { createClient } from '@supabase/supabase-js'
 import { validateLead } from '@/lib/leads'
@@ -66,6 +67,7 @@ export async function POST(request: Request, context: { params: Promise<{ slug: 
       return NextResponse.json({ error: 'This page is unavailable.' }, { status: 404 })
     }
     console.error('lead submit failed', error.code)
+    await logError('/api/f/[slug]/lead', error.message || 'insert failed', { detail: { code: error.code } })
     return NextResponse.json({ error: 'Could not save lead' }, { status: 500 })
   }
   return NextResponse.json({ ok: true }, { status: 201 })

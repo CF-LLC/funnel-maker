@@ -1,13 +1,16 @@
 import { NextResponse } from 'next/server'
-import { currentAdminId, serviceClient } from '@/lib/server/admin-client'
+import { serviceClient } from '@/lib/server/admin-client'
+import { adminApiGuard } from '@/lib/admin/guard'
 import { setAccess } from '@/lib/server/access-admin'
 import { isAccessTool, ACCESS_SOURCES } from '@/lib/access'
 
 export const dynamic = 'force-dynamic'
+export const fetchCache = 'force-no-store'
 
 // GET: all access rows + users (with signup wish). POST {userId, tool, active, source?, plan?}
 export async function GET() {
-  if (!(await currentAdminId())) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  const g = await adminApiGuard()
+  if (g.res) return g.res
   const db = serviceClient()
   const [{ data: users, error: e1 }, { data: access, error: e2 }] = await Promise.all([
     db.from('users').select('id, email, approved, plan, wish_tool').order('email').limit(1000),
@@ -18,7 +21,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  if (!(await currentAdminId())) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  const g = await adminApiGuard()
+  if (g.res) return g.res
   const b = await request.json().catch(() => null)
   if (!b || typeof b.userId !== 'string' || !/^[0-9a-f-]{36}$/i.test(b.userId) || !isAccessTool(b.tool) || typeof b.active !== 'boolean') {
     return NextResponse.json({ error: 'Invalid body' }, { status: 400 })
