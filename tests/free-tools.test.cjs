@@ -65,3 +65,41 @@ test('free invoice generator never stores data', () => {
   const src = fs.readFileSync(path.join(root, 'components/free-tools/invoice-generator.tsx'), 'utf8') + fs.readFileSync(path.join(root, 'lib/free-tools/invoice.ts'), 'utf8')
   assert.doesNotMatch(src, /localStorage|sessionStorage|indexedDB|fetch\(|supabase|document\.cookie/)
 })
+
+const hr = jiti('../lib/free-tools/hourly-rate.ts')
+const close = (a, b, eps = 1e-6) => assert.ok(Math.abs(a - b) < eps, `${a} != ${b}`)
+
+test('hourly rate: hand-checked example', () => {
+  // 75k take-home, 25% tax => profit 100k, taxes 25k; expenses 500/mo = 6k; pre-buffer 106k; +10% = 116.6k
+  // 52-6 = 46 weeks * 40h * 50% = 920 billable hours => 126.7391.../hr
+  const r = hr.calcRate({ income: 75000, incomePeriod: 'year', expensesMonthly: 500, taxPct: 25, hoursPerWeek: 40, weeksOff: 6, bufferPct: 10, billablePct: 50, projectHours: 20 })
+  close(r.taxes, 25000); close(r.expenses, 6000); close(r.preBuffer, 106000); close(r.buffer, 10600); close(r.gross, 116600)
+  assert.equal(r.workingWeeks, 46); close(r.billableHours, 920)
+  close(r.hourly, 116600 / 920); close(r.day, (116600 / 920) * 8); close(r.project, (116600 / 920) * 20)
+  close(r.monthlyGross, 116600 / 12)
+  assert.equal(hr.roundUp(r.hourly), 127)
+})
+
+test('hourly rate: monthly income, zero tax/buffer, 100% billable', () => {
+  const r = hr.calcRate({ income: 5000, incomePeriod: 'month', expensesMonthly: 0, taxPct: 0, hoursPerWeek: 30, weeksOff: 2, bufferPct: 0, billablePct: 100 })
+  close(r.gross, 60000); close(r.billableHours, 1500); close(r.hourly, 40); close(r.day, 320); close(r.project, 800)
+})
+
+test('hourly rate: billing less of your time raises the rate proportionally', () => {
+  const base = { income: 60000, incomePeriod: 'year', expensesMonthly: 200, taxPct: 30, hoursPerWeek: 40, weeksOff: 4, bufferPct: 15 }
+  const a = hr.calcRate({ ...base, billablePct: 100 }), b = hr.calcRate({ ...base, billablePct: 50 })
+  close(b.hourly, a.hourly * 2); close(a.gross, b.gross)
+})
+
+test('hourly rate: guards against bad input', () => {
+  const r = hr.calcRate({ income: NaN, incomePeriod: 'year', expensesMonthly: -5, taxPct: 150, hoursPerWeek: 0, weeksOff: 60, bufferPct: -1, billablePct: 50 })
+  assert.equal(r.hourly, 0); assert.ok(Number.isFinite(r.gross)); assert.equal(r.workingWeeks, 1)
+  const t = hr.calcRate({ income: 10000, incomePeriod: 'year', expensesMonthly: 0, taxPct: 100, hoursPerWeek: 10, weeksOff: 0, bufferPct: 0, billablePct: 100 })
+  assert.ok(Number.isFinite(t.hourly)); close(t.taxes, 90000) // tax clamped to 90%
+  assert.equal(hr.roundUp(40.01), 41); assert.equal(hr.roundUp(40), 40); assert.equal(hr.roundUp(40.004), 40)
+})
+
+test('hourly rate calculator never stores data', () => {
+  const src = fs.readFileSync(path.join(root, 'components/free-tools/hourly-rate-calculator.tsx'), 'utf8') + fs.readFileSync(path.join(root, 'lib/free-tools/hourly-rate.ts'), 'utf8')
+  assert.doesNotMatch(src, /localStorage|sessionStorage|indexedDB|fetch\(|supabase|document\.cookie/)
+})
