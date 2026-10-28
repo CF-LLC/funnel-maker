@@ -5,14 +5,14 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LayoutDashboard, Zap, LogOut, Users, CreditCard, Shield, Menu, X, Plus } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
-import { publicTools, LAUNCH_FLAGS } from '@/tools/registry'
+import { publicTools, LAUNCH_FLAGS, LAUNCH_FLAG_KEYS } from '@/tools/registry'
 import { TOOL_ICONS } from '@/components/tools/tool-icons'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false) // mobile drawer; desktop sidebar is always shown
   const [isAdmin, setIsAdmin] = useState(false)
   const [userEmail, setUserEmail] = useState('')
-  const [crmOn, setCrmOn] = useState(LAUNCH_FLAGS.crm)
+  const [flags, setFlags] = useState<Record<string, boolean>>({ ...LAUNCH_FLAGS })
   const pathname = usePathname()
   const supabase = createClient()
 
@@ -22,7 +22,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       // Admin link only for admin_users (fm_is_admin); /admin itself is enforced server-side.
       if (user) (supabase as any).rpc('fm_is_admin', { uid: user.id }).then(({ data }: { data: unknown }) => setIsAdmin(data === true))
     })
-    if (!LAUNCH_FLAGS.crm) (supabase as any).rpc('fm_public_flag', { flag_key: 'crm_public' }).then(({ data }: { data: unknown }) => setCrmOn(data === true))
+    for (const k of LAUNCH_FLAG_KEYS) if (!LAUNCH_FLAGS[k]) (supabase as any).rpc('fm_public_flag', { flag_key: `${k}_public` }).then(({ data }: { data: unknown }) => setFlags((f) => ({ ...f, [k]: data === true })))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -36,7 +36,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    ...publicTools({ crm: crmOn }).flatMap((t) => t.nav.map((n) => ({ name: n.label, href: n.href, icon: TOOL_ICONS[n.icon] }))),
+    ...publicTools(flags).flatMap((t) => t.nav.map((n) => ({ name: n.label, href: n.href, icon: TOOL_ICONS[n.icon] }))),
     { name: 'Organizations', href: '/dashboard/organizations', icon: Users },
     { name: 'Billing', href: '/dashboard/billing', icon: CreditCard },
   ]

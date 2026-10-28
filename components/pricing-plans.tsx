@@ -10,18 +10,20 @@ const SINGLE: { id: Exclude<SoldKey, 'all'>; name: string }[] = [
   { id: 'funnels', name: 'Funnels' }, { id: 'invoices', name: 'Invoices' }, { id: 'forms', name: 'Forms' },
   { id: 'proposals', name: 'Proposals' }, { id: 'testimonials', name: 'Testimonials' }, { id: 'booking', name: 'Booking' },
   { id: 'dataremoval', name: 'Data Removal' }, { id: 'crm', name: 'CRM' },
+  { id: 'emaillist', name: 'Email list' },
 ]
 
-/** Tools shown in the Single dropdown. CRM appears only when its launch flag (crm_public / NEXT_PUBLIC_CRM_ENABLED) is on. */
-export function singleTools(flags: { crm?: boolean } = {}) {
-  return SINGLE.filter((t) => t.id !== 'crm' || flags.crm)
+/** Pre-launch tools appear in the Single dropdown only when their launch flag (<id>_public / NEXT_PUBLIC_<ID>_ENABLED) is on. */
+const GATED: readonly string[] = ['crm', 'emaillist']
+export function singleTools(flags: Partial<Record<string, boolean>> = {}) {
+  return SINGLE.filter((t) => !GATED.includes(t.id) || flags[t.id])
 }
 
 function listNames(names: string[]) {
   return names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} or ${names[names.length - 1]}`
 }
 
-export function PricingPlans({ flags = {} }: { flags?: { crm?: boolean } }) {
+export function PricingPlans({ flags = {} }: { flags?: Partial<Record<string, boolean>> }) {
   const tools = singleTools(flags)
   const names = tools.map((t) => t.name)
   const [user, setUser] = useState<{ id: string; email?: string | null } | null>(null)

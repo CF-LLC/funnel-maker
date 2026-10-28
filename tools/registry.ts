@@ -10,8 +10,9 @@ import { testimonialsTool } from './testimonials/tool'
 import { bookingTool } from './booking/tool'
 import { dataremovalTool } from './dataremoval/tool'
 import { crmTool } from './crm/tool'
+import { emaillistTool } from './emaillist/tool'
 
-export const TOOL_REGISTRY = [funnelsTool, invoicesTool, linkinbioTool, formsTool, proposalsTool, testimonialsTool, bookingTool, dataremovalTool, crmTool] as const satisfies readonly ToolDef[]
+export const TOOL_REGISTRY = [funnelsTool, invoicesTool, linkinbioTool, formsTool, proposalsTool, testimonialsTool, bookingTool, dataremovalTool, crmTool, emaillistTool] as const satisfies readonly ToolDef[]
 export type ToolId = (typeof TOOL_REGISTRY)[number]['id']
 export const TOOL_IDS = TOOL_REGISTRY.map((t) => t.id) as ToolId[]
 /** 'all' = All Access, one app_access row covering every tool. */
@@ -24,9 +25,12 @@ export const SOLD_ACCESS_KEYS = [...SOLD_TOOL_IDS, ALL_ACCESS] as (ToolId | type
 export const isIncludedTool = (id: string) => !!(TOOL_REGISTRY as readonly ToolDef[]).find((t) => t.id === id)?.includedWithAnyPlan
 
 /** Launch flags. NEXT_PUBLIC_* must be referenced literally so Next inlines them. Default off. */
-export const LAUNCH_FLAGS: Record<'crm', boolean> = {
-  crm: ['1', 'true'].includes(String(process.env.NEXT_PUBLIC_CRM_ENABLED || '').toLowerCase()),
+const on = (v: string | undefined) => ['1', 'true'].includes(String(v || '').toLowerCase())
+export const LAUNCH_FLAGS: Record<import('./types').LaunchFlag, boolean> = {
+  crm: on(process.env.NEXT_PUBLIC_CRM_ENABLED),
+  emaillist: on(process.env.NEXT_PUBLIC_EMAILLIST_ENABLED),
 }
+export const LAUNCH_FLAG_KEYS = Object.keys(LAUNCH_FLAGS) as import('./types').LaunchFlag[]
 export function isToolLaunched(t: Pick<ToolDef, 'launchFlag'>, flags: Record<string, boolean> = LAUNCH_FLAGS): boolean {
   return !t.launchFlag || !!flags[t.launchFlag]
 }
