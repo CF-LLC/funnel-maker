@@ -232,3 +232,49 @@ test('public marketing pages declare a canonical; signed-in pages untouched', ()
   }
   for (const f of ['app/dashboard/page.tsx']) if (fs.existsSync(path.join(root, f))) assert.ok(!fs.readFileSync(path.join(root, f), 'utf8').includes('canonical'), f)
 })
+
+const sig = jiti('../lib/free-tools/email-signature.ts')
+test('email signature: safeUrl only allows http, https, mailto and tel', () => {
+  assert.equal(sig.safeUrl('example.com'), 'https://example.com/')
+  assert.equal(sig.safeUrl('http://a.co/x?y=1'), 'http://a.co/x?y=1')
+  for (const bad of ['javascript:alert(1)', 'JaVaScRiPt:alert(1)', 'data:text/html,hi', 'vbscript:x', 'file:///etc/passwd', 'ftp://a.co', 'blob:https://a.co/1', 'https://a.co/"onmouseover=x', 'https://user:pw@a.co', 'not a url', '', 'localhost'])
+    assert.equal(sig.safeUrl(bad), null, bad)
+  assert.equal(sig.safeUrl('a@b.co', 'email'), 'mailto:a@b.co')
+  assert.equal(sig.safeUrl('a@b.co?bcc=x@y.z', 'email'), null)
+  assert.equal(sig.safeUrl('javascript:a@b.co', 'email'), null)
+  assert.equal(sig.safeUrl('+1 (555) 010-2030', 'tel'), 'tel:+15550102030')
+  assert.equal(sig.safeUrl('call me', 'tel'), null)
+})
+test('email signature: escapes user input and never emits scripts or unsafe links', () => {
+  const evil = '<script>alert(1)</script>"\'&'
+  const d = { name: evil, title: evil, company: evil, address: evil, phone: '555 0100', email: 'a@b.co', website: 'javascript:alert(1)', linkedin: 'data:text/html,x', x: 'x.com/me', customLabel: '<b>hi</b>', customUrl: 'https://cal.com/me', imageUrl: 'javascript:alert(1)' }
+  for (const [t] of sig.SIG_TEMPLATES) {
+    const h = sig.buildSignature(d, { template: t, color: '#123456' })
+    assert.doesNotMatch(h, /<script|javascript:|data:|on\w+=|<b>hi/i, t)
+    assert.match(h, /&lt;script&gt;alert\(1\)&lt;\/script&gt;&quot;&#39;&amp;/)
+    const hrefs = [...h.matchAll(/href="([^"]*)"/g)].map((m) => m[1])
+    assert.ok(hrefs.length >= 4 && hrefs.every((u) => /^(https?:\/\/|mailto:|tel:)/.test(u)), hrefs.join())
+    assert.match(h, /^<table[^>]*cellpadding="0"/)
+    assert.doesNotMatch(h, /<style|class=|<div/)
+    assert.doesNotMatch(h, /<img/)
+    assert.match(h, /#123456/)
+  }
+})
+test('email signature: color, images and local preview handling', () => {
+  const d = { name: 'Ana', imageUrl: 'https://cdn.example.com/logo.png' }
+  assert.match(sig.buildSignature(d, { template: 'classic', color: 'red;background:url(x)' }), /#4f46e5/)
+  assert.doesNotMatch(sig.buildSignature(d, { template: 'classic', color: 'red;background:url(x)' }), /url\(x\)/)
+  assert.match(sig.buildSignature(d, { template: 'sidebar', color: '#000000' }), /<img src="https:\/\/cdn\.example\.com\/logo\.png"/)
+  const loc = sig.buildSignature({ name: 'Ana' }, { template: 'banner', color: '#000000', previewImageSrc: 'blob:http://localhost/abc' })
+  assert.match(loc, /<img src="blob:/)
+  assert.doesNotMatch(sig.buildSignature({ name: 'Ana' }, { template: 'banner', color: '#000000', previewImageSrc: 'javascript:x' }), /<img/)
+  assert.doesNotMatch(sig.buildSignature({ name: 'Ana' }, { template: 'banner', color: '#000000' }), /<img/)
+})
+test('email signature: no storage, network or upload in the tool', () => {
+  const src = ['components/free-tools/email-signature-generator.tsx', 'lib/free-tools/email-signature.ts', 'app/free-tools/email-signature-generator/page.tsx'].map((f) => fs.readFileSync(path.join(root, f), 'utf8')).join('\n')
+  assert.doesNotMatch(src, /localStorage|sessionStorage|indexedDB|fetch\(|XMLHttpRequest|FormData|supabase|document\.cookie|window\.open/)
+  assert.match(src, /ClipboardItem/)
+  assert.match(src, /'text\/html'/)
+  assert.match(src, /alternates: \{ canonical: freeToolPath/)
+  assert.ok(sitemap().some((e) => e.url.endsWith('/free-tools/email-signature-generator')))
+})
