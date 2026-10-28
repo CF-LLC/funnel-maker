@@ -42,6 +42,17 @@ export const FREE_TOOLS: FreeTool[] = [
     colors: ['#0891b2', '#7c3aed'],
     emoji: '⏱️',
   },
+  {
+    slug: 'utm-builder',
+    name: 'UTM builder',
+    title: 'UTM Builder – Free UTM Link Generator',
+    h1: 'UTM builder',
+    description: 'Free UTM builder: add source, medium and campaign to any link, pick common presets, tidy the naming and copy the tracked URL in one tap. No signup.',
+    blurb: 'Tag any link with clean UTMs, use presets, build several at once, copy in one tap.',
+    feeds: { name: 'Funnels', href: '/pricing' },
+    colors: ['#059669', '#0ea5e9'],
+    emoji: '🔗',
+  },
 ]
 
 export const freeToolPath = (slug: string) => `${FREE_TOOLS_PATH}/${slug}`

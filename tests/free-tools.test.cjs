@@ -122,3 +122,57 @@ test('canonical site URL is the apex, never the funnels. app host', () => {
   const layout = fs.readFileSync(path.join(root, 'app/layout.tsx'), 'utf8')
   assert.match(layout, /metadataBase: new URL\(SITE_URL\)/)
 })
+
+const utm = jiti('../lib/free-tools/utm.ts')
+const P = { source: 'google', medium: 'cpc', campaign: 'spring_sale' }
+
+test('utm: normalizes bare domains and builds params in order', () => {
+  const r = utm.buildUtmUrl('example.com', P)
+  assert.deepEqual(r, { ok: true, url: 'https://example.com/?utm_source=google&utm_medium=cpc&utm_campaign=spring_sale' })
+  assert.equal(utm.buildUtmUrl('  http://Example.com/a  ', P).url, 'http://example.com/a?utm_source=google&utm_medium=cpc&utm_campaign=spring_sale')
+  assert.equal(utm.buildUtmUrl('example.com:8080/x', P).url, 'https://example.com:8080/x?utm_source=google&utm_medium=cpc&utm_campaign=spring_sale')
+})
+
+test('utm: keeps existing query and hash, replaces existing utm_ keys', () => {
+  const r = utm.buildUtmUrl('https://ex.com/p?ref=home&utm_source=old#signup', { ...P, content: 'hero' })
+  assert.equal(r.url, 'https://ex.com/p?ref=home&utm_source=google&utm_medium=cpc&utm_campaign=spring_sale&utm_content=hero#signup')
+  const u = new URL(r.url)
+  assert.equal(u.hash, '#signup'); assert.equal(u.searchParams.get('ref'), 'home'); assert.equal(u.searchParams.getAll('utm_source').length, 1)
+  assert.ok(!r.url.includes('utm_term'), 'empty optional params are omitted')
+})
+
+test('utm: encodes values safely; tidy option normalizes naming', () => {
+  const raw = utm.buildUtmUrl('ex.com', { source: 'News Letter', medium: 'e&mail', campaign: 'Black Friday #1', term: 'a=b' })
+  const u = new URL(raw.url)
+  assert.equal(u.searchParams.get('utm_source'), 'News Letter'); assert.equal(u.searchParams.get('utm_medium'), 'e&mail')
+  assert.equal(u.searchParams.get('utm_campaign'), 'Black Friday #1'); assert.equal(u.searchParams.get('utm_term'), 'a=b'); assert.equal(u.hash, '')
+  assert.ok(!/[ #]/.test(raw.url.split('?')[1]))
+  assert.equal(utm.tidy('  Black-Friday  Sale!! '), 'black_friday_sale')
+  assert.equal(utm.buildUtmUrl('ex.com', { source: 'Face Book', medium: 'Paid Social', campaign: 'Q4 Launch' }, { tidy: true }).url, 'https://ex.com/?utm_source=face_book&utm_medium=paid_social&utm_campaign=q4_launch')
+})
+
+test('utm: rejects invalid URLs and missing required fields', () => {
+  for (const bad of ['', '   ', 'not a url', 'javascript:alert(1)', 'mailto:a@b.com', 'ftp://ex.com', 'localhostish', 'http://', 'https://exa mple.com']) {
+    assert.equal(utm.buildUtmUrl(bad, P).ok, false, bad)
+  }
+  assert.equal(utm.buildUtmUrl('ex.com', { ...P, source: '' }).ok, false)
+  assert.equal(utm.buildUtmUrl('ex.com', { ...P, medium: ' ' }).ok, false)
+  assert.equal(utm.buildUtmUrl('ex.com', { ...P, campaign: '' }).ok, false)
+  assert.equal(utm.buildUtmUrl('ex.com', { ...P, source: '!!!' }, { tidy: true }).ok, false)
+})
+
+test('utm: build several uses one campaign and per-line source/medium', () => {
+  const rows = utm.buildMany('ex.com/l', 'google/cpc\n\n Newsletter \nx/social', { source: '', medium: 'email', campaign: 'launch' }, { tidy: true })
+  assert.equal(rows.length, 3)
+  assert.deepEqual(rows.map((r) => r.result.url), [
+    'https://ex.com/l?utm_source=google&utm_medium=cpc&utm_campaign=launch',
+    'https://ex.com/l?utm_source=newsletter&utm_medium=email&utm_campaign=launch',
+    'https://ex.com/l?utm_source=x&utm_medium=social&utm_campaign=launch',
+  ])
+  for (const pr of utm.UTM_PRESETS) assert.equal(pr.source + pr.medium, utm.tidy(pr.source) + utm.tidy(pr.medium))
+})
+
+test('utm builder never stores data', () => {
+  const src = fs.readFileSync(path.join(root, 'components/free-tools/utm-builder.tsx'), 'utf8') + fs.readFileSync(path.join(root, 'lib/free-tools/utm.ts'), 'utf8')
+  assert.doesNotMatch(src, /localStorage|sessionStorage|indexedDB|fetch\(|supabase|document\.cookie/)
+})
