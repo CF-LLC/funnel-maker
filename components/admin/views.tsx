@@ -102,7 +102,7 @@ export function UserDetailView({ d, tools, adminId, preview = false }: { d: User
   const s = userStatus(u)
   return (
     <div className="space-y-6">
-      <Link href="/admin/users" className="text-sm text-zinc-400 hover:underline">← All accounts</Link>
+      <div className="flex flex-wrap items-center justify-between gap-2"><Link href="/admin/users" className="text-sm text-zinc-400 hover:underline">← All accounts</Link><Link href={`/admin/users/${u.id}/view`} className="rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-amber-400/40 text-amber-200 hover:bg-amber-500/10">View as user (read only, logged)</Link></div>
       <Hero eyebrow="Admin · Account" title={u.email || u.id}>
         <div className="flex flex-wrap items-center gap-2 text-sm text-zinc-300">
           <StatusPill s={s} />
@@ -175,7 +175,7 @@ export function SystemView({ s, preview = false, emailOf }: { s: System; preview
       <Hero eyebrow="Admin · System" title="Errors, flags and audit log" text="Feature flags take effect within about a minute, no rebuild needed. Everything is off unless you turn it on." />
       <div className="grid gap-6 lg:grid-cols-2">
         <Panel title="Feature flags"><FlagToggles flags={s.flags} preview={preview} /></Panel>
-        <Panel title="Admin audit log"><DataTable columns={['Action', 'Target', 'Detail', 'When']} pageSize={8} rows={s.audit.map((a) => ({ id: String(a.id), href: a.target_user_id ? `/admin/users/${a.target_user_id}` : undefined, cells: [{ text: a.action, tone: 'strong' }, a.target_user_id ? emailOf[a.target_user_id] || a.target_user_id.slice(0, 8) : '—', a.detail ? Object.entries(a.detail).map(([k, v]) => `${k}=${v}`).join(' ') : '', fmtDateTime(a.created_at)] }))} empty="No admin actions yet." /></Panel>
+        <Panel title="Admin audit log" action={<a href="/api/admin/export?kind=audit" className="inline-flex min-h-[36px] items-center rounded-full px-3 text-xs font-semibold ring-1 ring-white/15 hover:bg-white/10">Export CSV</a>}><DataTable columns={['Action', 'Target', 'Detail', 'When']} pageSize={8} rows={s.audit.map((a) => ({ id: String(a.id), href: a.target_user_id ? `/admin/users/${a.target_user_id}` : undefined, cells: [{ text: a.action, tone: 'strong' }, a.target_user_id ? emailOf[a.target_user_id] || a.target_user_id.slice(0, 8) : '—', a.detail ? Object.entries(a.detail).map(([k, v]) => `${k}=${v}`).join(' ') : '', fmtDateTime(a.created_at)] }))} empty="No admin actions yet." /></Panel>
       </div>
       <Panel title="Recent errors"><DataTable columns={['Route', 'Message', 'User', 'When']} pageSize={10} rows={s.errors.map((e) => ({ id: String(e.id), cells: [{ text: e.route, tone: 'strong' }, e.message, e.user_id ? emailOf[e.user_id] || e.user_id.slice(0, 8) : '—', fmtDateTime(e.created_at)] }))} empty="No errors logged. Nice." /></Panel>
     </div>
