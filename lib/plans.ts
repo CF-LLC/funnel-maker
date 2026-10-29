@@ -42,7 +42,7 @@ export function checkoutUrl(plan: Plan, user?: { id: string; email?: string | nu
 // SaaS Nation pricing (locked Oct 24, 2026): each tool $12/mo or $99/yr; All Access $29/mo or $249/yr.
 // NEXT_PUBLIC_* must be referenced literally so Next inlines them at build time.
 export type Billing = 'monthly' | 'yearly'
-export type SoldKey = 'funnels' | 'invoices' | 'forms' | 'proposals' | 'testimonials' | 'booking' | 'dataremoval' | 'crm' | 'emaillist' | 'downloads' | 'portal' | 'all'
+export type SoldKey = 'funnels' | 'invoices' | 'forms' | 'proposals' | 'testimonials' | 'booking' | 'dataremoval' | 'crm' | 'emaillist' | 'downloads' | 'portal' | 'changelog' | 'all'
 export const TOOL_PRICE = { monthly: '$12', yearly: '$99' } as const
 export const ALL_ACCESS_PRICE = { monthly: '$29', yearly: '$249' } as const
 export const PAYMENT_LINKS: Record<SoldKey, Record<Billing, string | undefined>> = {
@@ -57,6 +57,7 @@ export const PAYMENT_LINKS: Record<SoldKey, Record<Billing, string | undefined>>
   emaillist: { monthly: process.env.NEXT_PUBLIC_STRIPE_LINK_EMAILLIST_MONTHLY, yearly: process.env.NEXT_PUBLIC_STRIPE_LINK_EMAILLIST_YEARLY },
   downloads: { monthly: process.env.NEXT_PUBLIC_STRIPE_LINK_DOWNLOADS_MONTHLY, yearly: process.env.NEXT_PUBLIC_STRIPE_LINK_DOWNLOADS_YEARLY },
   portal: { monthly: process.env.NEXT_PUBLIC_STRIPE_LINK_PORTAL_MONTHLY, yearly: process.env.NEXT_PUBLIC_STRIPE_LINK_PORTAL_YEARLY },
+  changelog: { monthly: process.env.NEXT_PUBLIC_STRIPE_LINK_CHANGELOG_MONTHLY, yearly: process.env.NEXT_PUBLIC_STRIPE_LINK_CHANGELOG_YEARLY },
   all: { monthly: process.env.NEXT_PUBLIC_STRIPE_LINK_ALL_MONTHLY, yearly: process.env.NEXT_PUBLIC_STRIPE_LINK_ALL_YEARLY },
 }
 export function paymentLinkUrl(key: SoldKey, billing: Billing, user?: { id: string; email?: string | null }): string | null {

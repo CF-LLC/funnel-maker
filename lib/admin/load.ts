@@ -22,6 +22,7 @@ export const USAGE_TABLES: { key: string; label: string; table: string; userCol:
   { key: 'emaillist', label: 'Email subscribers', table: 'el_subscribers', userCol: 'user_id' },
   { key: 'downloads', label: 'Download products', table: 'dl_products', userCol: 'user_id' },
   { key: 'portal', label: 'Client portals', table: 'pt_portals', userCol: 'user_id' },
+  { key: 'changelog', label: 'Change log projects', table: 'cl_projects', userCol: 'user_id' },
   { key: 'orgs', label: 'Organizations', table: 'organizations', userCol: 'owner_id' },
 ]
 
