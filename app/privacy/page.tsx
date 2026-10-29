@@ -13,6 +13,7 @@ export default function PrivacyPage() {
         <li><strong>Your content:</strong> funnels, Link-in-bio pages, forms, clients, invoices, proposals, testimonials and any files you upload, all stored in Supabase.</li>
         <li><strong>Leads:</strong> details that visitors submit on your published funnels and forms, and names, ratings and photos clients submit in reviews or when accepting a proposal (for example name, email, phone, message). You control this data; we store it on your behalf.</li>
         <li><strong>Payments:</strong> handled by Stripe. We never see or store your full card number. We receive your email, plan and payment status.</li>
+        <li><strong>Visit counts:</strong> on public pages we set one anonymous first-party cookie, <code>sn_vid</code> (a random ID, kept 90 days), and record which pages and free tools were opened plus any UTM campaign tags. It holds no email or IP address and nothing you type into a tool. We skip it when your browser sends Do Not Track.</li>
         <li><strong>Security:</strong> sign-up forms use Cloudflare Turnstile to block bots, and basic server logs (IP address, browser) are kept for security.</li>
       </ul>
       <h2>How we use it</h2>

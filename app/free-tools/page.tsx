@@ -6,7 +6,7 @@ import { FREE_TOOLS, freeToolPath } from '@/lib/free-tools/registry'
 
 export const metadata: Metadata = {
   title: 'Free Tools – No Signup, Browser-Only',
-  description: 'Free tools for freelancers and small businesses. They run in your browser, need no signup and store nothing.',
+  description: 'Free tools for freelancers and small businesses. They run in your browser, need no signup and never store what you type.',
   alternates: { canonical: '/free-tools' },
 }
 

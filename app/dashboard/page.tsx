@@ -10,6 +10,8 @@ import { recentWork, ago } from '@/components/showcase/dashboard-data'
 import { OnboardingChecklist, type Step } from '@/components/dashboard/onboarding'
 import { UpsellTiles } from '@/components/dashboard/upsell-tiles'
 import { recordSignupOnce } from '@/lib/acquisition/server'
+import { ResultsPanel } from '@/components/dashboard/results-panel'
+import { loadResults } from '@/lib/me/results'
 
 export const metadata = { title: 'Dashboard' }
 
@@ -19,12 +21,13 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const checkoutSuccess = sp.checkout === 'success'
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  const [{ data: profile }, { data: access }, recent, { count: orgCount }] = await Promise.all([
+  const [{ data: profile }, { data: access }, recent, { count: orgCount }, , results] = await Promise.all([
     (supabase.from('users') as any).select('approved').eq('id', user!.id).maybeSingle(),
     (supabase as any).from('app_access').select('tool, active').eq('user_id', user!.id),
     recentWork(supabase, user!.id),
     (supabase as any).from('organizations').select('id', { count: 'exact', head: true }).eq('owner_id', user!.id),
     recordSignupOnce(user!.id),
+    loadResults(supabase, user!.id, 30),
   ])
   const approved = !!profile?.approved
   const active = new Set<string>((access || []).filter((r: any) => r.active).map((r: any) => r.tool))
@@ -85,6 +88,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         })} />
       </div>
       <OnboardingChecklist steps={steps} />
+      <ResultsPanel c={results} />
       <UpsellTiles tools={locked} />
       <div>
       </div>

@@ -194,13 +194,15 @@ export async function loadRevenue(): Promise<Revenue> {
   if (!process.env.STRIPE_SECRET_KEY) return { source: 'estimate', last30Cents: null, invoices: 0, note: 'Estimate only: no Stripe key on this server, so collected revenue cannot be read. MRR above is estimated from seats.' }
   try {
     const map = parsePriceMap(process.env.STRIPE_PRICE_MAP)
+    // Without a price map we can't tell SaaS Nation invoices from other products on the account, so never sum them all.
+    if (!Object.keys(map).length) return { source: 'estimate', last30Cents: null, invoices: 0, note: 'Estimate only: STRIPE_PRICE_MAP is not set on this server, so SaaS Nation invoices cannot be told apart from other products.' }
     const since = Math.floor(Date.now() / 1000) - 30 * 86400
     let cents = 0
     let n = 0
     for await (const inv of getStripe().invoices.list({ status: 'paid', created: { gte: since }, limit: 100, expand: ['data.lines'] })) {
       const ours = inv.lines.data.some((l: any) => {
         const pid = l.pricing?.price_details?.price ?? l.price?.id
-        return !Object.keys(map).length || (pid && map[pid])
+        return !!(pid && map[pid])
       })
       if (!ours) continue
       cents += inv.amount_paid ?? 0

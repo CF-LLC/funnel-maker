@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Zap, LogOut, Users, CreditCard, Shield, Menu, X, Plus } from 'lucide-react'
+import { LayoutDashboard, Zap, LogOut, Users, CreditCard, Shield, Menu, X, Plus, Search, Settings } from 'lucide-react'
+import { CommandPalette, QUICK_CREATE, openPalette } from '@/components/dashboard/command-palette'
 import { createClient } from '@/lib/supabase'
 import { publicTools, LAUNCH_FLAGS, LAUNCH_FLAG_KEYS } from '@/tools/registry'
 import { TOOL_ICONS } from '@/components/tools/tool-icons'
@@ -39,7 +40,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     ...publicTools(flags).flatMap((t) => t.nav.map((n) => ({ name: n.label, href: n.href, icon: TOOL_ICONS[n.icon] }))),
     { name: 'Organizations', href: '/dashboard/organizations', icon: Users },
     { name: 'Billing', href: '/dashboard/billing', icon: CreditCard },
+    { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   ]
+  const paletteItems = [...QUICK_CREATE, ...navigation.map((n) => ({ label: n.name, href: n.href, group: 'Go to' as const }))]
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -63,6 +66,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <Link href="/funnels/templates" className="press flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-brand text-sm font-semibold text-white shadow-md hover:brightness-110">
           <Plus className="h-4 w-4" /> New funnel
         </Link>
+        <button onClick={openPalette} className="press mt-2 hidden min-h-[44px] w-full items-center gap-2 rounded-xl px-3 text-sm text-muted-foreground ring-1 ring-border hover:bg-muted lg:flex" data-search-open>
+          <Search className="h-4 w-4" />Search or create<kbd className="ml-auto rounded bg-muted px-1.5 text-[10px]">Ctrl K</kbd>
+        </button>
       </div>
       <nav className="flex-1 space-y-1 px-3 py-4" aria-label="Dashboard">
         {navigation.map(({ name, href, icon: Icon }) => (
@@ -100,8 +106,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-background/80 px-2 backdrop-blur lg:hidden">
           <button onClick={() => setOpen(true)} aria-label="Open menu" className="press flex h-11 w-11 items-center justify-center rounded-lg hover:bg-muted"><Menu className="h-5 w-5" /></button>
           <Link href="/dashboard" className="flex min-h-[44px] items-center px-1 font-bold">SaaS Nation</Link>
+          <button onClick={openPalette} aria-label="Search or create" className="press ml-auto flex h-11 w-11 items-center justify-center rounded-lg hover:bg-muted"><Search className="h-5 w-5" /></button>
         </header>
-        <main className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8">{children}</main>
+        <main className="mx-auto w-full max-w-7xl p-4 pb-24 sm:p-6 sm:pb-24 lg:p-8">{children}</main>
+        {/* Mobile bottom nav */}
+        <nav aria-label="Quick" data-bottom-nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
+          {[{ href: '/dashboard', label: 'Home', icon: LayoutDashboard }].map(({ href, label, icon: Icon }) => (
+            <Link key={href} href={href} aria-current={isActive(href) ? 'page' : undefined} className={`flex min-h-[56px] flex-col items-center justify-center gap-0.5 text-[11px] font-medium ${isActive(href) ? 'text-violet-600' : 'text-muted-foreground'}`}><Icon className="h-5 w-5" />{label}</Link>
+          ))}
+          <button onClick={openPalette} className="flex min-h-[56px] flex-col items-center justify-center gap-0.5 text-[11px] font-medium text-muted-foreground"><Search className="h-5 w-5" />Search</button>
+          <button onClick={openPalette} className="flex min-h-[56px] flex-col items-center justify-center gap-0.5 text-[11px] font-medium text-muted-foreground"><Plus className="h-5 w-5" />Create</button>
+          <button onClick={() => setOpen(true)} className="flex min-h-[56px] flex-col items-center justify-center gap-0.5 text-[11px] font-medium text-muted-foreground"><Menu className="h-5 w-5" />Menu</button>
+        </nav>
+        <CommandPalette items={paletteItems} />
       </div>
     </div>
   )
