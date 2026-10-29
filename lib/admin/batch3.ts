@@ -44,7 +44,7 @@ export function healthStatus(t: Omit<ToolHealth, 'status'>): ToolHealth['status'
 export const ERROR_ROUTE_HINTS: Record<string, string[]> = {
   funnels: ['/funnel', '/f/'], leads: ['/lead'], invoices: ['/invoice', '/i/'], forms: ['/form'], responses: ['/form'],
   proposals: ['/proposal'], testimonials: ['/testimonial'], bookings: ['/book'], linkinbio: ['/link', '/u/'],
-  dataremoval: ['/removal', '/data-removal'], crm: ['/crm'], emaillist: ['/email-list', '/list'], downloads: ['/download', '/d/'], orgs: ['/org'],
+  dataremoval: ['/removal', '/data-removal'], crm: ['/crm'], emaillist: ['/email-list', '/list'], downloads: ['/download', '/d/'], portal: ['/portal', '/p/'], orgs: ['/org'],
 }
 export const errorsForTool = (key: string, routes: string[]) => {
   const hints = ERROR_ROUTE_HINTS[key] ?? []

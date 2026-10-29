@@ -25,6 +25,7 @@ test('access + price map derive from the registry; all access stays', () => {
   assert.ok(isAccessTool('all') && !isAccessTool('nope'))
   assert.equal(parsePriceMap(JSON.stringify({ price_1: { tool: 'invoices' } })).price_1.tool, 'invoices')
   assert.throws(() => parsePriceMap(JSON.stringify({ price_1: { tool: 'nope' } })))
+  assert.equal(parsePriceMap(JSON.stringify({ price_1UVtgDDs9LwkRsZNNTWBit05: { tool: 'portal', plan: 'monthly' } })).price_1UVtgDDs9LwkRsZNNTWBit05.tool, 'portal')
 })
 
 test('existing URLs still protected/public as before', () => {
