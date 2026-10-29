@@ -83,3 +83,19 @@ export function FlagToggles({ flags, preview = false }: { flags: { key: string; 
     </div>
   )
 }
+
+/** Mark a "new tools" list signup unsubscribed / restore it. Never deletes. */
+export function UpdatesListToggle({ id, email, subscribed }: { id: number; email: string; subscribed: boolean }) {
+  const c = useConfirm(false)
+  return (
+    <span className="inline-flex items-center gap-2">
+      <button className={`${btn} ${subscribed ? 'ring-rose-400/40 text-rose-200 hover:bg-rose-500/10' : 'ring-white/15 hover:bg-white/10'}`} onClick={() => c.ask(subscribed
+        ? { title: `Unsubscribe ${email}?`, body: 'They stay on file but are marked unsubscribed. Nothing is deleted.', danger: true, url: '/api/admin/updates-list', payload: { id, subscribed: false } }
+        : { title: `Restore ${email}?`, body: 'Only do this if they asked to be added back.', url: '/api/admin/updates-list', payload: { id, subscribed: true } })}>
+        {subscribed ? 'Unsubscribe' : 'Restore'}
+      </button>
+      {c.msg && <span className="text-xs text-zinc-400">{c.msg}</span>}
+      {c.dialog}
+    </span>
+  )
+}
