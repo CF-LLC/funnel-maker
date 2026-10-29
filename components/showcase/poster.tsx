@@ -28,6 +28,8 @@ function Motif({ id, accent }: { id: string; accent: string }) {
       return (<g {...s}><path d="M60 175V35h80v140" /><path d="M60 35l45 18v140l-45-18" /><circle cx="92" cy="108" r="4" /><path d="M150 70l12 12 22-24" /><path d="M150 110l12 12 22-24" /></g>)
     case 'changelog':
       return (<g {...s}><rect x="45" y="30" width="110" height="145" rx="10" /><path d="M70 65h60M70 95h60M70 125h35" /><path d="M150 140v40M130 160h40" /></g>)
+    case 'approvals':
+      return (<g {...s}><rect x="40" y="35" width="120" height="95" rx="10" /><path d="M60 110l25-30 20 20 15-15 20 25" /><circle cx="150" cy="160" r="22" /><path d="M140 160l7 7 13-14" /></g>)
     default:
       return (<g {...s}><circle cx="100" cy="90" r="50" /></g>)
   }
