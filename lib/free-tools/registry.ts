@@ -25,7 +25,7 @@ export const FREE_TOOLS: FreeTool[] = [
     name: 'Invoice generator',
     title: 'Free Invoice Generator – Make a PDF Invoice, No Signup',
     h1: 'Free invoice generator',
-    description: 'Free invoice generator: add your details, line items, tax and notes, see a live preview, and download a clean PDF invoice. No signup, nothing stored.',
+    description: 'Free invoice generator: add your details, line items, tax and notes, see a live preview, and download a clean PDF invoice. No signup, and what you type is never stored.',
     blurb: 'Fill it in, watch the live preview, download a clean PDF. No signup.',
     feeds: { name: 'Invoices', href: '/pricing' },
     colors: ['#7c3aed', '#db2777'],
