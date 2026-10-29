@@ -1,12 +1,15 @@
+import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { Play } from 'lucide-react'
 import { Poster } from './poster'
 
 /** Full-width cinematic hero featuring one tool (no rotation). */
-export function Hero({ art, eyebrow, title, text, colors, shot, primary, secondary }: {
+export function Hero({ art, eyebrow, title, text, colors, shot, primary, secondary, children, primaryIcon = true }: {
   art: string; eyebrow: string; title: string; text: string
   colors: { from: string; to: string; accent: string }; shot?: string
   primary: { href: string; label: string }; secondary?: { href: string; label: string }
+  /** Extra content between the intro text and the buttons (home page strips). */
+  children?: ReactNode; primaryIcon?: boolean
 }) {
   return (
     <section className="relative isolate overflow-hidden" data-hero={art}>
@@ -20,9 +23,10 @@ export function Hero({ art, eyebrow, title, text, colors, shot, primary, seconda
         <div className="text-xs font-bold uppercase tracking-[0.3em]" style={{ color: colors.accent }}>{eyebrow}</div>
         <h1 className="mt-3 max-w-3xl text-4xl font-black leading-[1.02] tracking-tight text-white sm:text-6xl lg:text-7xl">{title}</h1>
         <p className="mt-4 max-w-xl text-base text-zinc-300 sm:text-lg">{text}</p>
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+        {children}
+        <div className={children ? 'mt-5 flex flex-col gap-3 sm:flex-row' : 'mt-8 flex flex-col gap-3 sm:flex-row'}>
           <Link href={primary.href} className="press inline-flex min-h-[52px] items-center justify-center gap-2 rounded-md bg-white px-7 text-base font-bold text-black hover:bg-zinc-200">
-            <Play className="h-5 w-5 fill-black" />{primary.label}
+            {primaryIcon && <Play className="h-5 w-5 fill-black" />}{primary.label}
           </Link>
           {secondary && (
             <Link href={secondary.href} className="press inline-flex min-h-[52px] items-center justify-center rounded-md bg-white/15 px-7 text-base font-bold text-white backdrop-blur hover:bg-white/25">{secondary.label}</Link>

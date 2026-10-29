@@ -6,6 +6,7 @@ import { AccessControls, FlagToggles } from './actions'
 import { DemoToggle, Hero, Panel, Sparkline, Stat, StatusPill, ToolChip, fmtDate, fmtDateTime, usd } from './ui'
 
 export type Overview = {
+  updates?: { active: number | null; unsubscribed: number | null }
   totals: { accounts: number; last7: number; last30: number; suspended: number; demoExcluded: number }
   series30: number[]
   seats: { tool: string; paid: number; comped: number }[]
@@ -28,6 +29,7 @@ export function OverviewView({ data, includeDemo }: { data: Overview; includeDem
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <p className="flex-1 text-xs text-zinc-400">{mrr.note}</p>
+          {data.updates && data.updates.active !== null && <p className="w-full text-xs text-zinc-400" data-updates-count>New-tools email list: <b className="text-white">{data.updates.active}</b> subscribed{data.updates.unsubscribed ? ` · ${data.updates.unsubscribed} unsubscribed` : ''} (counts only)</p>}
           <DemoToggle href={includeDemo ? '/admin' : '/admin?demo=1'} on={includeDemo} />
         </div>
       </Hero>

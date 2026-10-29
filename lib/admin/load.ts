@@ -105,7 +105,14 @@ export async function loadOverview(includeDemo = false) {
     return { key: t.key, label: t.label, count: error ? null : count ?? 0 }
   }))
   const created = counted.map((u) => u.createdAt)
+  const updCount = async (unsub: boolean) => {
+    const q: any = db.from('tool_updates_signups').select('id', { count: 'exact', head: true })
+    const { count, error } = await (unsub ? q.not('unsubscribed_at', 'is', null) : q.is('unsubscribed_at', null))
+    return error ? null : count ?? 0
+  }
+  const [updActive, updUnsub] = await Promise.all([updCount(false), updCount(true)])
   return {
+    updates: { active: updActive, unsubscribed: updUnsub },
     totals: {
       accounts: counted.length,
       last7: countSince(created, 7),

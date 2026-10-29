@@ -1,10 +1,16 @@
 import { Navbar } from '@/components/nav/navbar'
 import { Footer } from '@/components/nav/footer'
 import { getLaunchFlags } from '@/lib/flags'
-import { HOME_ROWS, HERO_TOOL_ID, getTool, toolsInRow } from '@/tools/registry'
+import { HERO_TOOL_ID, getTool, toolsInRow } from '@/tools/registry'
 import { Hero } from '@/components/showcase/hero'
-import { ToolRow } from '@/components/showcase/tool-row'
 import { toolCard } from '@/components/showcase/cards'
+import { FreeToolsStrip } from '@/components/home/free-tools-strip'
+import { ToolPicker } from '@/components/home/tool-picker'
+import { Examples } from '@/components/home/examples'
+import { WhyThis } from '@/components/home/why'
+import { SocialProofSlot } from '@/components/home/social-proof'
+import { UpdatesSignup } from '@/components/home/updates-signup'
+import { HOME_PRICE_LINE } from '@/lib/home/pricing-line'
 
 export const metadata = { alternates: { canonical: '/' } }
 
@@ -14,25 +20,29 @@ export const revalidate = 60
 export default async function Home() {
   const flags = await getLaunchFlags()
   const hero = getTool(HERO_TOOL_ID)!
+  const cards = (row: 'all' | 'coaches' | 'creators' | 'everyone') => toolsInRow(row, flags).map((t) => toolCard(t))
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Navbar />
       <main className="flex-1">
         <Hero
           art={hero.id}
-          eyebrow={hero.name}
+          eyebrow="SaaS Nation"
           title="Simple tools for coaches and creators. One price, no bloat."
-          text={hero.showcase.cardTagline}
+          text="Funnels, invoices, booking and more. Pick one tool or get them all."
           colors={hero.showcase.colors}
           shot={hero.showcase.shot}
-          primary={{ href: '/auth/register', label: 'Start building' }}
-          secondary={{ href: '/f/riverside-strategy-call', label: 'See it' }}
-        />
-        <div id="tools" className="relative z-10 -mt-10 space-y-2 pb-16 sm:-mt-16">
-          {HOME_ROWS.map((r) => (
-            <ToolRow key={r.id} id={r.id} title={r.title} cards={toolsInRow(r.id, flags).map((t) => toolCard(t))} />
-          ))}
-        </div>
+          primary={{ href: '/pricing', label: 'See pricing' }}
+          primaryIcon={false}
+        >
+          <FreeToolsStrip />
+          <p className="mt-6 text-sm font-semibold text-zinc-200" data-price-line>{HOME_PRICE_LINE}</p>
+        </Hero>
+        <ToolPicker rows={{ all: cards('all'), coaches: cards('coaches'), creators: cards('creators'), everyone: cards('everyone') }} />
+        <Examples />
+        <WhyThis />
+        <SocialProofSlot />
+        <UpdatesSignup />
       </main>
       <Footer />
     </div>
