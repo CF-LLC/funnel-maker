@@ -105,3 +105,13 @@ test('hasAccess honours All Access rows', () => {
   const src = fs.readFileSync(path.join(root, 'lib/access.ts'), 'utf8')
   assert.match(src, /\.in\('tool', \[tool, 'all'\]\)/)
 })
+
+test('changelog: live price + payment link ids grant tool=changelog (single)', async () => {
+  const map = parsePriceMap(JSON.stringify({ price_1UVujGDs9LwkRsZN2jodVk9P: { tool: 'changelog', plan: 'monthly' }, plink_1UVujWDs9LwkRsZNGvkAFJG5: { tool: 'changelog', plan: 'yearly' } }))
+  const s = fakeStore()
+  assert.equal((await handleEvent(signed(checkout('evt_cl1')), { store: s.api, priceMap: map, listLineItemPriceIds: async () => ['price_1UVujGDs9LwkRsZN2jodVk9P'] })).status, 'processed')
+  assert.equal(s.rows[0].tool, 'changelog'); assert.equal(s.rows[0].plan, 'monthly'); assert.equal(s.rows[0].source, 'single')
+  const s2 = fakeStore()
+  assert.equal((await handleEvent(signed(checkout('evt_cl2', { payment_link: 'plink_1UVujWDs9LwkRsZNGvkAFJG5' })), { store: s2.api, priceMap: map, listLineItemPriceIds: async () => [] })).status, 'processed')
+  assert.equal(s2.rows[0].tool, 'changelog'); assert.equal(s2.rows[0].plan, 'yearly')
+})

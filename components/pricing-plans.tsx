@@ -11,11 +11,11 @@ const SINGLE: { id: Exclude<SoldKey, 'all'>; name: string }[] = [
   { id: 'proposals', name: 'Proposals' }, { id: 'testimonials', name: 'Testimonials' }, { id: 'booking', name: 'Booking' },
   { id: 'dataremoval', name: 'Data Removal' }, { id: 'crm', name: 'CRM' },
   { id: 'emaillist', name: 'Email list' }, { id: 'downloads', name: 'Digital downloads' },
-  { id: 'portal', name: 'Client portal' },
+  { id: 'portal', name: 'Client portal' }, { id: 'changelog', name: 'Change log' },
 ]
 
 /** Pre-launch tools appear in the Single dropdown only when their launch flag (<id>_public / NEXT_PUBLIC_<ID>_ENABLED) is on. */
-const GATED: readonly string[] = ['crm', 'emaillist', 'downloads', 'portal']
+const GATED: readonly string[] = ['crm', 'emaillist', 'downloads', 'portal', 'changelog']
 export function singleTools(flags: Partial<Record<string, boolean>> = {}) {
   return SINGLE.filter((t) => !GATED.includes(t.id) || flags[t.id])
 }
