@@ -23,8 +23,11 @@ export const metadata: Metadata = {
   applicationName: "SaaS Nation",
   description: "SaaS Nation: simple tools for solo businesses. Funnel Maker, Invoices and Link-in-bio in one account.",
   icons: {
-    icon: '/icon.svg',
-    apple: '/icon.svg',
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: '16x16 32x32' },
+    ],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
 };
 
