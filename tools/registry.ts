@@ -13,9 +13,10 @@ import { crmTool } from './crm/tool'
 import { emaillistTool } from './emaillist/tool'
 import { downloadsTool } from './downloads/tool'
 import { portalTool } from './portal/tool'
+import { approvalsTool } from './approvals/tool'
 import { changelogTool } from './changelog/tool'
 
-export const TOOL_REGISTRY = [funnelsTool, invoicesTool, linkinbioTool, formsTool, proposalsTool, testimonialsTool, bookingTool, dataremovalTool, crmTool, emaillistTool, downloadsTool, portalTool, changelogTool] as const satisfies readonly ToolDef[]
+export const TOOL_REGISTRY = [funnelsTool, invoicesTool, linkinbioTool, formsTool, proposalsTool, testimonialsTool, bookingTool, dataremovalTool, crmTool, emaillistTool, downloadsTool, portalTool, approvalsTool, changelogTool] as const satisfies readonly ToolDef[]
 export type ToolId = (typeof TOOL_REGISTRY)[number]['id']
 export const TOOL_IDS = TOOL_REGISTRY.map((t) => t.id) as ToolId[]
 /** 'all' = All Access, one app_access row covering every tool. */
@@ -34,6 +35,7 @@ export const LAUNCH_FLAGS: Record<import('./types').LaunchFlag, boolean> = {
   emaillist: on(process.env.NEXT_PUBLIC_EMAILLIST_ENABLED),
   downloads: on(process.env.NEXT_PUBLIC_DOWNLOADS_ENABLED),
   portal: on(process.env.NEXT_PUBLIC_PORTAL_ENABLED),
+  approvals: on(process.env.NEXT_PUBLIC_APPROVALS_ENABLED),
   changelog: on(process.env.NEXT_PUBLIC_CHANGELOG_ENABLED),
 }
 export const LAUNCH_FLAG_KEYS = Object.keys(LAUNCH_FLAGS) as import('./types').LaunchFlag[]

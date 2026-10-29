@@ -87,7 +87,7 @@ test('email list is hidden until its launch flag is on', () => {
   assert.ok(reg.publicTools({ crm: true, emaillist: true }).some((x) => x.id === 'emaillist'))
   const pp = read('components/pricing-plans.tsx')
   assert.match(pp, /\{ id: 'emaillist', name: 'Email list' \}/)
-  assert.match(pp, /GATED: readonly string\[\] = \['crm', 'emaillist', 'downloads', 'portal', 'changelog'\]/)
+  assert.match(pp, /GATED: readonly string\[\] = \['crm', 'emaillist', 'downloads', 'portal', 'approvals', 'changelog'\]/)
   assert.match(pp, /!GATED\.includes\(t\.id\) \|\| flags\[t\.id\]/)
 })
 
