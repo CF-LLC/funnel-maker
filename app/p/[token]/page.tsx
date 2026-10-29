@@ -6,6 +6,7 @@ import { DEMO_TOKEN, fmtBytes, isToken, progress } from '@/lib/portal/core'
 import { getPublicPortal, type PublicPortal } from '@/lib/portal/public'
 import { DEMO_OWNER, demoFiles, demoItems, demoPortals, demoTasks } from '@/lib/portal/demo'
 import { ClientChecklist } from '@/components/portal/client-checklist'
+import { MadeWith } from '@/components/made-with'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Your client portal', robots: { index: false, follow: false, nocache: true }, referrer: 'no-referrer' }
@@ -76,6 +77,7 @@ export default async function ClientPortal({ params, searchParams }: { params: P
         {!v.tasks.length && !v.items.length && !v.files.length && <p className="rounded-xl border border-white/10 bg-white/[0.04] p-4 text-zinc-300">Nothing here yet. {v.owner} will add things soon.</p>}
         <p className="pt-4 text-center text-xs text-zinc-600">This page is private to you. Please don’t share the link.</p>
       </main>
+      <MadeWith tool="portal" />
     </div>
   )
 }

@@ -1,0 +1,10 @@
+// Long-tail guides: static, indexable, canonical. Honest copy only (no stats, testimonials or features we don't have).
+export const GUIDES_PATH = '/guides'
+export type Guide = { slug: string; title: string; h1: string; description: string; tool: { name: string; href: string }; freeTool: { name: string; href: string }; colors: [string, string] }
+export const GUIDES: Guide[] = [
+  { slug: 'scope-creep-email-template', title: 'Scope creep email template (copy and paste) | SaaS Nation', h1: 'Scope creep email template', description: 'Polite, copy-paste email templates for when a client asks for “just one more thing”: name the extra, price it, and get a clear yes or no before you start.', tool: { name: 'Change log', href: '/pricing' }, freeTool: { name: 'Freelance hourly rate calculator', href: '/free-tools/hourly-rate-calculator' }, colors: ['#c084fc', '#7c3aed'] },
+  { slug: 'how-to-get-client-design-approval', title: 'How to get a client to approve a design | SaaS Nation', h1: 'How to get a client to approve a design', description: 'A simple, repeatable way to get clear sign-off on designs and drafts: one link, numbered versions, comments in one place, and an explicit Approve or Request changes.', tool: { name: 'Approval link', href: '/pricing' }, freeTool: { name: 'Email signature generator', href: '/free-tools/email-signature-generator' }, colors: ['#34d399', '#059669'] },
+  { slug: 'client-onboarding-checklist', title: 'Client onboarding checklist for freelancers and coaches | SaaS Nation', h1: 'Client onboarding checklist', description: 'A practical client onboarding checklist for freelancers, coaches and small studios: what to collect, what to send, and how to keep it all in one place for the client.', tool: { name: 'Client portal', href: '/pricing' }, freeTool: { name: 'Free invoice generator', href: '/free-tools/invoice-generator' }, colors: ['#38bdf8', '#0369a1'] },
+]
+export const guidePath = (slug: string) => `${GUIDES_PATH}/${slug}`
+export const getGuide = (slug: string) => GUIDES.find((g) => g.slug === slug)

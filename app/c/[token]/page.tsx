@@ -6,6 +6,7 @@ import { DEMO_TOKEN, isToken, money, requestCents, type Req } from '@/lib/change
 import { getPublicLog, type PublicLog } from '@/lib/changelog/public'
 import { DEMO_OWNER, demoProjects, demoRequests } from '@/lib/changelog/demo'
 import { ClientRequests } from '@/components/changelog/client-requests'
+import { MadeWith } from '@/components/made-with'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Extra requests', robots: { index: false, follow: false, nocache: true }, referrer: 'no-referrer' }
@@ -49,6 +50,7 @@ export default async function ClientChangeLog({ params }: { params: Promise<{ to
         <ClientRequests token={token} initial={v.requests} currency={v.currency} rate={v.hourly_rate_cents} demo={demo} />
         <p className="pt-8 text-center text-xs text-zinc-600">This page is private to you. Please don’t share the link.</p>
       </main>
+      <MadeWith tool="changelog" />
     </div>
   )
 }

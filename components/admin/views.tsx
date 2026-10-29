@@ -182,7 +182,8 @@ export function SystemView({ s, preview = false, emailOf }: { s: System; preview
   )
 }
 
-export type FunnelData = { days: number; error: boolean; total: FRow | null; bySource: FRow[]; byTool: FRow[] }
+export type FunnelData = { days: number; error: boolean; total: FRow | null; bySource: FRow[]; byTool: FRow[]; byRef?: RRow[] }
+type RRow = { key: string; visitors: number; ctaClicks: number; ctaVisitors: number; signups: number; paying: number }
 type FRow = { key: string; visitors: number; freeToolUsers: number; signups: number; paying: number }
 const pct = (a: number, b: number) => (b ? `${Math.round((a / b) * 100)}%` : '—')
 
@@ -204,6 +205,9 @@ export function FunnelView({ f }: { f: FunnelData }) {
         {f.error && <p className="text-sm text-rose-300">Could not read funnel events.</p>}
       </Hero>
       <Panel title="By UTM source"><DataTable columns={cols} rows={rows(f.bySource)} pageSize={15} placeholder="Search source" empty="No visits recorded yet." /></Panel>
+      <Panel title="By “Made with SaaS Nation” ref (client pages)">
+        <DataTable columns={['Ref', 'Visitors', 'CTA clicks', 'Clicked a CTA', 'Signed up', 'Paying']} rows={(f.byRef ?? []).map((r) => ({ id: r.key, search: r.key, cells: [{ text: r.key, tone: 'strong' }, String(r.visitors), String(r.ctaClicks), `${r.ctaVisitors} (${pct(r.ctaVisitors, r.visitors)})`, `${r.signups} (${pct(r.signups, r.visitors)})`, `${r.paying} (${pct(r.paying, r.signups)})`] }))} pageSize={10} placeholder="Search ref" empty="No visits from client-page footer links yet." />
+      </Panel>
       <Panel title="By free tool"><DataTable columns={['Free tool', ...cols.slice(1)]} rows={rows(f.byTool)} pageSize={15} placeholder="Search tool" empty="No free tool visits yet." /></Panel>
     </div>
   )

@@ -6,6 +6,7 @@ import { DEMO_TOKEN, isToken, vLabel } from '@/lib/approvals/core'
 import { getPublicView, type PublicView } from '@/lib/approvals/public'
 import { DEMO_OWNER, DEMO_PREVIEW, demoComments, demoItems, demoVersions } from '@/lib/approvals/demo'
 import { ClientView } from '@/components/approvals/client-view'
+import { MadeWith } from '@/components/made-with'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Ready for your approval', robots: { index: false, follow: false, nocache: true }, referrer: 'no-referrer' }
@@ -45,6 +46,7 @@ export default async function ClientApproval({ params }: { params: Promise<{ tok
         {v.versions.length > 1 && <p className="pt-6 text-center text-xs text-zinc-500">Earlier versions: {v.versions.slice(1).map((x) => `${vLabel(x.number)} (${x.status === 'approved' ? 'approved' : x.status === 'changes' ? 'changes requested' : 'replaced'})`).join(' · ')}</p>}
         <p className="pt-4 text-center text-xs text-zinc-600">This page is private to you. Please don’t share the link.</p>
       </main>
+      <MadeWith tool="approvals" />
     </div>
   )
 }
