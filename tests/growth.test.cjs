@@ -54,3 +54,12 @@ test('guides: static, indexable, canonical, in the sitemap; honest copy', () => 
     assert.doesNotMatch(s.replace(/doesn’t send (emails|reminders)[^.]*\.|isn’t an e-signature tool/g, ''), /reminder|e-sign|we host/i)
   }
 })
+
+test('guides index: canonical, indexable, in sitemap, linked from footer and /free-tools', () => {
+  const s = read('app/guides/page.tsx')
+  assert.match(s, /canonical: GUIDES_PATH/); assert.doesNotMatch(s, /noindex|index: false|force-dynamic/)
+  assert.match(s, /href="\/free-tools"/); assert.match(s, /href="\/pricing"/)
+  assert.match(read('app/sitemap.ts'), /GUIDES_PATH, \.\.\.GUIDES/)
+  assert.match(read('components/nav/footer.tsx'), /href="\/guides"/)
+  assert.match(read('app/free-tools/page.tsx'), /href="\/guides"/)
+})

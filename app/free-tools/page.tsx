@@ -40,6 +40,7 @@ export default function FreeToolsIndex() {
             </Link>
           ))}
         </div>
+        <p className="container mx-auto px-4 pb-12 text-sm text-zinc-400">Looking for how-tos? Read our <Link href="/guides" className="font-semibold text-violet-300 hover:text-white">guides for freelancers</Link>.</p>
       </main>
       <Footer />
     </div>
