@@ -7,6 +7,9 @@ import { Hero } from '@/components/showcase/hero'
 import { ToolRow } from '@/components/showcase/tool-row'
 import { toolCard } from '@/components/showcase/cards'
 import { recentWork, ago } from '@/components/showcase/dashboard-data'
+import { OnboardingChecklist, type Step } from '@/components/dashboard/onboarding'
+import { UpsellTiles } from '@/components/dashboard/upsell-tiles'
+import { recordSignupOnce } from '@/lib/acquisition/server'
 
 export const metadata = { title: 'Dashboard' }
 
@@ -16,10 +19,12 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const checkoutSuccess = sp.checkout === 'success'
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  const [{ data: profile }, { data: access }, recent] = await Promise.all([
+  const [{ data: profile }, { data: access }, recent, { count: orgCount }] = await Promise.all([
     (supabase.from('users') as any).select('approved').eq('id', user!.id).maybeSingle(),
     (supabase as any).from('app_access').select('tool, active').eq('user_id', user!.id),
     recentWork(supabase, user!.id),
+    (supabase as any).from('organizations').select('id', { count: 'exact', head: true }).eq('owner_id', user!.id),
+    recordSignupOnce(user!.id),
   ])
   const approved = !!profile?.approved
   const active = new Set<string>((access || []).filter((r: any) => r.active).map((r: any) => r.tool))
@@ -31,6 +36,12 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
   const last = recent[0]
   const heroTool = getTool(last?.tool ?? mine[0]?.id ?? 'funnels')!
+  const steps: Step[] = [
+    { id: 'approved', label: 'Account approved', hint: approved ? 'You can publish and share.' : 'Usually within 24 hours.', href: '/dashboard', done: approved },
+    { id: 'plan', label: 'Pick your tools', hint: 'One tool or All Access.', href: '/pricing', done: active.size > 0 },
+    { id: 'create', label: 'Make your first thing', hint: mine[0] ? `Start in ${mine[0].name}.` : 'A funnel, invoice or page.', href: mine[0]?.route ?? '/funnels/templates', done: recent.length > 0 },
+    { id: 'org', label: 'Add your business', hint: 'Name and team, in Organizations.', href: '/dashboard/organizations', done: (orgCount ?? 0) > 0 },
+  ]
 
   return (
     <div className="-mx-4 -mt-4 space-y-2 pb-10 sm:-mx-6 sm:-mt-6 lg:-mx-8 lg:-mt-8">
@@ -72,7 +83,10 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           const t = getTool(i.tool)!
           return { id: `${i.tool}-${i.id}`, art: t.id, name: i.title, tagline: `${t.name} · ${ago(i.at)}`, colors: t.showcase.colors, shot: t.showcase.shot, href: i.href, cta: 'Continue', badge: t.name }
         })} />
-        <ToolRow id="try-next" title="Try next" cards={locked.map((t) => toolCard(t, { href: '/pricing', cta: 'Unlock', badge: 'Locked' }))} />
+      </div>
+      <OnboardingChecklist steps={steps} />
+      <UpsellTiles tools={locked} />
+      <div>
       </div>
     </div>
   )

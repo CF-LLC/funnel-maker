@@ -11,6 +11,7 @@ export type Overview = {
   series30: number[]
   seats: { tool: string; paid: number; comped: number }[]
   mrr: { cents: number; source: 'stripe' | 'estimate'; note: string }
+  revenue?: { source: 'stripe' | 'estimate'; last30Cents: number | null; invoices: number; note: string }
   usage: { key: string; label: string; count: number | null }[]
 }
 
@@ -29,6 +30,13 @@ export function OverviewView({ data, includeDemo }: { data: Overview; includeDem
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <p className="flex-1 text-xs text-zinc-400">{mrr.note}</p>
+          {data.revenue && (
+            <p className="w-full text-xs text-zinc-400" data-revenue={data.revenue.source}>
+              {data.revenue.source === 'stripe' && data.revenue.last30Cents !== null
+                ? <>Collected, last 30 days: <b className="text-white">{usd(data.revenue.last30Cents)}</b> from {data.revenue.invoices} paid invoice{data.revenue.invoices === 1 ? '' : 's'}. {data.revenue.note}</>
+                : <><span className="mr-1 rounded-full bg-amber-500/15 px-2 py-0.5 font-bold text-amber-200 ring-1 ring-amber-400/30">Estimate only</span>{data.revenue.note}</>}
+            </p>
+          )}
           {data.updates && data.updates.active !== null && <p className="w-full text-xs text-zinc-400" data-updates-count>New-tools email list: <b className="text-white">{data.updates.active}</b> subscribed{data.updates.unsubscribed ? ` · ${data.updates.unsubscribed} unsubscribed` : ''} (counts only)</p>}
           <DemoToggle href={includeDemo ? '/admin' : '/admin?demo=1'} on={includeDemo} />
         </div>
@@ -170,6 +178,33 @@ export function SystemView({ s, preview = false, emailOf }: { s: System; preview
         <Panel title="Admin audit log"><DataTable columns={['Action', 'Target', 'Detail', 'When']} pageSize={8} rows={s.audit.map((a) => ({ id: String(a.id), href: a.target_user_id ? `/admin/users/${a.target_user_id}` : undefined, cells: [{ text: a.action, tone: 'strong' }, a.target_user_id ? emailOf[a.target_user_id] || a.target_user_id.slice(0, 8) : '—', a.detail ? Object.entries(a.detail).map(([k, v]) => `${k}=${v}`).join(' ') : '', fmtDateTime(a.created_at)] }))} empty="No admin actions yet." /></Panel>
       </div>
       <Panel title="Recent errors"><DataTable columns={['Route', 'Message', 'User', 'When']} pageSize={10} rows={s.errors.map((e) => ({ id: String(e.id), cells: [{ text: e.route, tone: 'strong' }, e.message, e.user_id ? emailOf[e.user_id] || e.user_id.slice(0, 8) : '—', fmtDateTime(e.created_at)] }))} empty="No errors logged. Nice." /></Panel>
+    </div>
+  )
+}
+
+export type FunnelData = { days: number; error: boolean; total: FRow | null; bySource: FRow[]; byTool: FRow[] }
+type FRow = { key: string; visitors: number; freeToolUsers: number; signups: number; paying: number }
+const pct = (a: number, b: number) => (b ? `${Math.round((a / b) * 100)}%` : '—')
+
+export function FunnelView({ f }: { f: FunnelData }) {
+  const t = f.total
+  const rows = (list: FRow[]): Row[] => list.map((r) => ({ id: r.key, search: r.key, cells: [{ text: r.key, tone: 'strong' }, String(r.visitors), `${r.freeToolUsers} (${pct(r.freeToolUsers, r.visitors)})`, `${r.signups} (${pct(r.signups, r.visitors)})`, `${r.paying} (${pct(r.paying, r.signups)})`] }))
+  const cols = ['Source', 'Visitors', 'Used a free tool', 'Signed up', 'Paying']
+  return (
+    <div className="space-y-6">
+      <Hero eyebrow="Admin · Funnel" title="Where customers come from" text={`Last ${f.days} days. Anonymous first-party visitor id; source is the first UTM tag seen (else "direct / none"). Paying = active paid seat. Starts counting from when this shipped.`}>
+        {t && (
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <Stat label="Visitors" value={t.visitors} />
+            <Stat label="Used a free tool" value={t.freeToolUsers} sub={pct(t.freeToolUsers, t.visitors)} />
+            <Stat label="Signed up" value={t.signups} sub={`${pct(t.signups, t.visitors)} of visitors`} />
+            <Stat label="Paying" value={t.paying} sub={`${pct(t.paying, t.signups)} of signups`} />
+          </div>
+        )}
+        {f.error && <p className="text-sm text-rose-300">Could not read funnel events.</p>}
+      </Hero>
+      <Panel title="By UTM source"><DataTable columns={cols} rows={rows(f.bySource)} pageSize={15} placeholder="Search source" empty="No visits recorded yet." /></Panel>
+      <Panel title="By free tool"><DataTable columns={['Free tool', ...cols.slice(1)]} rows={rows(f.byTool)} pageSize={15} placeholder="Search tool" empty="No free tool visits yet." /></Panel>
     </div>
   )
 }

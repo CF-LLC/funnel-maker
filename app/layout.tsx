@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { SessionProvider } from "@/components/session-provider";
 import { Toaster } from "@/components/ui/toast";
+import { Beacon } from "@/components/tracking/beacon";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -48,6 +49,7 @@ export default function RootLayout({
           {children}
         </SessionProvider>
         <Toaster />
+        <Beacon />
       </body>
     </html>
   );

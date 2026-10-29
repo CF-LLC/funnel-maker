@@ -17,3 +17,8 @@ export function cleanSourcePage(v: unknown): string {
 export function isUuid(v: unknown): v is string {
   return typeof v === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v)
 }
+
+/** Public unsubscribe link for a signup's private token (for future update email footers). */
+export function unsubscribeUrl(siteUrl: string, token: string): string {
+  return `${siteUrl.replace(/\/+$/, '')}/updates/unsubscribe?token=${encodeURIComponent(token)}`
+}

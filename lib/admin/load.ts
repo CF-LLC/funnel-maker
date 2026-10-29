@@ -123,6 +123,7 @@ export async function loadOverview(includeDemo = false) {
     series30: dailySeries(created, 30),
     seats: seatsByPlan(access),
     mrr: await loadMrr(access),
+    revenue: await loadRevenue(),
     usage,
   }
 }
@@ -180,4 +181,53 @@ export async function loadUserDetail(id: string) {
 
 export async function audit(adminId: string, action: string, targetUserId: string | null, detail: Record<string, unknown>) {
   return serviceClient().from('admin_audit').insert({ admin_id: adminId, action, target_user_id: targetUserId, detail })
+}
+
+export type Revenue = { source: 'stripe' | 'estimate'; last30Cents: number | null; invoices: number; note: string }
+
+/**
+ * Collected revenue, last 30 days, read live from Stripe when STRIPE_SECRET_KEY is set on the server
+ * (a restricted, read-only key: Invoices read + Subscriptions read is enough). Only invoices with a SaaS Nation price
+ * (STRIPE_PRICE_MAP) count. Without a key it returns an explicit "estimate only" state. Never writes to Stripe.
+ */
+export async function loadRevenue(): Promise<Revenue> {
+  if (!process.env.STRIPE_SECRET_KEY) return { source: 'estimate', last30Cents: null, invoices: 0, note: 'Estimate only: no Stripe key on this server, so collected revenue cannot be read. MRR above is estimated from seats.' }
+  try {
+    const map = parsePriceMap(process.env.STRIPE_PRICE_MAP)
+    const since = Math.floor(Date.now() / 1000) - 30 * 86400
+    let cents = 0
+    let n = 0
+    for await (const inv of getStripe().invoices.list({ status: 'paid', created: { gte: since }, limit: 100, expand: ['data.lines'] })) {
+      const ours = inv.lines.data.some((l: any) => {
+        const pid = l.pricing?.price_details?.price ?? l.price?.id
+        return !Object.keys(map).length || (pid && map[pid])
+      })
+      if (!ours) continue
+      cents += inv.amount_paid ?? 0
+      if (++n > 5000) break
+    }
+    return { source: 'stripe', last30Cents: cents, invoices: n, note: 'Live from Stripe (read-only): paid invoices in the last 30 days on SaaS Nation prices, after discounts, before Stripe fees and refunds.' }
+  } catch {
+    return { source: 'estimate', last30Cents: null, invoices: 0, note: 'Estimate only: the Stripe read failed (check the key is a restricted key with Invoices read).' }
+  }
+}
+
+/** Acquisition funnel: visitors -> free tool -> signup -> paying, by first UTM source and by free tool. Demo accounts are excluded. */
+export async function loadFunnel(days = 30) {
+  const { buildFunnel } = await import('@/lib/acquisition/core')
+  const db = serviceClient()
+  const since = new Date(Date.now() - days * 86400_000).toISOString()
+  const events: any[] = []
+  for (let from = 0; from < 200_000; from += 1000) {
+    const { data, error } = await db.from('acquisition_events').select('visitor_id, kind, free_tool, utm_source, utm_medium, utm_campaign, user_id').gte('created_at', since).order('id').range(from, from + 999)
+    if (error) return { days, error: true as const, total: null, bySource: [], byTool: [] }
+    events.push(...(data ?? []))
+    if (!data || data.length < 1000) break
+  }
+  const demo = demoUserIds()
+  const { data: access } = await db.from('app_access').select('user_id, tool, plan, source, active, stripe_subscription_id').eq('active', true).limit(50000)
+  const { isPaidSeat } = await import('./core')
+  const paid = new Set<string>(((access ?? []) as AccessRow[]).filter(isPaidSeat).map((r) => r.user_id))
+  const clean = events.filter((e) => !(e.user_id && demo.has(String(e.user_id).toLowerCase())))
+  return { days, error: false as const, ...buildFunnel(clean, paid) }
 }
