@@ -9,6 +9,7 @@ import { DemoBanner } from '@/components/demo-banner'
 import { SlotPicker } from '@/components/booking/slot-picker'
 import { Backdrop, Monogram } from '@/components/booking/backdrop'
 import { isDemoUser } from '@/lib/demo'
+import { MadeWith } from '@/components/made-with'
 
 export const dynamic = 'force-dynamic'
 type P = { params: Promise<{ handle: string; type: string }>; searchParams: Promise<{ embed?: string }> }
@@ -57,7 +58,7 @@ export default async function BookType({ params, searchParams }: P) {
           <SlotPicker handle={o.handle} type={t.slug} typeName={t.name} ownerName={name} location={t.location} slots={slots} demo={demo} emailOn={emailConfigured()} />
         </div>
       </main>
-      {!embed && <footer className="pb-10 text-center text-xs text-zinc-500"><Link href="/pricing" className="hover:text-zinc-300">Made with SaaS Nation</Link></footer>}
+      {!embed && <MadeWith tool="booking" />}
     </div>
     </>
   )

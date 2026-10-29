@@ -224,8 +224,8 @@ export async function loadFunnel(days = 30) {
   const since = new Date(Date.now() - days * 86400_000).toISOString()
   const events: any[] = []
   for (let from = 0; from < 200_000; from += 1000) {
-    const { data, error } = await db.from('acquisition_events').select('visitor_id, kind, free_tool, utm_source, utm_medium, utm_campaign, user_id').gte('created_at', since).order('id').range(from, from + 999)
-    if (error) return { days, error: true as const, total: null, bySource: [], byTool: [] }
+    const { data, error } = await db.from('acquisition_events').select('visitor_id, kind, free_tool, utm_source, utm_medium, utm_campaign, user_id, ref').gte('created_at', since).order('id').range(from, from + 999)
+    if (error) return { days, error: true as const, total: null, bySource: [], byTool: [], byRef: [] }
     events.push(...(data ?? []))
     if (!data || data.length < 1000) break
   }

@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { getPublicInvoice } from '@/lib/invoices/public'
 import { InvoicePreview } from '@/components/invoices/invoice-preview'
 import { formatCurrency, safePayLink, totals } from '@/lib/invoices/core'
+import { MadeWith } from '@/components/made-with'
 
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = { title: 'Invoice', robots: { index: false, follow: false } }
@@ -23,7 +24,7 @@ export default async function PublicInvoicePage({ params }: { params: Promise<{ 
           )}
         </div>
         <InvoicePreview d={inv} />
-        <p className="text-center text-xs text-slate-400">Made with SaaS Nation Invoices</p>
+        <MadeWith tool="invoices" className="text-slate-400 hover:text-slate-600" />
       </div>
     </main>
   )

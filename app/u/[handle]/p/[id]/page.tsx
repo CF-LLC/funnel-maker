@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getPublicProposal } from '@/lib/proposals/public'
@@ -9,6 +8,7 @@ import { ReviewList } from '@/components/testimonials/review-list'
 import { ProposalResponse } from '@/components/proposals/public-response'
 import { DemoBanner } from '@/components/demo-banner'
 import { isDemoUser } from '@/lib/demo'
+import { MadeWith } from '@/components/made-with'
 
 export const dynamic = 'force-dynamic'
 type P = { params: Promise<{ handle: string; id: string }> }
@@ -55,7 +55,7 @@ export default async function PublicProposalPage({ params }: P) {
         {s === 'expired' && <p role="status" className="rounded-xl border bg-amber-50 p-4 text-amber-900">This proposal has expired. Contact the sender for an updated one.</p>}
         {reviews && <section className="space-y-3"><h2 className="text-lg font-semibold">What clients say</h2><ReviewList reviews={reviews.reviews} layout={reviews.layout} handle={reviews.handle} /></section>}
       </main>
-      <footer className="mt-12 text-xs text-muted-foreground"><Link href="/pricing" className="hover:underline">Made with SaaS Nation</Link></footer>
+      <MadeWith tool="proposals" className="text-muted-foreground hover:underline" />
     </div>
     </>
   )

@@ -7,6 +7,7 @@ import { bookPath } from '@/lib/booking/core'
 import { DemoBanner } from '@/components/demo-banner'
 import { Backdrop, Monogram } from '@/components/booking/backdrop'
 import { isDemoUser } from '@/lib/demo'
+import { MadeWith } from '@/components/made-with'
 
 export const dynamic = 'force-dynamic'
 type P = { params: Promise<{ handle: string }> }
@@ -54,7 +55,7 @@ export default async function BookIndex({ params }: P) {
           </ul>
         )}
       </main>
-      <footer className="pb-10 text-center text-xs text-zinc-500"><Link href="/pricing" className="hover:text-zinc-300">Made with SaaS Nation</Link></footer>
+      <MadeWith tool="booking" />
     </div>
     </>
   )
