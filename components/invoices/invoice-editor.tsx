@@ -69,6 +69,14 @@ export function InvoiceEditor({ id }: { id?: string }) {
     set('lines', [...lines, { description: it.description, quantity: '1', price: (Number(it.unit_price_cents) / 100).toFixed(2) }])
   }
 
+  const remove = async () => {
+    if (!id || !confirm('Delete this invoice? Any tracked time on it goes back to unbilled.')) return
+    setSaving(true); setErrors([])
+    const { error } = await supabase.from('inv_invoices').delete().eq('id', id)
+    setSaving(false)
+    if (error) { setErrors(['Could not delete invoice']); return }
+    router.push('/invoices'); router.refresh()
+  }
   const save = async () => {
     setErrors([])
     const parsed = invoiceSchema.safeParse(f)
@@ -143,7 +151,8 @@ export function InvoiceEditor({ id }: { id?: string }) {
           <label className="mt-2 block"><span className="font-medium">Address</span><textarea className="mt-1 w-full rounded-md border bg-background px-3 py-2" rows={2} value={f.sellerAddress} onChange={(e) => set('sellerAddress', e.target.value)} /></label>
         </details>
         {errors.length > 0 && <ul className="text-sm text-red-600" role="alert">{errors.map((e, i) => <li key={i}>{e}</li>)}</ul>}
-        <div className="flex items-center gap-3"><Button onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save invoice'}</Button>
+        <div className="flex flex-wrap items-center gap-3"><Button onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save invoice'}</Button>
+          {id && <Button type="button" variant="ghost" className="text-red-600" disabled={saving} onClick={remove}><Trash2 className="mr-1 h-4 w-4" />Delete invoice</Button>}
           <span className="text-sm text-muted-foreground">Total {formatCurrency(t.total, f.currency.length === 3 ? f.currency.toUpperCase() : 'USD')}</span></div>
       </div>
       <div className="xl:sticky xl:top-20 h-fit">
