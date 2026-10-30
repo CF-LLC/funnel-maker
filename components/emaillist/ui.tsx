@@ -1,5 +1,6 @@
 'use client'
 import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 export const btn = 'inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold transition disabled:opacity-50'
 export const btnPrimary = `${btn} bg-white text-black hover:bg-zinc-200`
@@ -15,13 +16,15 @@ export function Modal({ open, onClose, title, children }: { open: boolean; onClo
     window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k)
   }, [open, onClose])
   if (!open) return null
-  return (
+  // Portal to <body>: the .page-enter wrapper keeps a transform, which would make `fixed` relative to the page, not the screen.
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-0 backdrop-blur-sm sm:items-center sm:p-4" onClick={onClose}>
       <div role="dialog" aria-modal="true" aria-label={title} className="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-3xl border border-white/10 bg-[#141418] p-5 shadow-2xl sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
         <div className="mb-4 flex items-center justify-between"><h2 className="text-lg font-bold">{title}</h2><button onClick={onClose} aria-label="Close" className="rounded-full px-2 text-2xl leading-none text-zinc-400 hover:text-white">×</button></div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 
