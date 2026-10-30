@@ -19,7 +19,7 @@ const dockerfile = fs.readFileSync(path.join(root, 'Dockerfile'), 'utf8');
 const compose = fs.readFileSync(path.join(root, 'docker-compose.yml'), 'utf8');
 
 test('code uses the per-tool Stripe links', () => {
-  for (const t of ['INVOICES', 'FORMS', 'PROPOSALS', 'TESTIMONIALS', 'ALL', 'BOOKING', 'DATAREMOVAL', 'CRM', 'EMAILLIST', 'DOWNLOADS', 'PORTAL', 'APPROVALS', 'CHANGELOG', 'TIME', 'EXPENSES'])
+  for (const t of ['INVOICES', 'FORMS', 'PROPOSALS', 'TESTIMONIALS', 'ALL', 'BOOKING', 'DATAREMOVAL', 'CRM', 'EMAILLIST', 'DOWNLOADS', 'PORTAL', 'APPROVALS', 'CHANGELOG', 'TIME', 'EXPENSES', 'REPORTS'])
     for (const p of ['MONTHLY', 'YEARLY']) assert.ok(used.has(`NEXT_PUBLIC_STRIPE_LINK_${t}_${p}`), `${t}_${p}`);
 });
 test('every NEXT_PUBLIC_* used in code is an ARG+ENV in the Dockerfile and a build arg in compose', () => {
@@ -34,9 +34,21 @@ test('CRM is in plans and gated in the Single dropdown', () => {
   const plans = fs.readFileSync(path.join(root, 'lib/plans.ts'), 'utf8');
   assert.match(plans, /crm: \{ monthly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_CRM_MONTHLY, yearly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_CRM_YEARLY \}/);
   const pp = fs.readFileSync(path.join(root, 'components/pricing-plans.tsx'), 'utf8');
-  assert.match(pp, /GATED: readonly string\[\] = \['crm', 'emaillist', 'downloads', 'portal', 'approvals', 'changelog', 'time', 'expenses'\]/);
+  assert.match(pp, /GATED: readonly string\[\] = \['crm', 'emaillist', 'downloads', 'portal', 'approvals', 'changelog', 'time', 'expenses', 'reports'\]/);
   assert.match(plans, /emaillist: \{ monthly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_EMAILLIST_MONTHLY, yearly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_EMAILLIST_YEARLY \}/);
   assert.match(plans, /downloads: \{ monthly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_DOWNLOADS_MONTHLY, yearly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_DOWNLOADS_YEARLY \}/);
   assert.match(plans, /portal: \{ monthly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_PORTAL_MONTHLY, yearly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_PORTAL_YEARLY \}/);
   assert.match(fs.readFileSync(path.join(root, 'app/pricing/page.tsx'), 'utf8'), /<PricingPlans flags=\{flags\} \/>/);
+});
+
+test('Report kit links: build args wired and unset links fall back gracefully', () => {
+  for (const v of ['NEXT_PUBLIC_REPORTS_ENABLED', 'NEXT_PUBLIC_STRIPE_LINK_REPORTS_MONTHLY', 'NEXT_PUBLIC_STRIPE_LINK_REPORTS_YEARLY']) {
+    assert.match(dockerfile, new RegExp(`^ARG ${v}$`, 'm')); assert.match(compose, new RegExp(`${v}: \\$\\{${v}:-\\}`))
+  }
+  const jiti = require('jiti')(__filename, { alias: { '@': root } })
+  const saved = { m: process.env.NEXT_PUBLIC_STRIPE_LINK_REPORTS_MONTHLY, y: process.env.NEXT_PUBLIC_STRIPE_LINK_REPORTS_YEARLY }
+  delete process.env.NEXT_PUBLIC_STRIPE_LINK_REPORTS_MONTHLY; delete process.env.NEXT_PUBLIC_STRIPE_LINK_REPORTS_YEARLY
+  const plans = jiti('../lib/plans.ts')
+  assert.ok(!plans.PAYMENT_LINKS.reports.monthly); assert.ok(!plans.PAYMENT_LINKS.reports.yearly)
+  if (saved.m) process.env.NEXT_PUBLIC_STRIPE_LINK_REPORTS_MONTHLY = saved.m; if (saved.y) process.env.NEXT_PUBLIC_STRIPE_LINK_REPORTS_YEARLY = saved.y
 });
