@@ -44,7 +44,7 @@ test('beacon: Do-Not-Track respected; never runs on client-facing pages; no PII'
 })
 
 test('guides: static, indexable, canonical, in the sitemap; honest copy', () => {
-  assert.equal(G.GUIDES.length, 3)
+  assert.equal(G.GUIDES.length, 4)
   const sm = read('app/sitemap.ts'); assert.match(sm, /GUIDES\.map/)
   for (const g of G.GUIDES) {
     const s = read(`app/guides/${g.slug}/page.tsx`)

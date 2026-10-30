@@ -278,3 +278,33 @@ test('email signature: no storage, network or upload in the tool', () => {
   assert.match(src, /alternates: \{ canonical: freeToolPath/)
   assert.ok(sitemap().some((e) => e.url.endsWith('/free-tools/email-signature-generator')))
 })
+
+test('late invoice kit: days late, fee math, reminders (no send), guide + sitemap', () => {
+  const li = jiti('../lib/free-tools/late-invoice.ts')
+  assert.equal(li.daysLateFrom('2026-10-01', new Date(2026, 9, 22)), 21)
+  assert.equal(li.daysLateFrom('2026-11-01', new Date(2026, 9, 22)), 0)
+  assert.equal(li.daysLateFrom('nope'), 0)
+  assert.deepEqual(li.lateFee(1200, 'monthly', 1.5, 21), { fee: 12.6, total: 1212.6 })
+  assert.deepEqual(li.lateFee(1200, 'flat', 5, 3), { fee: 60, total: 1260 })
+  assert.deepEqual(li.lateFee(1200, 'flat', 5, 0), { fee: 0, total: 1200 })
+  assert.deepEqual(li.lateFee(-5, 'monthly', 999, 10), { fee: 0, total: 0 })
+  const inp = { number: 'INV-7', amount: 1200, dueDate: '2026-10-01', daysLate: 21, client: 'Acme', you: 'Sam', mode: 'monthly', ratePct: 1.5 }
+  for (const tone of ['warm', 'neutral', 'direct']) {
+    const r = li.reminders(inp, tone)
+    assert.equal(r.length, 3)
+    assert.deepEqual(r.map((m) => m.step), [1, 2, 3])
+    for (const m of r) { assert.match(m.body, /INV-7/); assert.match(m.body, /Acme/); assert.match(m.body, /Sam/); assert.doesNotMatch(m.body + m.subject, /mailto:|undefined|NaN/) }
+    assert.doesNotMatch(r[0].body, /late fee/)
+    assert.match(r[2].body, /\$12\.60/)
+  }
+  const blank = li.reminders({ ...inp, number: '', client: '', you: '' }, 'neutral')
+  assert.match(blank[0].body, /\[client name\]/)
+  const src = fs.readFileSync(path.join(root, 'components/free-tools/late-invoice-kit.tsx'), 'utf8')
+  assert.doesNotMatch(src, /mailto:|fetch\(|localStorage|sessionStorage/)
+  assert.match(src, /not legal advice/)
+  assert.match(src, /@media print/)
+  const urls = sitemap().map((e) => new URL(e.url).pathname)
+  assert.ok(urls.includes('/free-tools/late-invoice-kit') && urls.includes('/guides/overdue-invoice-email-templates'))
+  assert.ok(fs.existsSync(path.join(root, 'app/guides/overdue-invoice-email-templates/page.tsx')))
+  assert.equal(jiti('../lib/acquisition/core.ts').cleanRef('latekit'), 'latekit')
+})

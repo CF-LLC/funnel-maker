@@ -75,6 +75,17 @@ export const FREE_TOOLS: FreeTool[] = [
     colors: ['#06b6d4', '#6366f1'],
     emoji: '✍️',
   },
+  {
+    slug: 'late-invoice-kit',
+    name: 'Late invoice kit',
+    title: 'Late Invoice Kit – Late Fee Calculator & Payment Reminder Templates',
+    h1: 'Late invoice kit',
+    description: 'Free late invoice kit: work out a late fee or interest, copy a 3-step payment reminder sequence, and print a late payment notice. No signup, nothing sent.',
+    blurb: 'Late fee calculator, 3 copy-ready reminders and a printable notice. Nothing sent.',
+    feeds: { name: 'Invoices', href: '/pricing' },
+    colors: ['#f43f5e', '#f97316'],
+    emoji: '⏰',
+  },
 ]
 
 export const freeToolPath = (slug: string) => `${FREE_TOOLS_PATH}/${slug}`

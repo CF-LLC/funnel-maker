@@ -31,7 +31,7 @@ test('home price line matches the pricing constants', () => {
 
 test('home page: free tools strip, one main CTA, flag-aware tool list, no repeated rows', () => {
   const { FREE_TOOLS } = jiti('../lib/free-tools/registry.ts')
-  assert.deepEqual(FREE_TOOLS.map((t) => t.slug), ['invoice-generator', 'hourly-rate-calculator', 'utm-builder', 'qr-code-generator', 'email-signature-generator'])
+  assert.deepEqual(FREE_TOOLS.map((t) => t.slug), ['invoice-generator', 'hourly-rate-calculator', 'utm-builder', 'qr-code-generator', 'email-signature-generator', 'late-invoice-kit'])
   const page = read('app/page.tsx')
   assert.match(page, /alternates: \{ canonical: '\/' \}/)
   assert.match(page, /getLaunchFlags\(\)/)
