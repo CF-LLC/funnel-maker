@@ -18,8 +18,9 @@ import { changelogTool } from './changelog/tool'
 import { timeTool } from './time/tool'
 import { expensesTool } from './expenses/tool'
 import { reportsTool } from './reports/tool'
+import { paidTool } from './paid/tool'
 
-export const TOOL_REGISTRY = [funnelsTool, invoicesTool, linkinbioTool, formsTool, proposalsTool, testimonialsTool, bookingTool, dataremovalTool, crmTool, emaillistTool, downloadsTool, portalTool, approvalsTool, changelogTool, timeTool, expensesTool, reportsTool] as const satisfies readonly ToolDef[]
+export const TOOL_REGISTRY = [funnelsTool, invoicesTool, linkinbioTool, formsTool, proposalsTool, testimonialsTool, bookingTool, dataremovalTool, crmTool, emaillistTool, downloadsTool, portalTool, approvalsTool, changelogTool, timeTool, expensesTool, reportsTool, paidTool] as const satisfies readonly ToolDef[]
 export type ToolId = (typeof TOOL_REGISTRY)[number]['id']
 export const TOOL_IDS = TOOL_REGISTRY.map((t) => t.id) as ToolId[]
 /** 'all' = All Access, one app_access row covering every tool. */
@@ -43,6 +44,7 @@ export const LAUNCH_FLAGS: Record<import('./types').LaunchFlag, boolean> = {
   timetracking: on(process.env.NEXT_PUBLIC_TIMETRACKING_ENABLED),
   expenses: on(process.env.NEXT_PUBLIC_EXPENSES_ENABLED),
   reports: on(process.env.NEXT_PUBLIC_REPORTS_ENABLED),
+  paid: on(process.env.NEXT_PUBLIC_PAID_ENABLED),
 }
 export const LAUNCH_FLAG_KEYS = Object.keys(LAUNCH_FLAGS) as import('./types').LaunchFlag[]
 export function isToolLaunched(t: Pick<ToolDef, 'launchFlag'>, flags: Record<string, boolean> = LAUNCH_FLAGS): boolean {

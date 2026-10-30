@@ -26,6 +26,7 @@ export const USAGE_TABLES: { key: string; label: string; table: string; userCol:
   { key: 'time', label: 'Time entries', table: 'tt_entries', userCol: 'user_id' },
   { key: 'expenses', label: 'Expenses', table: 'ex_expenses', userCol: 'user_id' },
   { key: 'reports', label: 'Report kit', table: 'rp_reports', userCol: 'user_id' },
+  { key: 'paid', label: 'Paid?', table: 'pd_matches', userCol: 'user_id' },
   { key: 'approvals', label: 'Approval items', table: 'ap_items', userCol: 'user_id' },
   { key: 'orgs', label: 'Organizations', table: 'organizations', userCol: 'owner_id' },
 ]

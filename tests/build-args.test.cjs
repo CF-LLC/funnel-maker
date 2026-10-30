@@ -34,7 +34,7 @@ test('CRM is in plans and gated in the Single dropdown', () => {
   const plans = fs.readFileSync(path.join(root, 'lib/plans.ts'), 'utf8');
   assert.match(plans, /crm: \{ monthly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_CRM_MONTHLY, yearly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_CRM_YEARLY \}/);
   const pp = fs.readFileSync(path.join(root, 'components/pricing-plans.tsx'), 'utf8');
-  assert.match(pp, /GATED: readonly string\[\] = \['crm', 'emaillist', 'downloads', 'portal', 'approvals', 'changelog', 'time', 'expenses', 'reports'\]/);
+  assert.match(pp, /GATED: readonly string\[\] = \['crm', 'emaillist', 'downloads', 'portal', 'approvals', 'changelog', 'time', 'expenses', 'reports', 'paid'\]/);
   assert.match(plans, /emaillist: \{ monthly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_EMAILLIST_MONTHLY, yearly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_EMAILLIST_YEARLY \}/);
   assert.match(plans, /downloads: \{ monthly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_DOWNLOADS_MONTHLY, yearly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_DOWNLOADS_YEARLY \}/);
   assert.match(plans, /portal: \{ monthly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_PORTAL_MONTHLY, yearly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_PORTAL_YEARLY \}/);
@@ -51,4 +51,16 @@ test('Report kit links: build args wired and unset links fall back gracefully', 
   const plans = jiti('../lib/plans.ts')
   assert.ok(!plans.PAYMENT_LINKS.reports.monthly); assert.ok(!plans.PAYMENT_LINKS.reports.yearly)
   if (saved.m) process.env.NEXT_PUBLIC_STRIPE_LINK_REPORTS_MONTHLY = saved.m; if (saved.y) process.env.NEXT_PUBLIC_STRIPE_LINK_REPORTS_YEARLY = saved.y
+});
+
+test('Paid? links: build args wired and unset links fall back gracefully', () => {
+  for (const v of ['NEXT_PUBLIC_PAID_ENABLED', 'NEXT_PUBLIC_STRIPE_LINK_PAID_MONTHLY', 'NEXT_PUBLIC_STRIPE_LINK_PAID_YEARLY']) {
+    assert.match(dockerfile, new RegExp(`^ARG ${v}$`, 'm')); assert.match(compose, new RegExp(`${v}: \\$\\{${v}:-\\}`))
+  }
+  const jiti = require('jiti')(__filename, { alias: { '@': root } })
+  const saved = { m: process.env.NEXT_PUBLIC_STRIPE_LINK_PAID_MONTHLY, y: process.env.NEXT_PUBLIC_STRIPE_LINK_PAID_YEARLY }
+  delete process.env.NEXT_PUBLIC_STRIPE_LINK_PAID_MONTHLY; delete process.env.NEXT_PUBLIC_STRIPE_LINK_PAID_YEARLY
+  const plans = jiti('../lib/plans.ts')
+  assert.ok(!plans.PAYMENT_LINKS.paid.monthly); assert.ok(!plans.PAYMENT_LINKS.paid.yearly)
+  if (saved.m) process.env.NEXT_PUBLIC_STRIPE_LINK_PAID_MONTHLY = saved.m; if (saved.y) process.env.NEXT_PUBLIC_STRIPE_LINK_PAID_YEARLY = saved.y
 });
