@@ -30,6 +30,8 @@ function Motif({ id, accent }: { id: string; accent: string }) {
       return (<g {...s}><rect x="45" y="30" width="110" height="145" rx="10" /><path d="M70 65h60M70 95h60M70 125h35" /><path d="M150 140v40M130 160h40" /></g>)
     case 'expenses':
       return (<g {...s}><rect x="38" y="58" width="124" height="92" rx="14" /><path d="M38 82h124M122 106h40v24h-40a12 12 0 0 1 0-24z" /><circle cx="134" cy="118" r="3" /></g>)
+    case 'reports':
+      return (<g {...s}><rect x="40" y="30" width="120" height="150" rx="12" /><path d="M65 150v-30M90 150V95M115 150v-40M140 150V70" /><path d="M62 70l25-15 25 12 30-22" /></g>)
     case 'time':
       return (<g {...s}><circle cx="100" cy="105" r="62" /><path d="M88 30h24M100 30v13M100 105V70M100 105l26 18" /><path d="M150 55l10-10" /></g>)
     case 'approvals':
