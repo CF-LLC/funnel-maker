@@ -18,7 +18,7 @@ export function freeToolFromPath(path: string): string | null {
 }
 
 /** "Made with SaaS Nation" footer tags on client-facing pages (?ref=<tool>). Anything else is dropped. */
-export const REFS = ['approvals', 'changelog', 'portal', 'proposals', 'invoices', 'booking', 'reports'] as const
+export const REFS = ['approvals', 'changelog', 'portal', 'proposals', 'invoices', 'booking', 'reports', 'latekit'] as const
 export type Ref = (typeof REFS)[number]
 export const cleanRef = (v: unknown): Ref | null => (typeof v === 'string' && (REFS as readonly string[]).includes(v) ? (v as Ref) : null)
 export const madeWithHref = (ref: Ref, site = 'https://saasnation.site') => `${site}/?ref=${ref}`
