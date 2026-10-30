@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createServerClient } from '@/lib/supabase'
 import { bookPath, weeklySchema } from '@/lib/booking/core'
 import { emailConfigured } from '@/lib/booking/email'
+import { DownloadQr } from '@/components/qr/download-qr'
 import { BookingSettings, BookingsList, TypesManager } from '@/components/booking/dashboard'
 
 export const dynamic = 'force-dynamic'
@@ -24,10 +25,10 @@ export default async function BookingHome() {
     <div className="space-y-8">
       <h1 className="text-2xl font-bold">Booking</h1>
       {handle ? (
-        <p className="rounded-xl border bg-background p-4 text-sm">Your booking page: <a className="font-mono text-primary hover:underline" href={bookPath(handle)} target="_blank">saasnation.site{bookPath(handle)}</a>{!settings?.published && <span className="ml-2 text-amber-600">(not published yet)</span>}</p>
+        <p className="rounded-xl border bg-background p-4 text-sm">Your booking page: <a className="font-mono text-primary hover:underline" href={bookPath(handle)} target="_blank">saasnation.site{bookPath(handle)}</a>{!settings?.published && <span className="ml-2 text-amber-600">(not published yet)</span>}<span className="mt-2 flex"><DownloadQr path={bookPath(handle)} label="QR for your booking page" /></span></p>
       ) : <p className="rounded-xl border border-amber-400 bg-amber-50 p-3 text-sm text-amber-900">Your booking page uses your handle (saasnation.site/@handle/book). <Link href="/links" className="underline">Set your handle in Link-in-bio</Link>.</p>}
       <BookingSettings initial={{ timezone: settings?.timezone ?? 'America/Chicago', published: settings?.published ?? false }} exists={!!settings} weekly={weekly.success ? weekly.data : []} weeklyExists={!!av} />
-      <TypesManager types={types || []} />
+      <TypesManager types={types || []} handle={handle} />
       <BookingsList bookings={bookings || []} types={types || []} timezone={settings?.timezone ?? 'America/Chicago'} emailOn={emailConfigured()} />
       <p className="text-xs text-muted-foreground">{emailConfigured() ? 'New bookings email you and send the visitor a confirmation with a calendar invite. Cancelling emails them a notice.' : 'Email is not set up yet. Visitors see their confirmation on screen and can download a calendar file (.ics).'}</p>
     </div>

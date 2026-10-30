@@ -2,7 +2,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
-import { isValidTimeZone, labelToMin, minToLabel, typeSchema, WEEKDAYS, weeklySchema, type Window } from '@/lib/booking/core'
+import { DownloadQr } from '@/components/qr/download-qr'
+import { bookPath, isValidTimeZone, labelToMin, minToLabel, typeSchema, WEEKDAYS, weeklySchema, type Window } from '@/lib/booking/core'
 
 const box = 'rounded-xl border bg-background p-4 space-y-3'
 const input = 'rounded-lg border px-3 py-2 text-sm'
@@ -66,7 +67,7 @@ export function BookingSettings({ initial, exists, weekly, weeklyExists }: { ini
 
 type TypeRow = { id: string; slug: string; name: string; description: string | null; duration_min: number; buffer_before: number; buffer_after: number; min_notice_min: number; max_days_ahead: number; location: string | null; active: boolean }
 
-export function TypesManager({ types }: { types: TypeRow[] }) {
+export function TypesManager({ types, handle }: { types: TypeRow[]; handle?: string }) {
   const router = useRouter()
   const [msg, setMsg] = useState('')
   async function add(e: React.FormEvent<HTMLFormElement>) {
@@ -91,7 +92,8 @@ export function TypesManager({ types }: { types: TypeRow[] }) {
           <li key={t.id} className="flex flex-wrap items-center gap-2 py-2 text-sm">
             <span className="font-medium">{t.name}</span>
             <span className="text-muted-foreground">{t.duration_min} min · buffers {t.buffer_before}/{t.buffer_after} min · /{t.slug}</span>
-            <button onClick={() => toggle(t)} className="ml-auto rounded-full border px-3 py-1 text-xs">{t.active ? 'Turn off' : 'Turn on'}</button>
+            {handle && t.active && <span className="ml-auto"><DownloadQr path={bookPath(handle, t.slug)} label={`QR for ${t.name}`} compact /></span>}
+            <button onClick={() => toggle(t)} className={`${handle && t.active ? '' : 'ml-auto '} rounded-full border px-3 py-1 text-xs`}>{t.active ? 'Turn off' : 'Turn on'}</button>
           </li>
         ))}
         {types.length === 0 && <li className="py-2 text-sm text-muted-foreground">No meeting types yet.</li>}
