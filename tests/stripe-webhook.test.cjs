@@ -116,6 +116,16 @@ test('changelog: live price + payment link ids grant tool=changelog (single)', a
   assert.equal(s2.rows[0].tool, 'changelog'); assert.equal(s2.rows[0].plan, 'yearly')
 })
 
+test('time: live price + payment link ids grant tool=time (single)', async () => {
+  const map = parsePriceMap(JSON.stringify({ price_1UWGFqDs9LwkRsZNuY2CmW9a: { tool: 'time', plan: 'monthly' }, price_1UWGFyDs9LwkRsZNggF5QoIU: { tool: 'time', plan: 'yearly' }, plink_1UWGGADs9LwkRsZNXcEyuRup: { tool: 'time', plan: 'monthly' }, plink_1UWGGEDs9LwkRsZNe7HVOTI4: { tool: 'time', plan: 'yearly' } }))
+  const s = fakeStore()
+  assert.equal((await handleEvent(signed(checkout('evt_tt1')), { store: s.api, priceMap: map, listLineItemPriceIds: async () => ['price_1UWGFyDs9LwkRsZNggF5QoIU'] })).status, 'processed')
+  assert.equal(s.rows[0].tool, 'time'); assert.equal(s.rows[0].plan, 'yearly'); assert.equal(s.rows[0].source, 'single')
+  const s2 = fakeStore()
+  assert.equal((await handleEvent(signed(checkout('evt_tt2', { payment_link: 'plink_1UWGGADs9LwkRsZNXcEyuRup' })), { store: s2.api, priceMap: map, listLineItemPriceIds: async () => [] })).status, 'processed')
+  assert.equal(s2.rows[0].tool, 'time'); assert.equal(s2.rows[0].plan, 'monthly')
+})
+
 test('approvals: live price + payment link ids grant tool=approvals (single)', async () => {
   const map = parsePriceMap(JSON.stringify({ price_1UVujIDs9LwkRsZNJruQEv3O: { tool: 'approvals', plan: 'monthly' }, plink_1UVujaDs9LwkRsZNYemxQfE5: { tool: 'approvals', plan: 'yearly' } }))
   const s = fakeStore()

@@ -23,6 +23,7 @@ export const USAGE_TABLES: { key: string; label: string; table: string; userCol:
   { key: 'downloads', label: 'Download products', table: 'dl_products', userCol: 'user_id' },
   { key: 'portal', label: 'Client portals', table: 'pt_portals', userCol: 'user_id' },
   { key: 'changelog', label: 'Change log projects', table: 'cl_projects', userCol: 'user_id' },
+  { key: 'time', label: 'Time entries', table: 'tt_entries', userCol: 'user_id' },
   { key: 'approvals', label: 'Approval items', table: 'ap_items', userCol: 'user_id' },
   { key: 'orgs', label: 'Organizations', table: 'organizations', userCol: 'owner_id' },
 ]
