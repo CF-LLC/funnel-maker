@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { ImageInput } from '@/components/uploads/image-input'
+import { DownloadQr } from '@/components/qr/download-qr'
 import { linkSchema, MAX_LINKS, profileSchema, publicPath, SOCIALS, THEMES, type Theme } from '@/lib/linkinbio/core'
 
 type Profile = { handle: string; display_name: string; bio: string; avatar_url: string | null; show_funnels: boolean; published: boolean; theme: Theme; socials: Record<string, string>; hide_badge: boolean }
@@ -75,6 +76,7 @@ export function LinkInBioEditor({ userId, initialProfile, initialLinks, canHideB
           <h2 className="font-semibold">Profile</h2>
           {saved && p.handle && <Link href={publicPath(p.handle)} target="_blank" className="text-sm text-primary hover:underline">View {publicPath(p.handle)} ↗</Link>}
         </div>
+        {saved && p.handle && <div className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed p-2"><DownloadQr path={publicPath(p.handle)} label="QR for your page" /><span className="text-xs text-muted-foreground">Print it on cards, flyers or a table sign.</span></div>}
         <div><Label htmlFor="h">Handle</Label><Input id="h" value={p.handle} onChange={set('handle')} placeholder="yourname" /></div>
         <div><Label htmlFor="n">Name</Label><Input id="n" value={p.display_name} onChange={set('display_name')} maxLength={60} /></div>
         <div><Label htmlFor="b">Bio</Label><Textarea id="b" value={p.bio} onChange={set('bio')} maxLength={160} rows={2} /></div>
