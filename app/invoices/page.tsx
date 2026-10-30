@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { formatCurrency, isOverdue, reminderIcs, reminderMailto, todayISO, totals } from '@/lib/invoices/core'
+import { paidNote } from '@/lib/paid/core'
 
 type Inv = { id: string; number: string; client_name: string; client_id: string | null; due_date: string; issue_date: string; status: 'paid' | 'unpaid'; currency: string; tax_rate: number | null; public_token: string; total: number }
 
@@ -13,6 +14,7 @@ export default function InvoicesHome() {
   const [email, setEmail] = useState('')
   const [show, setShow] = useState<'unpaid' | 'paid' | 'all'>('unpaid')
   const [msg, setMsg] = useState('')
+  const [viaPaid, setViaPaid] = useState<Record<string, string>>({})
   const origin = typeof window !== 'undefined' ? window.location.origin : ''
 
   const load = async () => {
@@ -20,6 +22,9 @@ export default function InvoicesHome() {
       .select('id, number, client_name, client_id, due_date, issue_date, status, currency, tax_rate, public_token, inv_invoice_lines(quantity, unit_price_cents)')
       .order('due_date', { ascending: true }).limit(1000)
     if (error) { setMsg('Could not load invoices'); setRows([]); return }
+    // Invoices marked paid from Paid? (bank CSV matching) show a small note; no access needed to read your own matches.
+    const { data: pm } = await supabase.from('pd_matches').select('invoice_id, paid_on, note').is('undone_at', null).limit(1000)
+    setViaPaid(Object.fromEntries((pm || []).map((m: any) => [m.invoice_id, `${paidNote(m.paid_on)}${m.note ? ` · ${m.note}` : ''}`])))
     setRows((data || []).map((r: any) => ({ ...r, total: totals(r.inv_invoice_lines.map((l: any) => ({ quantity: Number(l.quantity), unit_price_cents: Number(l.unit_price_cents) })), r.tax_rate === null ? null : Number(r.tax_rate)).total })))
   }
   useEffect(() => {
@@ -92,7 +97,7 @@ export default function InvoicesHome() {
                   <td className="pr-2 hidden sm:table-cell">{r.client_name}</td>
                   <td className="pr-2 whitespace-nowrap">{r.due_date}{od && <span className="ml-2 rounded bg-red-100 px-1.5 py-0.5 text-xs font-semibold text-red-700">Overdue</span>}</td>
                   <td className="pr-2 text-right font-medium">{formatCurrency(r.total, r.currency)}</td>
-                  <td className="pr-2"><button onClick={() => toggle(r)} className={`rounded-full px-2.5 py-1 text-xs font-semibold ${r.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`} title="Toggle paid/unpaid">{r.status === 'paid' ? 'Paid' : 'Unpaid'}</button></td>
+                  <td className="pr-2"><button onClick={() => toggle(r)} className={`rounded-full px-2.5 py-1 text-xs font-semibold ${r.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`} title="Toggle paid/unpaid">{r.status === 'paid' ? 'Paid' : 'Unpaid'}</button>{r.status === 'paid' && viaPaid[r.id] && <div className="mt-1 text-[11px] text-muted-foreground" data-testid="via-paid">{viaPaid[r.id]}</div>}</td>
                   <td className="p-2 text-right whitespace-nowrap space-x-1">
                     <a className="inline-block rounded-md border px-2 py-1 text-xs hover:bg-muted" href={`/i/${r.public_token}`} target="_blank" rel="noopener">View</a>
                     <a className="inline-block rounded-md border px-2 py-1 text-xs hover:bg-muted" href={`/i/${r.public_token}/pdf`}>PDF</a>
