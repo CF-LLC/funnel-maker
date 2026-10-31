@@ -92,45 +92,17 @@ export default function RegisterPage() {
       }
 
       if (data.user) {
-        setSuccess('Account created! Setting up your profile...')
-        
+        // The profile row is created server-side by the fm_on_auth_user_created DB trigger.
+        // When email confirmation is on there is no session yet, so never write tables from the client here.
+        if (!data.session) {
+          setSuccess('Account created! Check your email and click the confirmation link, then sign in.')
+          setLoading(false)
+          return
+        }
         try {
-          // Wait a bit for Supabase trigger to complete
-          await new Promise(resolve => setTimeout(resolve, 1000))
-          
-          // Verify user record exists, create if not
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { error: upsertError } = await (supabase
-            .from('users') as any)
-            .upsert(
-              { id: data.user.id, email: data.user.email! },
-              { onConflict: 'id' }
-            )
-
-          if (upsertError) {
-            console.error('Error creating user record:', upsertError)
-            setError('Account created but there was an issue setting up your profile. Please try logging in.')
-            setSuccess('')
-            setLoading(false)
-            return
-          }
-
-          // Verify subscription exists, create if not
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { error: subError } = await (supabase
-            .from('subscriptions') as any)
-            .upsert(
-              {
-                user_id: data.user.id,
-                plan_type: 'free',
-                status: 'active'
-              },
-              { onConflict: 'user_id' }
-            )
-
-          if (subError) {
-            console.error('Error creating subscription:', subError)
-          }
+          setSuccess('Account created! Setting up your profile...')
+          // Server-side, idempotent safety net (service role); never blocks signup.
+          await fetch('/api/auth/ensure-profile', { method: 'POST' }).catch(() => null)
 
           // Send welcome email in the background
           fetch('/api/emails/welcome', {
@@ -140,17 +112,11 @@ export default function RegisterPage() {
           }).catch(console.error)
 
           setSuccess('Success! Redirecting to your dashboard...')
-          
-          // Give user time to see the success message
-          await new Promise(resolve => setTimeout(resolve, 1000))
-
-          // Redirect to dashboard
+          await new Promise(resolve => setTimeout(resolve, 800))
           window.location.href = '/dashboard'
         } catch (setupError) {
           console.error('User setup error:', setupError)
-          setError('Account created but there was an issue setting up. Please try logging in.')
-          setSuccess('')
-          setLoading(false)
+          window.location.href = '/dashboard'
         }
       }
     } catch (err) {
