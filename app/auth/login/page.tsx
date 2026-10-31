@@ -48,44 +48,8 @@ export default function LoginPage() {
       }
 
       if (data.user) {
-        // Ensure user record exists in database (handles cases where signup failed midway)
-        try {
-          // Try to upsert user record - this will create if doesn't exist, or do nothing if it does
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { error: upsertError } = await (supabase
-            .from('users') as any)
-            .upsert(
-              { id: data.user.id, email: data.user.email! },
-              { onConflict: 'id', ignoreDuplicates: false }
-            )
-
-          // Only error out if it's NOT a permission error (permission error means record exists but RLS blocks view)
-          if (upsertError && !upsertError.message.includes('violates row-level security')) {
-            console.error('Error upserting user record:', upsertError)
-            // Don't block login for this
-          }
-
-          // Try to upsert subscription - create if doesn't exist
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { error: subError } = await (supabase
-            .from('subscriptions') as any)
-            .upsert(
-              {
-                user_id: data.user.id,
-                plan_type: 'free',
-                status: 'active'
-              },
-              { onConflict: 'user_id', ignoreDuplicates: false }
-            )
-
-          // Only log subscription errors, don't block login
-          if (subError && !subError.message.includes('violates row-level security')) {
-            console.error('Error upserting subscription:', subError)
-          }
-        } catch (setupError) {
-          console.error('User setup error:', setupError)
-          // Don't block login - just log the error and continue
-        }
+        // Ensure the profile row exists (server-side, service role, idempotent). Never blocks login.
+        await fetch('/api/auth/ensure-profile', { method: 'POST' }).catch((e) => console.error('ensure-profile', e))
 
         // Small delay to ensure everything is saved
         await new Promise(resolve => setTimeout(resolve, 300))

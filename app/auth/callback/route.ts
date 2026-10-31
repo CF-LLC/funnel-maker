@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
 import { safeReturnPath } from '@/lib/safe-redirect'
+import { serviceClient } from '@/lib/server/admin-client'
+import { ensureProfile } from '@/lib/server/ensure-profile'
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
@@ -10,7 +12,11 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createServerClient()
-    await supabase.auth.exchangeCodeForSession(code)
+    const { data } = await supabase.auth.exchangeCodeForSession(code)
+    // Fallback: never strand a confirmed user without a profile row.
+    if (data?.user) {
+      try { await ensureProfile(serviceClient(), data.user) } catch (e) { console.error('ensure-profile (callback)', e) }
+    }
   }
 
   // If this is a password recovery, redirect to update password page
