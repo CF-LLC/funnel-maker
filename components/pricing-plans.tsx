@@ -93,7 +93,7 @@ export function PricingPlans({ flags = {} }: { flags?: Partial<Record<string, bo
           {cta('all', 'Get All Access', true)}
         </div>
       </div>
-      <p className="mt-6 text-center text-sm text-muted-foreground">No free plan. Accounts are approved by hand within 24 hours.</p>
+      <p className="mt-6 text-center text-sm text-muted-foreground">No free plan. Buying a plan gives you access right away.</p>
       <p className="mt-2 text-center text-xs text-muted-foreground">
         By paying you agree to our <Link href="/terms" className="underline">Terms</Link>, <Link href="/privacy" className="underline">Privacy Policy</Link> and <Link href="/refund" className="underline">Refund Policy</Link> (14-day money-back guarantee).
       </p>
