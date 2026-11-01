@@ -12,12 +12,19 @@ import { starterSitesUrl } from '@/lib/url-safety'
 export const metadata = { title: 'Pricing | SaaS Nation', description: 'Each tool $12/mo or $99/yr. All Access $29/mo or $249/yr.', alternates: { canonical: '/pricing' } }
 
 const FAQ = [
+  ['What is SaaS Nation?', 'A set of small tools for US online coaches and creators, including Funnels, Invoices, Forms, Proposals, Testimonials, Booking, Client list, Email list, Digital downloads and Link-in-bio.'],
+  ['How much is it?', '$12/mo ($99/yr) for one tool, or $29/mo ($249/yr) for All Access, including every future tool.'],
+  ['Does SaaS Nation take a cut?', 'No. Customers pay you through your own Stripe Payment Link.'],
+  ['Is there a free plan?', 'No paid-tool free plan, but the free tools at /free-tools need no signup.'],
+  ['What is the client portal?', 'One private link per client showing invoices, proposals, bookings and files, with an onboarding checklist. $12/mo or $99/yr, in All Access.'],
   ['Can I cancel anytime?', "Yes. Cancel from your account whenever you like and your plan stays active until the end of the period you've paid for."],
   ['Can I switch plans?', 'Yes. Move from a single tool to All Access, or between monthly and yearly, from your account at any time.'],
   ['Is Link-in-bio really included?', 'Yes, with any paid plan. Single-tool plans show a small "Made with SaaS Nation" badge; All Access removes it.'],
   ["Do you handle my customers' payments?", "Never. Your customers pay you directly through your own Stripe Payment Link. We never touch your customers' money and take no cut of your sales."],
-  ['How fast can I start?', "Every account is approved by hand within 24 hours of signup. You'll get access as soon as it's approved."],
+  ['How fast can I start?', 'Buying a plan gives you access to that tool right away. New accounts without a plan are reviewed and approved by hand.'],
 ]
+
+const faqLd = JSON.stringify({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: FAQ.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }).replace(/</g, '\\u003c')
 
 export const revalidate = 60
 
@@ -27,6 +34,7 @@ export default async function PricingPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqLd }} />
       <main className="container mx-auto flex-1 px-4 py-16 sm:py-20">
         <div className="mx-auto mb-10 max-w-3xl text-center">
           <h1 className="mb-4 text-4xl font-bold md:text-5xl">Simple tools for coaches and creators. One price, no bloat.</h1>

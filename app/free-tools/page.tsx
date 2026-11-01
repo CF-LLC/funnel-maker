@@ -40,6 +40,12 @@ export default function FreeToolsIndex() {
             </Link>
           ))}
         </div>
+<section className="container mx-auto max-w-3xl px-4 pb-12">
+          <h2 className="mb-4 text-2xl font-bold">FAQ</h2>
+          <div className="divide-y divide-white/10 rounded-2xl border border-white/10">
+            <details className="group p-4"><summary className="cursor-pointer font-semibold">{'Does SaaS Nation have free tools?'}</summary><p className="mt-2 text-sm text-zinc-400">{'Yes: an invoice generator, hourly rate calculator, UTM builder, QR code generator, email signature generator and late invoice kit. No signup, nothing stored.'}</p></details>
+          </div>
+        </section>
         <p className="container mx-auto px-4 pb-12 text-sm text-zinc-400">Looking for how-tos? Read our <Link href="/guides" className="font-semibold text-violet-300 hover:text-white">guides for freelancers</Link>.</p>
       </main>
       <Footer />
