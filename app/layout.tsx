@@ -37,6 +37,7 @@ export const viewport = {
   themeColor: "#09090b",
 };
 
+import { AuthLinkErrorRedirect } from '@/components/auth-link-error-redirect'
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -53,6 +54,7 @@ export default function RootLayout({
         </SessionProvider>
         <Toaster />
         <Beacon />
+        <AuthLinkErrorRedirect />
       </body>
     </html>
   );
