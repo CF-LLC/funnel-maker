@@ -7,7 +7,7 @@ import { getFreeTool, freeToolPath } from '@/lib/free-tools/registry'
 const tool = getFreeTool('late-invoice-kit')!
 
 export const metadata: Metadata = {
-  title: tool.title,
+  title: { absolute: tool.title },
   description: tool.description,
   alternates: { canonical: freeToolPath(tool.slug) },
   openGraph: { title: tool.title, description: tool.description, url: freeToolPath(tool.slug), type: 'website' },
