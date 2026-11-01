@@ -1,6 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { authCallbackUrl } from '@/lib/auth-urls'
+import { Turnstile, turnstileSiteKeySet } from '@/components/turnstile'
+import { confirmLinkErrorMessage } from '@/lib/auth-link-errors'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
@@ -16,8 +19,50 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [info, setInfo] = useState('')
+  const [needsConfirm, setNeedsConfirm] = useState(false)
+  const [resending, setResending] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState('')
+  const onToken = useCallback((t: string) => setCaptchaToken(t), [])
   const router = useRouter()
   const supabase = createClient()
+
+  // Surface confirmation-link failures (e.g. expired link) passed via query or hash.
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search)
+    const h = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+    const msg = confirmLinkErrorMessage(q.get('error_code') ?? h.get('error_code'), q.get('error_description') ?? h.get('error_description'))
+    if (msg) {
+      setError(msg)
+      setNeedsConfirm(true)
+    }
+  }, [])
+
+  const handleResend = async () => {
+    setError('')
+    setInfo('')
+    if (!email) {
+      setError('Enter your email above, then click resend.')
+      return
+    }
+    setResending(true)
+    const { error: resendError } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: {
+        emailRedirectTo: authCallbackUrl(),
+        ...(turnstileSiteKeySet ? { captchaToken } : {}),
+      },
+    })
+    setResending(false)
+    if (resendError) {
+      setError(resendError.message.toLowerCase().includes('rate limit')
+        ? 'Too many emails sent recently. Please wait a few minutes and try again.'
+        : resendError.message || 'Could not resend the confirmation email.')
+      return
+    }
+    setInfo('Confirmation email sent. Open the newest email and click the link right away.')
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,7 +80,8 @@ export default function LoginPage() {
         if (error.message.includes('Invalid login credentials')) {
           setError('Invalid email or password. Please check your credentials and try again.')
         } else if (error.message.includes('Email not confirmed')) {
-          setError('Please verify your email address before signing in. Check your inbox for the confirmation link.')
+          setError('Your email is not confirmed yet. Click the link in your confirmation email, or resend it below if the link expired.')
+          setNeedsConfirm(true)
         } else if (error.message.includes('Too many requests')) {
           setError('Too many login attempts. Please wait a few minutes and try again.')
         } else if (error.message.includes('network')) {
@@ -80,6 +126,11 @@ export default function LoginPage() {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
+            {info && (
+              <Alert>
+                <AlertDescription>{info}</AlertDescription>
+              </Alert>
+            )}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -113,6 +164,14 @@ export default function LoginPage() {
                 className="text-base"
               />
             </div>
+            {needsConfirm && (
+              <div className="space-y-2">
+                <Turnstile onToken={onToken} />
+                <Button type="button" variant="outline" className="w-full" onClick={handleResend} disabled={resending || (turnstileSiteKeySet && !captchaToken)}>
+                  {resending ? 'Sending...' : 'Resend confirmation email'}
+                </Button>
+              </div>
+            )}
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={loading}>
