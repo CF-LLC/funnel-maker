@@ -40,7 +40,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const last = recent[0]
   const heroTool = getTool(last?.tool ?? mine[0]?.id ?? 'funnels')!
   const steps: Step[] = [
-    { id: 'approved', label: 'Account approved', hint: approved ? 'You can publish and share.' : 'Usually within 24 hours.', href: '/dashboard', done: approved },
+    { id: 'approved', label: 'Account approved', hint: approved ? 'You can publish and share.' : 'Buying a plan gives you access right away. Otherwise we review new accounts by hand.', href: '/dashboard', done: approved },
     { id: 'plan', label: 'Pick your tools', hint: 'One tool or All Access.', href: '/pricing', done: active.size > 0 },
     { id: 'create', label: 'Make your first thing', hint: mine[0] ? `Start in ${mine[0].name}.` : 'A funnel, invoice or page.', href: mine[0]?.route ?? '/funnels/templates', done: recent.length > 0 },
     { id: 'org', label: 'Add your business', hint: 'Name and team, in Organizations.', href: '/dashboard/organizations', done: (orgCount ?? 0) > 0 },
@@ -53,7 +53,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           {checkoutSuccess && (
             <Card className="border-green-500 bg-green-50" role="status">
               <CardContent className="py-4 text-sm text-green-900">
-                <strong>Payment received, thank you!</strong> Your account will be activated within 24 hours. Your Stripe
+                <strong>Payment received, thank you!</strong> Buying a plan gives you access right away. Your Stripe
                 receipt is on its way to your email.
               </CardContent>
             </Card>
@@ -61,7 +61,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           {!approved && (
             <Card className="border-amber-400 bg-amber-50">
               <CardContent className="py-4 text-sm text-amber-900">
-                <strong>Your account is waiting for approval</strong> (usually within 24 hours). You can build and preview
+                <strong>Your account is waiting for approval.</strong> Buying a plan gives you access right away; new accounts without a plan are reviewed and approved by hand. You can build and preview
                 funnels now; publishing unlocks once you&apos;re approved.
               </CardContent>
             </Card>
