@@ -13,6 +13,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { GoogleButton } from '@/components/auth/google-button'
+import { EmailCodeSignIn } from '@/components/auth/email-code-signin'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -23,6 +25,7 @@ export default function LoginPage() {
   const [needsConfirm, setNeedsConfirm] = useState(false)
   const [resending, setResending] = useState(false)
   const [captchaToken, setCaptchaToken] = useState('')
+  const [showCode, setShowCode] = useState(false)
   const onToken = useCallback((t: string) => setCaptchaToken(t), [])
   const router = useRouter()
   const supabase = createClient()
@@ -185,6 +188,17 @@ export default function LoginPage() {
             </p>
           </CardFooter>
         </form>
+        <CardContent className="space-y-3 pt-0">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground"><span className="h-px flex-1 bg-border" />or<span className="h-px flex-1 bg-border" /></div>
+          <GoogleButton mode="login" onError={setError} />
+          {showCode ? (
+            <EmailCodeSignIn mode="login" initialEmail={email} />
+          ) : (
+            <Button type="button" variant="outline" className="w-full" onClick={() => setShowCode(true)} data-testid="show-email-code">
+              Email me a sign-in link or code (no password)
+            </Button>
+          )}
+        </CardContent>
       </Card>
     </div>
   )

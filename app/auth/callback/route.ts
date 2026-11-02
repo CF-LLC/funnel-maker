@@ -3,6 +3,8 @@ import { createServerClient } from '@/lib/supabase'
 import { safeReturnPath } from '@/lib/safe-redirect'
 import { serviceClient } from '@/lib/server/admin-client'
 import { ensureProfile } from '@/lib/server/ensure-profile'
+import { isNewUser } from '@/lib/auth-methods'
+import { recordSiteEvent } from '@/lib/site-events/server'
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
@@ -28,6 +30,12 @@ export async function GET(request: Request) {
     // Fallback: never strand a confirmed user without a profile row.
     if (data?.user) {
       try { await ensureProfile(serviceClient(), data.user) } catch (e) { console.error('ensure-profile (callback)', e) }
+      // Google / email-code signups have no client-side "completed" moment: count brand-new accounts here.
+      // (Password signups are counted on the register page, so m is only set by the OAuth and OTP-signup flows.)
+      const method = requestUrl.searchParams.get('m')
+      if ((method === 'oauth' || method === 'otp_signup') && isNewUser(data.user, Date.now(), 15)) {
+        await recordSiteEvent({ event: 'signup_completed', path: method === 'oauth' ? '/auth/callback/google' : '/auth/callback/email-code' })
+      }
     }
   }
 
