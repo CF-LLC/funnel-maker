@@ -4,7 +4,7 @@ import { crmGuard, bad } from '@/lib/crm/guard'
 import { normEmail } from '@/lib/crm/core'
 
 const body = z.string().trim().min(1, 'Write something first.').max(5000, 'Notes can be up to 5,000 characters.')
-const uuid = z.string().uuid()
+const uuid = z.guid()
 async function json(req: Request) { try { return await req.json() } catch { return null } }
 
 export async function POST(req: Request) {
