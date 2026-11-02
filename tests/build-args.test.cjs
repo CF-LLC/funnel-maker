@@ -38,7 +38,7 @@ test('CRM is in plans and gated in the Single dropdown', () => {
   assert.match(plans, /emaillist: \{ monthly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_EMAILLIST_MONTHLY, yearly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_EMAILLIST_YEARLY \}/);
   assert.match(plans, /downloads: \{ monthly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_DOWNLOADS_MONTHLY, yearly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_DOWNLOADS_YEARLY \}/);
   assert.match(plans, /portal: \{ monthly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_PORTAL_MONTHLY, yearly: process\.env\.NEXT_PUBLIC_STRIPE_LINK_PORTAL_YEARLY \}/);
-  assert.match(fs.readFileSync(path.join(root, 'app/pricing/page.tsx'), 'utf8'), /<PricingPlans flags=\{flags\} \/>/);
+  assert.match(fs.readFileSync(path.join(root, 'app/pricing/page.tsx'), 'utf8'), /<PricingPlans flags=\{flags\}( trial=\{trial\})? \/>/);
 });
 
 test('Report kit links: build args wired and unset links fall back gracefully', () => {
