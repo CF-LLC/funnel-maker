@@ -24,7 +24,7 @@ export function Toaster() {
   }, [])
   const Icon = { success: CheckCircle2, error: AlertCircle, info: Info }
   return (
-    <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-4 z-[100] flex flex-col items-center gap-2 px-4 sm:bottom-6 sm:items-end sm:pr-6">
+    <div aria-live="polite" data-above-mobile-bar className="pointer-events-none fixed inset-x-0 bottom-4 z-[100] flex flex-col items-center gap-2 px-4 sm:bottom-6 sm:items-end sm:pr-6">
       {items.map((t) => {
         const I = Icon[t.kind]
         return (

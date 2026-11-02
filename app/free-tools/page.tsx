@@ -5,7 +5,7 @@ import { Navbar } from '@/components/nav/navbar'
 import { Footer } from '@/components/nav/footer'
 import { FREE_TOOLS, freeToolPath } from '@/lib/free-tools/registry'
 
-export const metadata: Metadata = pageMeta({ title: 'Free Tools – No Signup, Browser-Only', description: FREE_TOOLS_DESCRIPTION, path: '/free-tools' })
+export const metadata: Metadata = pageMeta({ title: 'Free Tools – No Signup, Browser-Only (software as a service)', description: FREE_TOOLS_DESCRIPTION, path: '/free-tools' })
 
 export default function FreeToolsIndex() {
   return (

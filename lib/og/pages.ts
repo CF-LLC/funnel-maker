@@ -4,16 +4,19 @@ import { FREE_TOOLS, freeToolPath } from '@/lib/free-tools/registry'
 import { LANDINGS, COMPARES, LANDING_PATH, COMPARE_PATH } from '@/lib/landing/registry'
 
 export const SITE_NAME = 'SaaS Nation'
-export const HOME_TITLE = 'SaaS Nation - Simple tools for coaches, creators and solo businesses'
-export const HOME_DESCRIPTION = 'SaaS Nation: 18 simple tools for coaches, creators and solo businesses, including invoices, proposals, booking, forms, a client list, an email list, digital downloads and a client portal. $12/mo per tool or $29/mo for All Access, plus free no-signup tools.'
-export const PRICING_DESCRIPTION = 'SaaS Nation pricing: each tool is $12/mo or $99/yr; All Access to all 18 tools is $29/mo or $249/yr. Buying a plan gives you access right away. 14-day money-back guarantee.'
-export const FREE_TOOLS_DESCRIPTION = 'Free tools for freelancers, coaches and small businesses: invoice generator, late invoice kit, hourly rate calculator, UTM builder, QR code and email signature generators. No signup, they run in your browser.'
+/** Plain-language spelling of the brand's category, used in titles, descriptions and the footer. */
+export const SITE_TAGLINE = 'Software as a Service'
+export const PRICING_TITLE = 'Pricing | SaaS Nation, software as a service'
+export const HOME_TITLE = 'Simple online software tools for small business | SaaS Nation (software as a service)'
+export const HOME_DESCRIPTION = 'SaaS Nation is software as a service for small business: 18 simple tools for coaches, creators and solo businesses, including invoices, proposals, booking, forms, a client list, an email list, digital downloads and a client portal. $12/mo per tool or $29/mo for All Access, plus free no-signup tools.'
+export const PRICING_DESCRIPTION = 'SaaS Nation (software as a service) pricing: each tool is $12/mo or $99/yr; All Access to all 18 tools is $29/mo or $249/yr. Buying a plan gives you access right away. 14-day money-back guarantee.'
+export const FREE_TOOLS_DESCRIPTION = 'Free online tools from SaaS Nation (software as a service) for freelancers, coaches and small businesses: invoice generator, late invoice kit, hourly rate calculator, UTM builder, QR code and email signature generators. No signup, they run in your browser.'
 
 export type OgCard = { path: string; title: string; subtitle: string; colors: [string, string]; eyebrow: string }
 
 export function ogCards(): OgCard[] {
   return [
-    { path: '/', eyebrow: 'SaaS Nation', title: 'Simple tools for coaches, creators and solo businesses', subtitle: '18 tools: invoices, booking, forms, client list, email list, downloads and more. $12/mo per tool or $29/mo for all.', colors: ['#7c3aed', '#db2777'] },
+    { path: '/', eyebrow: 'SaaS Nation', title: 'Simple online software tools for small business', subtitle: '18 tools: invoices, booking, forms, client list, email list, downloads and more. $12/mo per tool or $29/mo for all.', colors: ['#7c3aed', '#db2777'] },
     { path: '/pricing', eyebrow: 'Pricing', title: '$12/mo per tool. $29/mo for all 18.', subtitle: 'Or $99/yr per tool, $249/yr All Access. Access right away, 14-day money-back guarantee.', colors: ['#059669', '#0ea5e9'] },
     { path: '/free-tools', eyebrow: 'Free tools', title: 'Free tools, no signup', subtitle: 'Invoice generator, late invoice kit, rate calculator, UTM builder, QR codes and email signatures.', colors: ['#f59e0b', '#ef4444'] },
     ...FREE_TOOLS.map((t) => ({ path: freeToolPath(t.slug), eyebrow: 'Free tool · no signup', title: t.h1.replace(/^./, (c) => c.toUpperCase()), subtitle: t.blurb, colors: t.colors })),

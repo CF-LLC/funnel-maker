@@ -35,8 +35,8 @@ export default async function Home() {
       <main className="flex-1">
         <Hero
           art={hero.id}
-          eyebrow="SaaS Nation"
-          title="Simple tools for coaches and creators. One price, no bloat."
+          eyebrow="SaaS Nation · Software as a Service"
+          title="Simple online software tools for small business"
           text={`${leadText.charAt(0).toUpperCase()}${leadText.slice(1)}, plus more. Pick one tool or get them all.`}
           colors={hero.showcase.colors}
           shot={hero.showcase.shot}

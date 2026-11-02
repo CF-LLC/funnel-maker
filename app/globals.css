@@ -403,3 +403,10 @@
   .cine-card, .slot-day, .slot-time, .cine-cta { transition: none; }
   .cine-card:hover, .cine-card:focus-visible { transform: none; }
 }
+
+/* Phone bottom bar (marketing pages only): keep the end of the page and any fixed toasts/notices clear of it. */
+:root { --mobile-bar-h: calc(64px + env(safe-area-inset-bottom)); }
+@media (max-width: 767.98px) {
+  body.has-mobile-bar { padding-bottom: var(--mobile-bar-h); }
+  body.has-mobile-bar [data-above-mobile-bar] { bottom: calc(var(--mobile-bar-h) + 0.75rem) !important; }
+}

@@ -92,14 +92,15 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h3 className="font-bold mb-4">SaaS Nation</h3>
+            <h3 className="font-bold">SaaS Nation</h3>
+            <p className="mb-4 text-[10px] font-medium uppercase tracking-wider text-zinc-400" data-logo-subtitle>Software as a Service</p>
             <p className="text-sm text-muted-foreground">
-              Simple tools for coaches, creators and solo businesses: invoices, proposals, booking, forms, a client list, an email list, digital downloads and more. Support: <a href={`mailto:${SUPPORT_EMAIL}`} className="underline hover:text-foreground">{SUPPORT_EMAIL}</a>
+              Simple online software tools (software as a service) for small business, coaches and creators: invoices, proposals, booking, forms, a client list, an email list, digital downloads and more. Support: <a href={`mailto:${SUPPORT_EMAIL}`} className="underline hover:text-foreground">{SUPPORT_EMAIL}</a>
             </p>
           </div>
         </div>
         <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} SaaS Nation by {COMPANY}, {COMPANY_LOCATION}. All rights reserved.
+          © {new Date().getFullYear()} SaaS Nation, software as a service, by {COMPANY}, {COMPANY_LOCATION}. All rights reserved.
         </div>
       </div>
     </footer>
