@@ -11,6 +11,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { GoogleButton } from '@/components/auth/google-button'
+import { EmailCodeSignIn } from '@/components/auth/email-code-signin'
 import { templates } from '@/data/templates'
 import { Turnstile, turnstileSiteKeySet } from '@/components/turnstile'
 import { useCallback } from 'react'
@@ -25,6 +27,7 @@ export default function RegisterPage() {
   const [template, setTemplate] = useState<string>('book-call')
   const [wishTool, setWishTool] = useState('')
   const [captchaToken, setCaptchaToken] = useState('')
+  const [showCode, setShowCode] = useState(false)
   const onToken = useCallback((t: string) => setCaptchaToken(t), [])
   const router = useRouter()
   const supabase = createClient()
@@ -51,7 +54,7 @@ export default function RegisterPage() {
       return
     }
 
-    trackEvent('signup_started')
+    trackEvent('signup_started', { method: 'password' })
     try {
       setSuccess('Creating your account...')
       
@@ -95,7 +98,7 @@ export default function RegisterPage() {
 
       if (data.user) {
         // Supabase returns an empty identities list for an already-registered email: not a new signup.
-        if ((data.user.identities?.length ?? 1) > 0) trackEvent('signup_completed')
+        if ((data.user.identities?.length ?? 1) > 0) trackEvent('signup_completed', { method: 'password' })
         // The profile row is created server-side by the fm_on_auth_user_created DB trigger.
         // When email confirmation is on there is no session yet, so never write tables from the client here.
         if (!data.session) {
@@ -221,6 +224,17 @@ return (
             </p>
           </CardFooter>
         </form>
+        <CardContent className="space-y-3 pt-0">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground"><span className="h-px flex-1 bg-border" />or<span className="h-px flex-1 bg-border" /></div>
+          <GoogleButton mode="signup" onError={setError} />
+          {showCode ? (
+            <EmailCodeSignIn mode="signup" initialEmail={email} metadata={{ template, ...(wishTool.trim() ? { wish_tool: wishTool.trim().slice(0, 500) } : {}) }} />
+          ) : (
+            <Button type="button" variant="outline" className="w-full" onClick={() => setShowCode(true)} data-testid="show-email-code">
+              Sign up with an email code (no password)
+            </Button>
+          )}
+        </CardContent>
       </Card>
     </div>
   )
