@@ -1,0 +1,15 @@
+Subject: One quick win in SaaS Nation
+
+One quick win in SaaS Nation
+
+A quick idea for this week: send one invoice or share one booking link from SaaS Nation.
+
+Customers pay you through your own Stripe Payment Link. SaaS Nation takes no cut.
+
+The free tools (invoice generator, late invoice kit, rate calculator and more) need no plan at all.
+
+See the free tools: https://saasnation.site/free-tools
+
+Cooper, SaaS Nation (CF LLC, Arkansas)
+
+Stop these emails: https://saasnation.site/api/welcome/unsubscribe?t=00000000-0000-0000-0000-000000000000

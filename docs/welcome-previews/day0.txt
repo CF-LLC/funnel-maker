@@ -1,0 +1,15 @@
+Subject: Welcome to SaaS Nation
+
+Welcome to SaaS Nation
+
+Thanks for signing up. SaaS Nation is a set of simple tools for coaches, creators and solo businesses.
+
+Start with the one job that costs you the most time: invoices, a client list, an email list or selling a digital download.
+
+Buying a plan gives you access right away. One tool is $12/mo or $99/yr; All Access is $29/mo or $249/yr.
+
+Open your dashboard: https://saasnation.site/dashboard
+
+Cooper, SaaS Nation (CF LLC, Arkansas)
+
+Stop these emails: https://saasnation.site/api/welcome/unsubscribe?t=00000000-0000-0000-0000-000000000000
