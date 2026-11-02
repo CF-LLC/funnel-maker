@@ -6,6 +6,7 @@ import "./globals.css";
 import { SessionProvider } from "@/components/session-provider";
 import { Toaster } from "@/components/ui/toast";
 import { Beacon } from "@/components/tracking/beacon";
+import { ReferralCapture } from "@/components/referrals/referral-capture";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -58,6 +59,7 @@ export default function RootLayout({
         </SessionProvider>
         <Toaster />
         <Beacon />
+        <ReferralCapture />
         <AuthLinkErrorRedirect />
       </body>
     </html>

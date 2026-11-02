@@ -12,6 +12,10 @@ import { UpsellTiles } from '@/components/dashboard/upsell-tiles'
 import { recordSignupOnce } from '@/lib/acquisition/server'
 import { ResultsPanel } from '@/components/dashboard/results-panel'
 import { loadResults } from '@/lib/me/results'
+import { attachReferralOnce, getOrCreateCode, referralStats } from '@/lib/referrals/server'
+import { referralLink, referralRewardsEnabled } from '@/lib/referrals/core'
+import { ReferCard } from '@/components/referrals/refer-card'
+import { SITE_URL } from '@/lib/free-tools/site-url'
 
 export const metadata = { title: 'Dashboard' }
 
@@ -26,9 +30,10 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     (supabase as any).from('app_access').select('tool, active').eq('user_id', user!.id),
     recentWork(supabase, user!.id),
     (supabase as any).from('organizations').select('id', { count: 'exact', head: true }).eq('owner_id', user!.id),
-    recordSignupOnce(user!.id),
+    recordSignupOnce(user!.id).then(() => attachReferralOnce(user!)),
     loadResults(supabase, user!.id, 30),
   ])
+  const [refCode, refStats] = await Promise.all([getOrCreateCode(user!.id), referralStats(user!.id)])
   const approved = !!profile?.approved
   const active = new Set<string>((access || []).filter((r: any) => r.active).map((r: any) => r.tool))
   const all = active.has(ALL_ACCESS)
@@ -89,6 +94,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       </div>
       <OnboardingChecklist steps={steps} />
       <ResultsPanel c={results} />
+      {refCode && <ReferCard link={referralLink(refCode, SITE_URL)} stats={refStats} rewardsOn={referralRewardsEnabled()} />}
       <UpsellTiles tools={locked} />
       <div>
       </div>
