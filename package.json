@@ -57,6 +57,7 @@
   "overrides": {
     "next": {
       "postcss": "8.5.31"
-    }
+    },
+    "minimatch": "^11.0.1"
   }
 }
