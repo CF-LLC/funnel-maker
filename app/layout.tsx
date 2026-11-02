@@ -21,7 +21,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: "SaaS Nation - Simple tools for coaches, creators and solo businesses", template: "%s · SaaS Nation" },
+  title: { default: "Simple online software tools for small business | SaaS Nation (software as a service)", template: "%s · SaaS Nation" },
   applicationName: "SaaS Nation",
   description: HOME_DESCRIPTION,
   // Default share card for pages without their own; title/description fall back to each page's <title>/description.

@@ -1,4 +1,4 @@
-import { pageMeta, PRICING_DESCRIPTION } from '@/lib/og/pages'
+import { pageMeta, PRICING_DESCRIPTION, PRICING_TITLE } from '@/lib/og/pages'
 import Link from 'next/link'
 import { Navbar } from '@/components/nav/navbar'
 import { Footer } from '@/components/nav/footer'
@@ -13,7 +13,7 @@ const countWord = (n: number) => ['zero', 'one', 'two', 'three', 'four', 'five',
 import { starterSitesUrl } from '@/lib/url-safety'
 import { ldHtml, pricingLd } from '@/lib/seo/schema'
 
-export const metadata = pageMeta({ title: 'Pricing | SaaS Nation', description: PRICING_DESCRIPTION, path: '/pricing', absoluteTitle: true })
+export const metadata = pageMeta({ title: PRICING_TITLE, description: PRICING_DESCRIPTION, path: '/pricing', absoluteTitle: true })
 
 const FAQ = [
   ['What is SaaS Nation?', 'A set of small tools for US online coaches and creators, including Funnels, Invoices, Forms, Proposals, Testimonials, Booking, Client list, Email list, Digital downloads and Link-in-bio.'],

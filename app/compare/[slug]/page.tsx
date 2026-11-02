@@ -13,7 +13,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const c = getCompare((await params).slug)
   if (!c) return {}
-  return pageMeta({ title: c.title, description: c.description, path: comparePath(c.slug), type: 'article' })
+  return pageMeta({ title: c.title, description: `${c.description} SaaS Nation is software as a service.`, path: comparePath(c.slug), type: 'article' })
 }
 
 // Honest comparisons: what SaaS Nation offers and costs. No competitor prices or feature claims.
