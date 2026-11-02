@@ -1,7 +1,7 @@
 // Share-card (Open Graph / Twitter) registry: one 1200x630 PNG per public marketing page, rendered at build time by /og/<path>.png.
 import type { Metadata } from 'next'
 import { FREE_TOOLS, freeToolPath } from '@/lib/free-tools/registry'
-import { LANDINGS, COMPARE, LANDING_PATH, COMPARE_PATH } from '@/lib/landing/registry'
+import { LANDINGS, COMPARES, LANDING_PATH, COMPARE_PATH } from '@/lib/landing/registry'
 
 export const SITE_NAME = 'SaaS Nation'
 export const HOME_TITLE = 'SaaS Nation - Simple tools for coaches, creators and solo businesses'
@@ -18,7 +18,7 @@ export function ogCards(): OgCard[] {
     { path: '/free-tools', eyebrow: 'Free tools', title: 'Free tools, no signup', subtitle: 'Invoice generator, late invoice kit, rate calculator, UTM builder, QR codes and email signatures.', colors: ['#f59e0b', '#ef4444'] },
     ...FREE_TOOLS.map((t) => ({ path: freeToolPath(t.slug), eyebrow: 'Free tool · no signup', title: t.h1.replace(/^./, (c) => c.toUpperCase()), subtitle: t.blurb, colors: t.colors })),
     ...LANDINGS.map((l) => ({ path: `${LANDING_PATH}/${l.slug}`, eyebrow: `SaaS Nation ${l.tool}`, title: l.h1, subtitle: '$12/mo or $99/yr, or every tool for $29/mo.', colors: l.colors })),
-    { path: `${COMPARE_PATH}/${COMPARE.slug}`, eyebrow: 'Comparison', title: COMPARE.h1, subtitle: 'Booking, link-in-bio and intake forms in one SaaS Nation account.', colors: ['#7c3aed', '#06b6d4'] },
+    ...COMPARES.map((c) => ({ path: `${COMPARE_PATH}/${c.slug}`, eyebrow: 'Comparison', title: c.h1, subtitle: c.ogSubtitle, colors: c.colors })),
   ]
 }
 

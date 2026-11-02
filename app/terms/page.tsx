@@ -17,7 +17,7 @@ export default function TermsPage() {
       <ul>
         <li>You can subscribe to single tools or to All Access, monthly or yearly, at the prices shown on the <Link href="/pricing">pricing page</Link> when you subscribe. Prices are in US dollars.</li>
         <li>Payments are processed by Stripe. Plans renew automatically until you cancel. You can cancel any time, and no further charges are made after you cancel, by emailing <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>; access continues until the end of the paid period. When a subscription ends, access to that tool stops, but your saved content is kept unless you ask us to delete it.</li>
-        <li>Paid access is activated after we confirm your payment, usually the same day. See the <Link href="/refund">Refund Policy</Link>.</li>
+        <li>Paid access is turned on automatically right after your payment goes through. See the <Link href="/refund">Refund Policy</Link>.</li>
       </ul>
       <h2>Your content</h2>
       <ul>

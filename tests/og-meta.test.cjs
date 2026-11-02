@@ -6,11 +6,11 @@ const root = path.resolve(__dirname, '..')
 const jiti = require('jiti')(__filename, { alias: { '@': root } })
 const og = jiti('../lib/og/pages.ts')
 const { FREE_TOOLS } = jiti('../lib/free-tools/registry.ts')
-const { LANDINGS, COMPARE } = jiti('../lib/landing/registry.ts')
+const { LANDINGS, COMPARES } = jiti('../lib/landing/registry.ts')
 
 test('a share card exists for home, pricing, free tools, each free tool, /tools/* and /compare/*', () => {
   const paths = og.ogCards().map((c) => c.path)
-  for (const p of ['/', '/pricing', '/free-tools', ...FREE_TOOLS.map((t) => `/free-tools/${t.slug}`), ...LANDINGS.map((l) => `/tools/${l.slug}`), `/compare/${COMPARE.slug}`]) assert.ok(paths.includes(p), p)
+  for (const p of ['/', '/pricing', '/free-tools', ...FREE_TOOLS.map((t) => `/free-tools/${t.slug}`), ...LANDINGS.map((l) => `/tools/${l.slug}`), ...COMPARES.map((c) => `/compare/${c.slug}`)]) assert.ok(paths.includes(p), p)
   assert.equal(new Set(paths).size, paths.length)
 })
 

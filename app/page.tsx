@@ -15,6 +15,7 @@ import { UpdatesSignup } from '@/components/home/updates-signup'
 import { HOME_PRICE_LINE } from '@/lib/home/pricing-line'
 import { TrustLine } from '@/components/trust-line'
 
+import { ldHtml, organizationLd, websiteLd } from '@/lib/seo/schema'
 export const metadata = pageMeta({ title: HOME_TITLE, description: HOME_DESCRIPTION, path: '/', absoluteTitle: true })
 
 // Runtime launch flags (feature_flags) are re-read at most once a minute.
@@ -29,6 +30,7 @@ export default async function Home() {
   const leadText = lead.length >= 2 ? `${lead.slice(0, -1).join(', ')} and ${lead[lead.length - 1]}` : 'Funnels, invoices, booking'
   return (
     <div className="flex min-h-screen flex-col bg-background">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldHtml([organizationLd(), websiteLd()]) }} />
       <Navbar />
       <main className="flex-1">
         <Hero
