@@ -8,8 +8,10 @@ import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase'
 import { Menu, X } from 'lucide-react'
 
-/** Phone menu links (big tap targets). Guides lives at /guides. */
+/** Phone menu links (big tap targets). Mirrors every desktop nav link, plus Guides. */
 export const MOBILE_MENU_LINKS = [
+  { href: '/#tools', label: 'Tools' },
+  { href: '/templates', label: 'Templates' },
   { href: '/free-tools', label: 'Free tools' },
   { href: '/pricing', label: 'Pricing' },
   { href: '/guides', label: 'Guides' },
@@ -72,7 +74,7 @@ export function Navbar({ bottomBar = true }: { bottomBar?: boolean }) {
   const tap = 'flex min-h-[56px] items-center rounded-xl px-4 text-2xl font-bold text-white hover:bg-white/5'
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-white/5 bg-zinc-950/80 backdrop-blur" aria-label="Main">
+    <nav className="sticky top-0 z-50 border-b border-white/5 bg-zinc-950/80 backdrop-blur" style={{ paddingTop: 'env(safe-area-inset-top)' }} aria-label="Main">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-4 sm:gap-8">
           <Link href="/" className="flex items-center gap-2" aria-label="SaaS Nation, software as a service: home">
@@ -127,8 +129,9 @@ export function Navbar({ bottomBar = true }: { bottomBar?: boolean }) {
           role="dialog"
           aria-modal="true"
           aria-label="Menu"
-          className="fixed inset-0 z-[70] flex flex-col bg-zinc-950 md:hidden"
+          className="mobile-menu-panel fixed inset-x-0 top-0 z-[70] flex flex-col bg-zinc-950 md:hidden"
           style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}
+          data-mobile-menu
         >
           <div className="flex h-16 items-center justify-between px-4 border-b border-white/5">
             <span className="flex flex-col leading-none">
@@ -139,7 +142,7 @@ export function Navbar({ bottomBar = true }: { bottomBar?: boolean }) {
               <X className="h-6 w-6" />
             </button>
           </div>
-          <div className="flex-1 overflow-y-auto px-2 py-4 space-y-1">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 py-4 space-y-1" data-mobile-menu-list>
             {MOBILE_MENU_LINKS.map((l) => (
               <Link key={l.href} href={l.href} className={tap} onClick={() => setOpen(false)} aria-current={pathname === l.href ? 'page' : undefined}>{l.label}</Link>
             ))}
@@ -153,7 +156,7 @@ export function Navbar({ bottomBar = true }: { bottomBar?: boolean }) {
             )}
           </div>
           {!user && (
-            <div className="px-4 pb-6">
+            <div className="shrink-0 px-4 pb-4 pt-2">
               <Link href="/auth/register" onClick={() => setOpen(false)} className="flex min-h-[52px] w-full items-center justify-center rounded-xl bg-white text-base font-bold text-black">Start building</Link>
             </div>
           )}
