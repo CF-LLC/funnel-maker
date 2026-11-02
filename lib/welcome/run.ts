@@ -8,13 +8,26 @@ import { MAX_PER_RUN, dueStep, renderWelcome, selfSignedUp, unsubUrl, welcomeMod
 
 export type RunResult = { enabled: boolean; live: boolean; reason: string; due: Record<string, number>; sent: number; failed: number }
 
+/** Reads every auth user page by page (Supabase caps a page at 1000). Stops on a short page, an error, or a safety cap. */
+export async function listAllUsers(db: any, perPage = 1000, maxPages = 200): Promise<Candidate[]> {
+  const out: Candidate[] = []
+  for (let page = 1; page <= maxPages; page++) {
+    const { data, error } = await db.auth.admin.listUsers({ page, perPage })
+    if (error) throw new Error('welcome: listUsers failed')
+    const batch = (data?.users || []) as Candidate[]
+    out.push(...batch)
+    if (batch.length < perPage) break
+  }
+  return out
+}
+
 export async function runWelcome(now = new Date(), f: typeof fetch = fetch): Promise<RunResult> {
   const mode = welcomeMode()
   const res: RunResult = { enabled: mode.enabled, live: mode.live, reason: mode.reason, due: { '0': 0, '2': 0, '5': 0 }, sent: 0, failed: 0 }
   if (!mode.enabled || !mode.startAt) return res
   const db = serviceClient() as any
-  const { data } = await db.auth.admin.listUsers({ page: 1, perPage: 200 })
-  const users = ((data?.users || []) as Candidate[]).filter((u) => selfSignedUp(u, mode.startAt, (id) => isDemoUser(id)))
+  const all = await listAllUsers(db)
+  const users = all.filter((u) => selfSignedUp(u, mode.startAt, (id) => isDemoUser(id)))
   if (!users.length) return res
   const ids = users.map((u) => u.id)
   const [{ data: sends }, { data: prefs }] = await Promise.all([
