@@ -15,7 +15,7 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 export const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 export const proposalSchema = z.object({
-  clientId: z.string().uuid('Pick a saved client'),
+  clientId: z.guid('Pick a saved client'),
   title: z.string().trim().min(1, 'Title is required').max(150),
   intro: z.string().trim().max(2000, 'Intro is too long (2000 max)'),
   currency: z.string().trim().length(3, 'Use a 3-letter code like USD').transform((v) => v.toUpperCase()),

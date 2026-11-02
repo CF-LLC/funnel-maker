@@ -15,7 +15,7 @@ export const invoiceSchema = z.object({
   number: z.string().trim().min(1, 'Invoice number is required').max(40),
   issueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date is required'),
   dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Due date is required'),
-  clientId: z.string().uuid().nullable().optional(),
+  clientId: z.guid().nullable().optional(),
   clientName: z.string().trim().min(1, 'Client name is required').max(200),
   clientEmail: optEmail,
   clientAddress: z.string().max(1000).optional(),

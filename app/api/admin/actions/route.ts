@@ -13,10 +13,10 @@ export const fetchCache = 'force-no-store'
 
 
 const Body = z.discriminatedUnion('action', [
-  z.object({ action: z.literal('grant'), userId: z.string().uuid(), tool: z.string() }),
-  z.object({ action: z.literal('revoke'), userId: z.string().uuid(), tool: z.string() }),
-  z.object({ action: z.literal('suspend'), userId: z.string().uuid() }),
-  z.object({ action: z.literal('unsuspend'), userId: z.string().uuid() }),
+  z.object({ action: z.literal('grant'), userId: z.guid(), tool: z.string() }),
+  z.object({ action: z.literal('revoke'), userId: z.guid(), tool: z.string() }),
+  z.object({ action: z.literal('suspend'), userId: z.guid() }),
+  z.object({ action: z.literal('unsuspend'), userId: z.guid() }),
 ])
 
 /** POST {action: grant|revoke, userId, tool} or {action: suspend|unsuspend, userId}. Admin only; every success writes admin_audit. Never deletes users or data. */
