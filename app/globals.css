@@ -410,3 +410,6 @@
   body.has-mobile-bar { padding-bottom: var(--mobile-bar-h); }
   body.has-mobile-bar [data-above-mobile-bar] { bottom: calc(var(--mobile-bar-h) + 0.75rem) !important; }
 }
+
+/* Phone menu: fit the visible viewport (iOS Safari URL bar + bottom toolbar), scroll inside, never the page behind. */
+.mobile-menu-panel { height: 100vh; height: 100svh; height: 100dvh; overscroll-behavior: contain; }

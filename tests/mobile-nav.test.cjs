@@ -31,3 +31,12 @@ test('software as a service is spelled out in home/pricing meta and footer', () 
   for (const s of [og.HOME_TITLE, og.HOME_DESCRIPTION, og.PRICING_TITLE, og.PRICING_DESCRIPTION, og.FREE_TOOLS_DESCRIPTION]) assert.match(s, /software as a service/i)
   assert.match(read('components/nav/footer.tsx'), /software as a service/i)
 })
+
+test('phone menu lists every desktop nav link and fits the visible viewport', () => {
+  const nav = read('components/nav/navbar.tsx'); const css = read('app/globals.css'); const layout = read('app/layout.tsx')
+  const menu = nav.slice(nav.indexOf('MOBILE_MENU_LINKS = ['), nav.indexOf('] as const'))
+  for (const href of ["'/#tools'", "'/templates'", "'/free-tools'", "'/pricing'", "'/guides'"]) assert.ok(menu.includes(href), href)
+  assert.match(css, /\.mobile-menu-panel \{[^}]*100dvh[^}]*overscroll-behavior: contain/)
+  assert.match(nav, /min-h-0 flex-1 overflow-y-auto overscroll-contain/)
+  assert.match(layout, /viewportFit: 'cover'/)
+})
