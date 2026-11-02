@@ -6,11 +6,12 @@ import { Check } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import { ALL_ACCESS_PRICE, TOOL_PRICE, paymentLinkUrl, type Billing, type SoldKey } from '@/lib/plans'
 
+// Main tools first (same order as MAIN_TOOL_IDS), then the rest.
 const SINGLE: { id: Exclude<SoldKey, 'all'>; name: string }[] = [
+  { id: 'dataremoval', name: 'Data Removal' }, { id: 'crm', name: 'Client list' },
+  { id: 'emaillist', name: 'Email list' }, { id: 'downloads', name: 'Digital downloads' },
   { id: 'funnels', name: 'Funnels' }, { id: 'invoices', name: 'Invoices' }, { id: 'forms', name: 'Forms' },
   { id: 'proposals', name: 'Proposals' }, { id: 'testimonials', name: 'Testimonials' }, { id: 'booking', name: 'Booking' },
-  { id: 'dataremoval', name: 'Data Removal' }, { id: 'crm', name: 'CRM' },
-  { id: 'emaillist', name: 'Email list' }, { id: 'downloads', name: 'Digital downloads' },
   { id: 'portal', name: 'Client portal' }, { id: 'changelog', name: 'Change log' }, { id: 'approvals', name: 'Approval link' },
   { id: 'time', name: 'Time tracking' },
   { id: 'expenses', name: 'Expenses' },
@@ -35,7 +36,7 @@ export function PricingPlans({ flags = {} }: { flags?: Partial<Record<string, bo
   const names = tools.map((t) => t.name)
   const [user, setUser] = useState<{ id: string; email?: string | null } | null>(null)
   const [billing, setBilling] = useState<Billing>('monthly')
-  const [tool, setTool] = useState<Exclude<SoldKey, 'all'>>('funnels')
+  const [tool, setTool] = useState<Exclude<SoldKey, 'all'>>(tools[0]?.id ?? 'funnels')
   useEffect(() => {
     createClient().auth.getUser().then(({ data }) => data.user && setUser({ id: data.user.id, email: data.user.email }))
   }, [])

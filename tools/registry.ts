@@ -80,3 +80,13 @@ export function toolsInRow(row: 'all' | import('./types').ToolRow, flags: Record
 }
 /** Tool featured in the public home hero. */
 export const HERO_TOOL_ID = 'funnels'
+
+/** The main tools SaaS Nation leads with (home, pricing). Order matters. Each still obeys its launch flag. */
+export const MAIN_TOOL_IDS = ['dataremoval', 'crm', 'emaillist', 'downloads'] as const
+/** Split the launched tools into the main tools (in MAIN_TOOL_IDS order) and the rest ("All tools"). */
+export function mainAndOtherTools(flags: Record<string, boolean> = LAUNCH_FLAGS): { main: ToolDef[]; rest: ToolDef[] } {
+  const list = publicTools(flags).sort((a, b) => a.showcase.order - b.showcase.order)
+  const ids = MAIN_TOOL_IDS as readonly string[]
+  const main = ids.map((id) => list.find((t) => t.id === id)).filter((t): t is ToolDef => !!t)
+  return { main, rest: list.filter((t) => !ids.includes(t.id)) }
+}

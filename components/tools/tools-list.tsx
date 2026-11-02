@@ -1,4 +1,4 @@
-import { publicTools } from '@/tools/registry'
+import { mainAndOtherTools } from '@/tools/registry'
 import type { ToolDef } from '@/tools/types'
 import { TOOL_ICONS } from '@/components/tools/tool-icons'
 
@@ -13,15 +13,22 @@ function Card({ t }: { t: ToolDef }) {
   )
 }
 
-/** Pricing page: tools listed from the single registry. Tools in the 'everyone' row get their own "For everyone" row. */
+/** Pricing page: main tools first, then "All tools" from the single registry. Tools in the 'everyone' row get their own "For everyone" row. */
 export function ToolsList({ flags }: { flags?: Record<string, boolean> }) {
-  const all = publicTools(flags)
-  const included = all.filter((t) => t.includedWithAnyPlan)
-  const sold = all.filter((t) => !t.includedWithAnyPlan)
+  const { main, rest } = mainAndOtherTools(flags)
+  const included = rest.filter((t) => t.includedWithAnyPlan)
+  const sold = rest.filter((t) => !t.includedWithAnyPlan)
   const everyone = sold.filter((t) => t.showcase.rows.includes('everyone'))
   const business = sold.filter((t) => !t.showcase.rows.includes('everyone'))
   return (
     <div className="max-w-5xl mx-auto mb-12 space-y-8">
+      {main.length > 0 && (
+        <div data-row="main">
+          <h3 className="mb-3 text-lg font-bold">Main tools</h3>
+          <div className="grid gap-4 sm:grid-cols-2">{main.map((t) => <Card key={t.id} t={t} />)}</div>
+        </div>
+      )}
+      <h3 className="text-lg font-bold" data-row="all">All tools</h3>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{business.map((t) => <Card key={t.id} t={t} />)}</div>
       {everyone.length > 0 && (
         <div data-row="everyone">
