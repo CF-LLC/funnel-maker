@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Navbar } from '@/components/nav/navbar'
 import { Footer } from '@/components/nav/footer'
 import { PricingPlans } from '@/components/pricing-plans'
+import { TrustLine } from '@/components/trust-line'
 import { ToolsList } from '@/components/tools/tools-list'
 import { getLaunchFlags } from '@/lib/flags'
 import { publicTools } from '@/tools/registry'
@@ -42,6 +43,7 @@ export default async function PricingPage() {
           <p className="text-lg text-muted-foreground">Get the one tool you need, or all {countWord(publicTools(flags).length)} SaaS Nation tools for less than most single apps cost. Built for US online coaches, course creators and creators.</p>
         </div>
         <PricingPlans flags={flags} />
+        <TrustLine className="mt-6" />
         <h2 className="mt-16 mb-6 text-center text-2xl font-bold">The tools</h2>
         <ToolsList flags={flags} />
         <p className="text-center text-sm text-muted-foreground">More tools are on the way. All Access members get each one the day it launches.</p>
