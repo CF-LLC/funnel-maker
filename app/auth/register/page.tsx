@@ -1,5 +1,6 @@
 'use client'
 
+import { trackEvent } from '@/lib/site-events/client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -50,6 +51,7 @@ export default function RegisterPage() {
       return
     }
 
+    trackEvent('signup_started')
     try {
       setSuccess('Creating your account...')
       
@@ -92,6 +94,8 @@ export default function RegisterPage() {
       }
 
       if (data.user) {
+        // Supabase returns an empty identities list for an already-registered email: not a new signup.
+        if ((data.user.identities?.length ?? 1) > 0) trackEvent('signup_completed')
         // The profile row is created server-side by the fm_on_auth_user_created DB trigger.
         // When email confirmation is on there is no session yet, so never write tables from the client here.
         if (!data.session) {
