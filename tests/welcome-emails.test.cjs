@@ -66,3 +66,18 @@ test('runner: claims before sending, honors opt-out, caps per run, never touches
   assert.match(sql, /unique \(user_id, step\)/); assert.doesNotMatch(sql, /drop table|drop column|delete from/i)
   assert.equal((sql.match(/force row level security/g) || []).length, 2)
 })
+
+test('user listing paginates past the first page', async () => {
+  const R = jiti('../lib/welcome/run.ts')
+  const pages = [3, 3, 1]; const calls = []
+  const db = { auth: { admin: { listUsers: async ({ page, perPage }) => { calls.push(page); const n = pages[page - 1] || 0; return { data: { users: Array.from({ length: n }, (_, i) => ({ id: `${page}-${i}` })) }, error: null } } } } }
+  const all = await R.listAllUsers(db, 3)
+  assert.equal(all.length, 7); assert.deepEqual(calls, [1, 2, 3])
+  await assert.rejects(R.listAllUsers({ auth: { admin: { listUsers: async () => ({ data: null, error: { message: 'x' } }) } } }, 3))
+})
+
+test('legacy welcome route retires (410) only when the new sequence is live', () => {
+  const src = read('app/api/emails/welcome/route.ts')
+  assert.match(src, /welcomeMode\(\)\.live\) return NextResponse\.json\(\{ retired: true \}, \{ status: 410 \}\)/)
+  assert.ok(src.indexOf('status: 410') < src.indexOf('sendWelcomeEmail(user.email)'))
+})
