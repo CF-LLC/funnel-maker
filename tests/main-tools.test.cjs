@@ -1,0 +1,38 @@
+// Batch 2 (6): lead with Data Removal, Client list, Email list, Digital downloads; the rest under "All tools".
+const test = require('node:test')
+const assert = require('node:assert/strict')
+const fs = require('node:fs')
+const path = require('node:path')
+const root = path.resolve(__dirname, '..')
+const jiti = require('jiti')(__filename, { alias: { '@': root } })
+const reg = jiti('../tools/registry.ts')
+const read = (f) => fs.readFileSync(path.join(root, f), 'utf8')
+const allOn = Object.fromEntries(reg.LAUNCH_FLAG_KEYS.map((k) => [k, true]))
+const allOff = Object.fromEntries(reg.LAUNCH_FLAG_KEYS.map((k) => [k, false]))
+
+test('main tools in order when all flags on; rest has everything else; nothing lost', () => {
+  const { main, rest } = reg.mainAndOtherTools(allOn)
+  assert.deepEqual(main.map((t) => t.id), ['dataremoval', 'crm', 'emaillist', 'downloads'])
+  assert.equal(main.length + rest.length, reg.publicTools(allOn).length)
+  for (const t of main) assert.ok(!rest.includes(t))
+})
+test('flags still respected: gated main tools hidden when off, rest has no gated tools', () => {
+  const { main, rest } = reg.mainAndOtherTools(allOff)
+  assert.deepEqual(main.map((t) => t.id), ['dataremoval'])
+  for (const t of [...main, ...rest]) assert.ok(reg.isToolLaunched(t, allOff))
+})
+test('home shows Main tools row and All tools = rest; pricing list has Main tools + All tools', () => {
+  const home = read('app/page.tsx')
+  assert.match(home, /title="Main tools"/)
+  assert.match(home, /row === 'all' \? rest/)
+  const list = read('components/tools/tools-list.tsx')
+  assert.match(list, />Main tools</)
+  assert.match(list, />All tools</)
+})
+test('single-tool dropdown leads with main tools; prices unchanged', () => {
+  const pp = read('components/pricing-plans.tsx')
+  assert.ok(pp.indexOf("id: 'dataremoval'") < pp.indexOf("id: 'funnels'"))
+  const plans = jiti('../lib/plans.ts')
+  assert.equal(plans.TOOL_PRICE.monthly, '$12'); assert.equal(plans.TOOL_PRICE.yearly, '$99')
+  assert.equal(plans.ALL_ACCESS_PRICE.monthly, '$29'); assert.equal(plans.ALL_ACCESS_PRICE.yearly, '$249')
+})
