@@ -5,7 +5,8 @@ import { Footer } from '@/components/nav/footer'
 import { PricingPlans } from '@/components/pricing-plans'
 import { TrustLine } from '@/components/trust-line'
 import { ToolsList } from '@/components/tools/tools-list'
-import { getLaunchFlags } from '@/lib/flags'
+import { getLaunchFlags, isFeatureEnabled } from '@/lib/flags'
+import { TRIAL_FAQ, TRIAL_FLAG } from '@/lib/trial/copy'
 import { publicTools } from '@/tools/registry'
 
 const countWord = (n: number) => ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'][n] ?? String(n)
@@ -27,24 +28,26 @@ const FAQ = [
   ['How fast can I start?', 'Buying a plan gives you access to that tool right away. New accounts without a plan are reviewed and approved by hand.'],
 ]
 
-const faqLd = JSON.stringify({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: FAQ.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }).replace(/</g, '\\u003c')
+const faqFor = (trial: boolean) => (trial ? [FAQ[0], FAQ[1], TRIAL_FAQ, ...FAQ.slice(2)] : FAQ)
+const faqLdFor = (faq: string[][]) => JSON.stringify({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }).replace(/</g, '\\u003c')
 
 export const revalidate = 60
 
 export default async function PricingPage() {
-  const flags = await getLaunchFlags()
+  const [flags, trial] = await Promise.all([getLaunchFlags(), isFeatureEnabled(TRIAL_FLAG)])
+  const faq = faqFor(trial)
   const starter = starterSitesUrl()
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqLd }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqLdFor(faq) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldHtml(pricingLd(PRICING_DESCRIPTION)) }} />
       <main className="container mx-auto flex-1 px-4 py-16 sm:py-20">
         <div className="mx-auto mb-10 max-w-3xl text-center">
           <h1 className="mb-4 text-4xl font-bold md:text-5xl">Simple tools for coaches and creators. One price, no bloat.</h1>
           <p className="text-lg text-muted-foreground">Get the one tool you need, or all {countWord(publicTools(flags).length)} SaaS Nation tools for less than most single apps cost. Built for US online coaches, course creators and creators.</p>
         </div>
-        <PricingPlans flags={flags} />
+        <PricingPlans flags={flags} trial={trial} />
         <TrustLine className="mt-6" />
         <h2 className="mt-16 mb-6 text-center text-2xl font-bold">The tools</h2>
         <ToolsList flags={flags} />
@@ -52,7 +55,7 @@ export default async function PricingPage() {
         <section className="mx-auto mt-16 max-w-3xl">
           <h2 className="mb-4 text-2xl font-bold">FAQ</h2>
           <div className="divide-y divide-white/10 rounded-2xl border border-white/10">
-            {FAQ.map(([q, a]) => (
+            {faq.map(([q, a]) => (
               <details key={q} className="group p-4"><summary className="cursor-pointer font-semibold">{q}</summary><p className="mt-2 text-sm text-muted-foreground">{a}</p></details>
             ))}
           </div>

@@ -1,10 +1,15 @@
 import Link from 'next/link'
+import { isFeatureEnabled } from '@/lib/flags'
+import { TRIAL_FLAG } from '@/lib/trial/copy'
 import { LegalPage } from '@/components/legal/legal-page'
 import { COMPANY, COMPANY_LOCATION, PRODUCT, SUPPORT_EMAIL } from '@/lib/site'
 
 export const metadata = { title: `Terms of Service | ${PRODUCT}`, alternates: { canonical: '/terms' } }
 
-export default function TermsPage() {
+export const revalidate = 60
+
+export default async function TermsPage() {
+  const trial = await isFeatureEnabled(TRIAL_FLAG)
   return (
     <LegalPage title="Terms of Service">
       <p>These terms cover your use of {PRODUCT} (saasnation.site), including its tools (Funnels, Invoices, Link-in-bio, Forms, Proposals and Testimonials), operated by {COMPANY}, {COMPANY_LOCATION}. By creating an account or paying for a plan you agree to them.</p>
@@ -17,7 +22,8 @@ export default function TermsPage() {
       <ul>
         <li>You can subscribe to single tools or to All Access, monthly or yearly, at the prices shown on the <Link href="/pricing">pricing page</Link> when you subscribe. Prices are in US dollars.</li>
         <li>Payments are processed by Stripe. Plans renew automatically until you cancel. You can cancel any time, and no further charges are made after you cancel, by emailing <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>; access continues until the end of the paid period. When a subscription ends, access to that tool stops, but your saved content is kept unless you ask us to delete it.</li>
-        <li>Paid access is turned on automatically right after your payment goes through. See the <Link href="/refund">Refund Policy</Link>.</li>
+        {trial && <li>Monthly plans include a 7-day free trial. A card is required at checkout. If you cancel before the 7 days end you are not charged; otherwise the monthly plan starts billing automatically when the trial ends. Yearly plans have no trial and are billed when you subscribe.</li>}
+        <li>Paid access is turned on automatically right after your payment goes through{trial ? ' (or right after you start a free trial)' : ''}. See the <Link href="/refund">Refund Policy</Link>.</li>
       </ul>
       <h2>Your content</h2>
       <ul>
