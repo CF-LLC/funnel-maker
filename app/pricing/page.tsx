@@ -10,6 +10,7 @@ import { publicTools } from '@/tools/registry'
 
 const countWord = (n: number) => ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'][n] ?? String(n)
 import { starterSitesUrl } from '@/lib/url-safety'
+import { ldHtml, pricingLd } from '@/lib/seo/schema'
 
 export const metadata = pageMeta({ title: 'Pricing | SaaS Nation', description: PRICING_DESCRIPTION, path: '/pricing', absoluteTitle: true })
 
@@ -37,6 +38,7 @@ export default async function PricingPage() {
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqLd }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldHtml(pricingLd(PRICING_DESCRIPTION)) }} />
       <main className="container mx-auto flex-1 px-4 py-16 sm:py-20">
         <div className="mx-auto mb-10 max-w-3xl text-center">
           <h1 className="mb-4 text-4xl font-bold md:text-5xl">Simple tools for coaches and creators. One price, no bloat.</h1>

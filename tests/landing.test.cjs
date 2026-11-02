@@ -4,16 +4,16 @@ const fs = require('node:fs')
 const path = require('node:path')
 const root = path.resolve(__dirname, '..')
 const jiti = require('jiti')(__filename, { alias: { '@': root } })
-const { LANDINGS, landingPath, COMPARE, comparePath } = jiti('../lib/landing/registry.ts')
+const { LANDINGS, landingPath, COMPARES, comparePath } = jiti('../lib/landing/registry.ts')
 const sitemap = jiti('../app/sitemap.ts').default
 const { isProtectedPath } = jiti('../tools/registry.ts')
 
 test('landing + compare pages: in sitemap, public, honest copy', () => {
   const urls = sitemap().map((e) => new URL(e.url).pathname)
-  const all = [...LANDINGS.map((l) => landingPath(l.slug)), comparePath(COMPARE.slug)]
+  const all = [...LANDINGS.map((l) => landingPath(l.slug)), ...COMPARES.map((c) => comparePath(c.slug))]
   assert.equal(new Set(LANDINGS.map((l) => l.slug)).size, LANDINGS.length)
   for (const u of all) { assert.ok(urls.includes(u), u); assert.equal(isProtectedPath(u), false, u) }
-  const src = [fs.readFileSync(path.join(root, 'lib/landing/registry.ts'), 'utf8'), fs.readFileSync(path.join(root, 'app/compare', COMPARE.slug, 'page.tsx'), 'utf8')].join('\n')
+  const src = [fs.readFileSync(path.join(root, 'lib/landing/registry.ts'), 'utf8'), fs.readFileSync(path.join(root, "app/compare/[slug]/page.tsx"), "utf8")].join('\n')
   assert.doesNotMatch(src, /within 24|24 ?hours/i)
   for (const l of LANDINGS) assert.ok(l.description.length <= 170, l.slug)
 })
