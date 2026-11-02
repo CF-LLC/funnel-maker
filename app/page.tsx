@@ -1,3 +1,4 @@
+import { pageMeta, HOME_TITLE, HOME_DESCRIPTION } from '@/lib/og/pages'
 import { Navbar } from '@/components/nav/navbar'
 import { Footer } from '@/components/nav/footer'
 import { getLaunchFlags } from '@/lib/flags'
@@ -12,7 +13,7 @@ import { SocialProofSlot } from '@/components/home/social-proof'
 import { UpdatesSignup } from '@/components/home/updates-signup'
 import { HOME_PRICE_LINE } from '@/lib/home/pricing-line'
 
-export const metadata = { alternates: { canonical: '/' } }
+export const metadata = pageMeta({ title: HOME_TITLE, description: HOME_DESCRIPTION, path: '/', absoluteTitle: true })
 
 // Runtime launch flags (feature_flags) are re-read at most once a minute.
 export const revalidate = 60

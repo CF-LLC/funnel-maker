@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SITE_URL } from "@/lib/free-tools/site-url";
+import { HOME_DESCRIPTION, SITE_NAME, ogImagePath } from "@/lib/og/pages";
 import localFont from "next/font/local";
 import "./globals.css";
 import { SessionProvider } from "@/components/session-provider";
@@ -19,9 +20,12 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: "SaaS Nation - Simple tools for solo businesses", template: "%s · SaaS Nation" },
+  title: { default: "SaaS Nation - Simple tools for coaches, creators and solo businesses", template: "%s · SaaS Nation" },
   applicationName: "SaaS Nation",
-  description: "SaaS Nation: simple tools for solo businesses. Funnel Maker, Invoices and Link-in-bio in one account.",
+  description: HOME_DESCRIPTION,
+  // Default share card for pages without their own; title/description fall back to each page's <title>/description.
+  openGraph: { siteName: SITE_NAME, type: "website", images: [{ url: ogImagePath("/"), width: 1200, height: 630, alt: SITE_NAME }] },
+  twitter: { card: "summary_large_image", images: [ogImagePath("/")] },
   icons: {
     icon: [
       { url: '/icon.svg', type: 'image/svg+xml' },

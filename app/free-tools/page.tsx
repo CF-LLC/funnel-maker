@@ -1,14 +1,11 @@
+import { pageMeta, FREE_TOOLS_DESCRIPTION } from '@/lib/og/pages'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Navbar } from '@/components/nav/navbar'
 import { Footer } from '@/components/nav/footer'
 import { FREE_TOOLS, freeToolPath } from '@/lib/free-tools/registry'
 
-export const metadata: Metadata = {
-  title: 'Free Tools – No Signup, Browser-Only',
-  description: 'Free tools for freelancers and small businesses. They run in your browser, need no signup and never store what you type.',
-  alternates: { canonical: '/free-tools' },
-}
+export const metadata: Metadata = pageMeta({ title: 'Free Tools – No Signup, Browser-Only', description: FREE_TOOLS_DESCRIPTION, path: '/free-tools' })
 
 export default function FreeToolsIndex() {
   return (

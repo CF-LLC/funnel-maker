@@ -1,9 +1,10 @@
+import { pageMeta } from '@/lib/og/pages'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { LandingShell } from '@/components/landing/landing-shell'
 import { ACCESS_LINE, COMPARE, PRICE_FAQ, comparePath, landingPath } from '@/lib/landing/registry'
 
-export const metadata: Metadata = { title: COMPARE.title, description: COMPARE.description, alternates: { canonical: comparePath(COMPARE.slug) }, openGraph: { title: COMPARE.title, description: COMPARE.description, url: comparePath(COMPARE.slug), type: 'article' } }
+export const metadata: Metadata = pageMeta({ title: COMPARE.title, description: COMPARE.description, path: comparePath(COMPARE.slug), type: 'article' })
 
 const ROWS: [string, string, string][] = [
   ['Booking page', 'Calendly', 'Booking: weekly hours, meeting types, no double bookings, .ics invites'],

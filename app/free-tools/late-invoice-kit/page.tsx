@@ -1,3 +1,4 @@
+import { pageMeta } from '@/lib/og/pages'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { FreeToolShell } from '@/components/free-tools/free-tool-shell'
@@ -6,12 +7,7 @@ import { getFreeTool, freeToolPath } from '@/lib/free-tools/registry'
 
 const tool = getFreeTool('late-invoice-kit')!
 
-export const metadata: Metadata = {
-  title: { absolute: tool.title },
-  description: tool.description,
-  alternates: { canonical: freeToolPath(tool.slug) },
-  openGraph: { title: tool.title, description: tool.description, url: freeToolPath(tool.slug), type: 'website' },
-}
+export const metadata: Metadata = pageMeta({ title: tool.title, description: tool.description, path: freeToolPath(tool.slug), absoluteTitle: true })
 
 export default function Page() {
   return (
