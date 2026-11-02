@@ -13,6 +13,7 @@ import { WhyThis } from '@/components/home/why'
 import { SocialProofSlot } from '@/components/home/social-proof'
 import { UpdatesSignup } from '@/components/home/updates-signup'
 import { HOME_PRICE_LINE } from '@/lib/home/pricing-line'
+import { TrustLine } from '@/components/trust-line'
 
 export const metadata = pageMeta({ title: HOME_TITLE, description: HOME_DESCRIPTION, path: '/', absoluteTitle: true })
 
@@ -47,6 +48,7 @@ export default async function Home() {
         <ToolPicker rows={{ all: cards('all'), coaches: cards('coaches'), creators: cards('creators'), everyone: cards('everyone') }} />
         <Examples />
         <WhyThis />
+        <TrustLine className="px-4 py-8" />
         <SocialProofSlot />
         <UpdatesSignup />
       </main>
