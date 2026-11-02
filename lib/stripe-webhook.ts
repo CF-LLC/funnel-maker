@@ -1,3 +1,4 @@
+import { onInvoicePaid, type RewardDeps } from '@/lib/referrals/rewards'
 // Stripe webhook logic, kept free of Next/Supabase imports so it can be unit-tested with a fake store.
 import type Stripe from 'stripe'
 
@@ -33,7 +34,7 @@ export interface Store {
   setSubscriptionActive(subscriptionId: string, active: boolean): Promise<number>
 }
 
-export type Deps = { store: Store; priceMap: PriceMap; listLineItemPriceIds?: (sessionId: string) => Promise<string[]> }
+export type Deps = { store: Store; priceMap: PriceMap; listLineItemPriceIds?: (sessionId: string) => Promise<string[]>; rewards?: RewardDeps }
 export type Result = { status: 'processed' | 'duplicate' | 'ignored'; detail?: string }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -88,6 +89,8 @@ export async function handleEvent(event: Stripe.Event, d: Deps): Promise<Result>
       const n = await d.store.setSubscriptionActive(sub.id, false)
       r = { status: n ? 'processed' : 'ignored', detail: `deleted rows=${n}` }; break
     }
+    case 'invoice.paid':
+      r = d.rewards ? { status: 'processed', detail: await onInvoicePaid(event.data.object as any, d.rewards) } : { status: 'ignored', detail: 'invoice.paid' }; break
     default:
       r = { status: 'ignored', detail: event.type }
   }
