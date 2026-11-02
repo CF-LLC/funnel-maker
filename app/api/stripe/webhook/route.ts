@@ -4,6 +4,9 @@ import Stripe from 'stripe'
 import { checkoutSummary, handleEvent, parsePriceMap } from '@/lib/stripe-webhook'
 import { recordSiteEvent } from '@/lib/site-events/server'
 import { supabaseStore } from '@/lib/server/stripe-store'
+import { referralRewardStore } from '@/lib/server/referral-reward-store'
+import { couponIds } from '@/lib/referrals/rewards'
+import { referralRewardsEnabled } from '@/lib/referrals/core'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -35,6 +38,11 @@ export async function POST(request: Request) {
       priceMap,
       listLineItemPriceIds: process.env.STRIPE_SECRET_KEY
         ? async (id) => (await stripe.checkout.sessions.listLineItems(id, { limit: 20 })).data.map((li) => li.price?.id).filter((x): x is string => !!x)
+        : undefined,
+      // Referral coupons only when explicitly enabled AND a Stripe key is present to apply them.
+      rewards: referralRewardsEnabled() && process.env.STRIPE_SECRET_KEY
+        ? { store: referralRewardStore(), coupons: couponIds(), enabled: true,
+            applyCoupon: async (sub, coupon, key) => { await stripe.subscriptions.update(sub, { discounts: [{ coupon }] }, { idempotencyKey: key }) } }
         : undefined,
     })
     if (event.type === 'checkout.session.completed' && result.status === 'processed') {
