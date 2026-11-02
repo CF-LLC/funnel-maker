@@ -33,7 +33,7 @@ test('home page: free tools strip, one main CTA, flag-aware tool list, no repeat
   const { FREE_TOOLS } = jiti('../lib/free-tools/registry.ts')
   assert.deepEqual(FREE_TOOLS.map((t) => t.slug), ['invoice-generator', 'hourly-rate-calculator', 'utm-builder', 'qr-code-generator', 'email-signature-generator', 'late-invoice-kit'])
   const page = read('app/page.tsx')
-  assert.match(page, /alternates: \{ canonical: '\/' \}/)
+  assert.match(page, /alternates: \{ canonical: '\/' \}|pageMeta\(\{[^)]*path: '\/'/)
   assert.match(page, /getLaunchFlags\(\)/)
   assert.match(page, /toolsInRow\(row, flags\)/)
   assert.doesNotMatch(page, /HOME_ROWS\.map/)

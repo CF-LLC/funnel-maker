@@ -137,7 +137,7 @@ return (
         <div className="h-1.5 bg-brand" />
         <CardHeader>
           <CardTitle className="text-2xl">Create your SaaS Nation account</CardTitle>
-          <CardDescription>One account for Funnel Maker, Invoices and Link-in-bio</CardDescription>
+          <CardDescription>One account for every SaaS Nation tool</CardDescription>
         </CardHeader>
         <form onSubmit={handleRegister}>
           <CardContent className="space-y-4">

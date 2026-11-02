@@ -94,7 +94,7 @@ export function Footer() {
           <div>
             <h3 className="font-bold mb-4">SaaS Nation</h3>
             <p className="text-sm text-muted-foreground">
-              Funnels, invoices, Link-in-bio, forms, proposals and testimonials for small businesses. Support: <a href={`mailto:${SUPPORT_EMAIL}`} className="underline hover:text-foreground">{SUPPORT_EMAIL}</a>
+              Simple tools for coaches, creators and solo businesses: invoices, proposals, booking, forms, a client list, an email list, digital downloads and more. Support: <a href={`mailto:${SUPPORT_EMAIL}`} className="underline hover:text-foreground">{SUPPORT_EMAIL}</a>
             </p>
           </div>
         </div>

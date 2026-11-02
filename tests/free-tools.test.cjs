@@ -227,7 +227,8 @@ test('qr generator never stores data or calls an API', () => {
 test('public marketing pages declare a canonical; signed-in pages untouched', () => {
   const pages = { 'app/page.tsx': '/', 'app/pricing/page.tsx': '/pricing', 'app/templates/page.tsx': '/templates', 'app/terms/page.tsx': '/terms', 'app/privacy/page.tsx': '/privacy', 'app/refund/page.tsx': '/refund', 'app/data-removal/page.tsx': '/data-removal' }
   for (const [f, c] of Object.entries(pages)) {
-    assert.ok(fs.readFileSync(path.join(root, f), 'utf8').includes(`alternates: { canonical: '${c}' }`), f)
+    const src = fs.readFileSync(path.join(root, f), 'utf8')
+    assert.ok(src.includes(`alternates: { canonical: '${c}' }`) || new RegExp(`pageMeta\\(\\{[^)]*path: '${c.replace(/\//g, '\\/')}'`).test(src), f)
     assert.equal(isProtectedPath(c), false, c)
   }
   for (const f of ['app/dashboard/page.tsx']) if (fs.existsSync(path.join(root, f))) assert.ok(!fs.readFileSync(path.join(root, f), 'utf8').includes('canonical'), f)
@@ -275,7 +276,7 @@ test('email signature: no storage, network or upload in the tool', () => {
   assert.doesNotMatch(src, /localStorage|sessionStorage|indexedDB|fetch\(|XMLHttpRequest|FormData|supabase|document\.cookie|window\.open/)
   assert.match(src, /ClipboardItem/)
   assert.match(src, /'text\/html'/)
-  assert.match(src, /alternates: \{ canonical: freeToolPath/)
+  assert.match(src, /alternates: \{ canonical: freeToolPath|pageMeta\(\{[^)]*path: freeToolPath/)
   assert.ok(sitemap().some((e) => e.url.endsWith('/free-tools/email-signature-generator')))
 })
 

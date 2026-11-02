@@ -1,3 +1,4 @@
+import { pageMeta, PRICING_DESCRIPTION } from '@/lib/og/pages'
 import Link from 'next/link'
 import { Navbar } from '@/components/nav/navbar'
 import { Footer } from '@/components/nav/footer'
@@ -9,7 +10,7 @@ import { publicTools } from '@/tools/registry'
 const countWord = (n: number) => ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'][n] ?? String(n)
 import { starterSitesUrl } from '@/lib/url-safety'
 
-export const metadata = { title: 'Pricing | SaaS Nation', description: 'Each tool $12/mo or $99/yr. All Access $29/mo or $249/yr.', alternates: { canonical: '/pricing' } }
+export const metadata = pageMeta({ title: 'Pricing | SaaS Nation', description: PRICING_DESCRIPTION, path: '/pricing', absoluteTitle: true })
 
 const FAQ = [
   ['What is SaaS Nation?', 'A set of small tools for US online coaches and creators, including Funnels, Invoices, Forms, Proposals, Testimonials, Booking, Client list, Email list, Digital downloads and Link-in-bio.'],

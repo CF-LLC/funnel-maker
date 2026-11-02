@@ -1,3 +1,4 @@
+import { pageMeta } from '@/lib/og/pages'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -12,7 +13,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const l = getLanding((await params).slug)
   if (!l) return {}
-  return { title: l.title, description: l.description, alternates: { canonical: landingPath(l.slug) }, openGraph: { title: l.title, description: l.description, url: landingPath(l.slug), type: 'website' } }
+  return pageMeta({ title: l.title, description: l.description, path: landingPath(l.slug) })
 }
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
