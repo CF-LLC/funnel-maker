@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { logError } from '@/lib/server/log-error'
 import Stripe from 'stripe'
-import { handleEvent, parsePriceMap } from '@/lib/stripe-webhook'
+import { checkoutSummary, handleEvent, parsePriceMap } from '@/lib/stripe-webhook'
+import { recordSiteEvent } from '@/lib/site-events/server'
 import { supabaseStore } from '@/lib/server/stripe-store'
 
 export const dynamic = 'force-dynamic'
@@ -36,6 +37,9 @@ export async function POST(request: Request) {
         ? async (id) => (await stripe.checkout.sessions.listLineItems(id, { limit: 20 })).data.map((li) => li.price?.id).filter((x): x is string => !!x)
         : undefined,
     })
+    if (event.type === 'checkout.session.completed' && result.status === 'processed') {
+      await recordSiteEvent({ event: 'checkout_completed', ...checkoutSummary(event.data.object as any, result.detail, priceMap) }) // never throws
+    }
     return NextResponse.json({ received: true, ...result })
   } catch (e: any) {
     console.error('[stripe-webhook] failed', event.type, event.id, e?.message)

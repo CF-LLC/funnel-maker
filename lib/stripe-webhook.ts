@@ -94,3 +94,11 @@ export async function handleEvent(event: Stripe.Event, d: Deps): Promise<Result>
   await d.store.markEvent(event.id, event.type)
   return r
 }
+
+/** Analytics-only summary of a processed checkout: tool(s), plan and amount. No customer, email or card data. */
+export function checkoutSummary(s: { amount_total?: number | null; payment_link?: unknown }, detail: string | undefined, priceMap: PriceMap): { tool: string; plan: string | null; amount_cents: number | null } {
+  const plink = idOf(s.payment_link)
+  const plan = (plink && priceMap[plink]?.plan) || null
+  const amt = typeof s.amount_total === 'number' && s.amount_total >= 0 ? Math.round(s.amount_total) : null
+  return { tool: (detail || 'unknown').slice(0, 60), plan: plan ? plan.slice(0, 40) : null, amount_cents: amt }
+}

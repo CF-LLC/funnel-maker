@@ -3,6 +3,7 @@ import { Navbar } from '@/components/nav/navbar'
 import { Footer } from '@/components/nav/footer'
 import { FREE_TOOLS_CTA, FREE_TOOLS_PATH, freeToolJsonLd, type FreeTool } from '@/lib/free-tools/registry'
 import { SITE_URL } from '@/lib/free-tools/site-url'
+import { FreeToolExtras } from '@/components/free-tools/free-tool-extras'
 
 // Shared layout for every free tool: H1, intro, JSON-LD, one soft CTA. No pop-ups, no signup walls.
 export function FreeToolShell({ tool, children, note }: { tool: FreeTool; children: React.ReactNode; note?: string }) {
@@ -21,7 +22,7 @@ export function FreeToolShell({ tool, children, note }: { tool: FreeTool; childr
             {note ? <p className="mt-3 inline-block rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs text-emerald-200">{note}</p> : null}
           </div>
         </section>
-        <div className="container mx-auto px-4 py-8">{children}</div>
+        <div className="container mx-auto px-4 py-8"><FreeToolExtras slug={tool.slug}>{children}</FreeToolExtras></div>
         <p className="container mx-auto px-4 pb-14 text-center text-sm text-zinc-400">
           <Link href={tool.feeds.href} className="underline decoration-zinc-600 underline-offset-4 hover:text-white">{FREE_TOOLS_CTA}</Link>
           <span className="text-zinc-500"> · {tool.feeds.name} by SaaS Nation</span>

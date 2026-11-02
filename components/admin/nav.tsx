@@ -7,6 +7,7 @@ const TABS = [
   { href: '/admin/users', label: 'Users' },
   { href: '/admin/signups', label: 'Signups' },
   { href: '/admin/funnel', label: 'Funnel' },
+  { href: '/admin/traffic', label: 'Traffic' },
   { href: '/admin/health', label: 'Health' },
   { href: '/admin/activity', label: 'Activity' },
   { href: '/admin/system', label: 'System' },

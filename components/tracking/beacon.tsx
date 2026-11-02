@@ -1,6 +1,7 @@
 'use client'
 import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
+import { checkoutFromHref, trackEvent } from '@/lib/site-events/client'
 
 const COOKIE = 'sn_vid'
 // Never track our users' client-facing pages (private token links, public proposals/invoices/booking): only our own site.
@@ -23,6 +24,23 @@ const sessionRef = () => { try { return sessionStorage.getItem('sn_ref') } catch
 /** Sends one anonymous beacon per page per session: the landing page (with UTM tags / ?ref) and each free tool opened; plus CTA clicks. Respects Do-Not-Track. */
 export function Beacon() {
   const path = usePathname()
+  // Cookieless pageview (site_events): every page change on our own public pages.
+  useEffect(() => {
+    if (!path || SKIP.test(path)) return
+    const q = new URLSearchParams(location.search)
+    trackEvent('pageview', { referrer: document.referrer || null, utm_source: q.get('utm_source'), utm_medium: q.get('utm_medium'), utm_campaign: q.get('utm_campaign') })
+  }, [path])
+  // Stripe checkout link clicks, by tool / plan (site_events).
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (SKIP.test(location.pathname) && !location.pathname.startsWith('/dashboard')) return
+      const href = (e.target as HTMLElement | null)?.closest?.('a')?.getAttribute('href') || ''
+      const c = checkoutFromHref(href)
+      if (c) trackEvent('checkout_clicked', { tool: c.tool, plan: c.plan })
+    }
+    document.addEventListener('click', onClick, true)
+    return () => document.removeEventListener('click', onClick, true)
+  }, [])
   useEffect(() => {
     if (!path || SKIP.test(path) || navigator.doNotTrack === '1') return
     const isTool = path.startsWith('/free-tools/')
