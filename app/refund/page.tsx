@@ -1,13 +1,19 @@
+import { isFeatureEnabled } from '@/lib/flags'
+import { TRIAL_FLAG, TRIAL_REFUND } from '@/lib/trial/copy'
 import { LegalPage } from '@/components/legal/legal-page'
 import { COMPANY, COMPANY_LOCATION, PRODUCT, SUPPORT_EMAIL } from '@/lib/site'
 
 export const metadata = { title: `Refund Policy | ${PRODUCT}`, alternates: { canonical: '/refund' } }
 
-export default function RefundPage() {
+export const revalidate = 60
+
+export default async function RefundPage() {
+  const trial = await isFeatureEnabled(TRIAL_FLAG)
   return (
     <LegalPage title="Refund Policy">
       <h2>14-day money-back guarantee</h2>
       <p>If {PRODUCT} isn&apos;t right for you, email <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> within 14 days of your first payment and we&apos;ll refund it in full. No questions asked.</p>
+      {trial && <p data-trial-refund>{TRIAL_REFUND}</p>}
       <h2>Renewals</h2>
       <ul>
         <li>Monthly renewals are not refunded, but you can cancel any time and keep access until the end of the month you paid for.</li>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { TRIAL_NOTE } from '@/lib/trial/copy'
 import Link from 'next/link'
 import { Check } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
@@ -31,7 +32,7 @@ function listNames(names: string[]) {
   return names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} or ${names[names.length - 1]}`
 }
 
-export function PricingPlans({ flags = {} }: { flags?: Partial<Record<string, boolean>> }) {
+export function PricingPlans({ flags = {}, trial = false }: { flags?: Partial<Record<string, boolean>>; trial?: boolean }) {
   const tools = singleTools(flags)
   const names = tools.map((t) => t.name)
   const [user, setUser] = useState<{ id: string; email?: string | null } | null>(null)
@@ -95,6 +96,7 @@ export function PricingPlans({ flags = {} }: { flags?: Partial<Record<string, bo
         </div>
       </div>
       <p className="mt-6 text-center text-sm text-muted-foreground">No free plan. Buying a plan gives you access right away.</p>
+      {trial && <p data-trial-note className="mt-2 text-center text-sm text-muted-foreground">{TRIAL_NOTE}</p>}
       <p className="mt-2 text-center text-xs text-muted-foreground">
         By paying you agree to our <Link href="/terms" className="underline">Terms</Link>, <Link href="/privacy" className="underline">Privacy Policy</Link> and <Link href="/refund" className="underline">Refund Policy</Link> (14-day money-back guarantee).
       </p>

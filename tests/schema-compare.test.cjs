@@ -37,7 +37,7 @@ test('FAQ JSON-LD is built from the same visible FAQ objects (exact text)', () =
   const shell = read('components/landing/landing-shell.tsx')
   assert.ok(shell.includes('faqJsonLd(faqs)') && shell.includes('{f.q}') && shell.includes('{f.a}'))
   for (const c of COMPARES) { const ld = faqJsonLd(c.faqs); assert.deepEqual(ld.mainEntity.map((m) => [m.name, m.acceptedAnswer.text]), c.faqs.map((f) => [f.q, f.a])) }
-  const pricing = read('app/pricing/page.tsx'); assert.ok(pricing.includes('FAQ.map(([q, a])'))
+  const pricing = read('app/pricing/page.tsx'); assert.ok(pricing.includes('faq.map(([q, a])') && pricing.includes('faqLdFor(faq)'))
 })
 
 test('comparison pages: unique, link only to real landings, no competitor prices or numbers about them', () => {
