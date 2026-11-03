@@ -54,15 +54,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     `press flex min-h-[44px] items-center gap-3 rounded-xl px-3 text-sm font-medium ${active ? 'bg-violet-100 text-violet-800' : 'text-foreground/80 hover:bg-muted hover:text-foreground'}`
 
   const Sidebar = (
-    <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between p-5">
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="flex shrink-0 items-center justify-between p-5">
         <Link href="/dashboard" className="flex items-center gap-2 text-lg font-extrabold">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-white"><Zap className="h-4 w-4" /></span>
           SaaS Nation
         </Link>
         <button onClick={() => setOpen(false)} aria-label="Close menu" className="press flex h-11 w-11 items-center justify-center rounded-lg hover:bg-muted lg:hidden"><X className="h-5 w-5" /></button>
       </div>
-      <div className="px-3">
+      <div className="shrink-0 px-3">
         <Link href="/funnels/templates" className="press flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-brand text-sm font-semibold text-white shadow-md hover:brightness-110">
           <Plus className="h-4 w-4" /> New funnel
         </Link>
@@ -70,7 +70,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <Search className="h-4 w-4" />Search or create<kbd className="ml-auto rounded bg-muted px-1.5 text-[10px]">Ctrl K</kbd>
         </button>
       </div>
-      <nav className="flex-1 space-y-1 px-3 py-4" aria-label="Dashboard">
+      <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain px-3 py-4" aria-label="Dashboard" data-dashboard-nav>
         {navigation.map(({ name, href, icon: Icon }) => (
           <Link key={href} href={href} className={item(isActive(href))} aria-current={isActive(href) ? 'page' : undefined}>
             <Icon className="h-4 w-4" />{name}
@@ -84,7 +84,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </>
         )}
       </nav>
-      <div className="border-t p-3">
+      <div className="shrink-0 border-t p-3" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
         {userEmail && <div className="truncate px-3 pb-2 text-xs text-muted-foreground">{userEmail}</div>}
         <button onClick={handleSignOut} className={`${item(false)} w-full`}><LogOut className="h-4 w-4" />Sign out</button>
       </div>
@@ -99,7 +99,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Mobile drawer */}
       <div className={`fixed inset-0 z-50 lg:hidden ${open ? '' : 'pointer-events-none'}`} aria-hidden={!open}>
         <div onClick={() => setOpen(false)} className={`absolute inset-0 bg-black/40 transition-opacity duration-200 ${open ? 'opacity-100' : 'opacity-0'}`} />
-        <aside role="dialog" aria-label="Menu" className={`absolute inset-y-0 left-0 w-72 max-w-[85vw] bg-background shadow-2xl transition-transform duration-300 ease-out ${open ? 'translate-x-0' : '-translate-x-full'}`}>{Sidebar}</aside>
+        <aside role="dialog" aria-label="Menu" className={`absolute inset-y-0 left-0 h-[100dvh] w-72 max-w-[85vw] bg-background shadow-2xl transition-transform duration-300 ease-out ${open ? 'translate-x-0' : '-translate-x-full'}`}>{Sidebar}</aside>
       </div>
 
       <div className="lg:pl-64">
