@@ -1,10 +1,10 @@
 // Pure helpers for cookieless first-party site analytics (no I/O; unit tested).
 import { createHash } from 'node:crypto'
 
-export const SITE_EVENTS = ['pageview', 'signup_started', 'signup_completed', 'checkout_clicked', 'checkout_completed', 'free_tool_used', 'email_captured', 'upgrade_clicked', 'referral_landed', 'referral_signup'] as const
+export const SITE_EVENTS = ['pageview', 'signup_started', 'signup_completed', 'checkout_clicked', 'checkout_completed', 'free_tool_used', 'email_captured', 'upgrade_clicked', 'referral_landed', 'referral_signup', 'home_view', 'job_card_click', 'hero_trial_click', 'hero_free_tool_click', 'demo_view', 'faq_open'] as const
 export type SiteEvent = (typeof SITE_EVENTS)[number]
 /** Events a browser may send. checkout_completed / email_captured are written by the server only. */
-export const CLIENT_EVENTS: readonly SiteEvent[] = ['pageview', 'signup_started', 'signup_completed', 'checkout_clicked', 'free_tool_used', 'upgrade_clicked', 'referral_landed']
+export const CLIENT_EVENTS: readonly SiteEvent[] = ['pageview', 'signup_started', 'signup_completed', 'checkout_clicked', 'free_tool_used', 'upgrade_clicked', 'referral_landed', 'home_view', 'job_card_click', 'hero_trial_click', 'hero_free_tool_click', 'demo_view', 'faq_open']
 
 const BOT = /bot|crawl|spider|slurp|bingpreview|facebookexternalhit|headless|lighthouse|pingdom|uptime|curl|wget|python-requests|httpclient|axios|node-fetch|go-http|java\/|preview|monitor|scan/i
 export const isBot = (ua: string | null | undefined) => !ua || ua.length < 20 || BOT.test(ua)
