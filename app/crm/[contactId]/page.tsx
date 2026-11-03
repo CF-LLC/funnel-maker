@@ -32,9 +32,16 @@ export default async function ContactPage({ params }: { params: Promise<{ contac
   )
   // workspace_v2 (default off): extra tool sections, only for tools the viewer can open. Off = page unchanged.
   let workspace: WsSection[] | undefined
+  let nextSteps: { href: string; label: string }[] | undefined
   if (!demo && (await isUserFlagEnabled('workspace_v2', user!.id))) {
     const tools = visibleTools(await accessibleTools(user, WS_TOOLS))
     workspace = await loadClientWorkspace(supabase, user!.id, data.contact.email, tools)
+    // Next-step links (no prefill: the editors do not read a query string; the "Pick a client" picker finds this client).
+    const own = await accessibleTools(user, ['invoices', 'proposals'] as const)
+    nextSteps = [
+      ...(own.has('invoices') ? [{ href: '/invoices/new', label: 'New invoice' }] : []),
+      ...(own.has('proposals') ? [{ href: '/proposals/new', label: 'New proposal' }] : []),
+    ]
   }
-  return <ContactDetail contact={data.contact} activities={data.activities} notes={data.notes} demo={demo} workspace={workspace} />
+  return <ContactDetail contact={data.contact} activities={data.activities} notes={data.notes} demo={demo} workspace={workspace} nextSteps={nextSteps} />
 }
