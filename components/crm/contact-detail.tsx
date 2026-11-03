@@ -16,7 +16,7 @@ async function call(url: string, method: string, body?: unknown) {
   return j
 }
 
-export function ContactDetail({ contact, activities, notes: initialNotes, demo, workspace }: { contact: Contact; activities: Activity[]; notes: Note[]; demo: boolean; workspace?: WsSection[] }) {
+export function ContactDetail({ contact, activities, notes: initialNotes, demo, workspace, nextSteps }: { contact: Contact; activities: Activity[]; notes: Note[]; demo: boolean; workspace?: WsSection[]; nextSteps?: { href: string; label: string }[] }) {
   const [c, setC] = useState(contact)
   const [form, setForm] = useState({ name: contact.name, phone: contact.phone, company: contact.company, status: contact.status as CrmStatus, tags: contact.tags.join(', '), follow_up_on: contact.followUpOn || '' })
   const [saving, setSaving] = useState(false)
@@ -157,6 +157,15 @@ export function ContactDetail({ contact, activities, notes: initialNotes, demo, 
           </ol>
         </section>
       </div>
+      {nextSteps && nextSteps.length > 0 && (
+        <section aria-label="Next steps" data-next-steps className="flex flex-wrap items-center gap-2">
+          <span className="text-sm text-zinc-400">Next step:</span>
+          {nextSteps.map((n) => (
+            <Link key={n.href} href={n.href} data-next-step={n.label} className="press min-h-[44px] rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-black">{n.label}</Link>
+          ))}
+          <span className="text-xs text-zinc-500">Then use “Pick a client” to choose {contact.name || contact.email}.</span>
+        </section>
+      )}
       {workspace && <ClientWorkspace sections={workspace} />}
     </div>
   )

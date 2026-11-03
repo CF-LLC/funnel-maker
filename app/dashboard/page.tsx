@@ -15,6 +15,9 @@ import { loadResults } from '@/lib/me/results'
 import { loadToday } from '@/lib/me/today'
 import { buildToday, TODAY_TOOLS, type TodayItem } from '@/lib/me/today-core'
 import { TodayPanel } from '@/components/dashboard/today-panel'
+import { loadSetup } from '@/lib/me/setup'
+import { buildSetup, SETUP_TOOLS, type SetupStep } from '@/lib/me/setup-core'
+import { SetupChecklist } from '@/components/dashboard/setup-checklist'
 import { isUserFlagEnabled } from '@/lib/flags'
 import { isDemoUser } from '@/lib/demo'
 import { attachReferralOnce, getOrCreateCode, referralStats } from '@/lib/referrals/server'
@@ -47,9 +50,13 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const mine = tools.filter(has)
   // workspace_v2 (default off): Today panel, only for tools the user has. Off = dashboard unchanged.
   let today: TodayItem[] | null = null
+  let setup: SetupStep[] | null = null
   if (!isDemoUser(user!.id) && (await isUserFlagEnabled('workspace_v2', user!.id))) {
     const avail = new Set<string>(mine.map((t) => t.id).filter((id) => (TODAY_TOOLS as readonly string[]).includes(id)))
-    today = buildToday(await loadToday(supabase, user!.id, avail), avail)
+    const setupAvail = new Set<string>(mine.map((t) => t.id).filter((id) => (SETUP_TOOLS as readonly string[]).includes(id)))
+    const [counts, facts] = await Promise.all([loadToday(supabase, user!.id, avail), loadSetup(supabase, user!.id, setupAvail)])
+    today = buildToday(counts, avail)
+    setup = buildSetup(facts, setupAvail)
   }
   const locked = tools.filter((t) => !has(t))
 
@@ -86,6 +93,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       )}
 
       {today && <TodayPanel items={today} />}
+      {setup && <SetupChecklist steps={setup} />}
 
       <Hero
         art={heroTool.id}
@@ -105,7 +113,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           return { id: `${i.tool}-${i.id}`, art: t.id, name: i.title, tagline: `${t.name} · ${ago(i.at)}`, colors: t.showcase.colors, shot: t.showcase.shot, href: i.href, cta: 'Continue', badge: t.name }
         })} />
       </div>
-      <OnboardingChecklist steps={steps} />
+      {/* workspace_v2 replaces the old checklist with "Get set up"; flag off = unchanged. */}
+      {!setup && <OnboardingChecklist steps={steps} />}
       <ResultsPanel c={results} />
       {refCode && <ReferCard link={referralLink(refCode, SITE_URL)} stats={refStats} rewardsOn={referralRewardsEnabled()} />}
       <UpsellTiles tools={locked} />
