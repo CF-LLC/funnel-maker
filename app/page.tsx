@@ -1,7 +1,10 @@
 import { pageMeta, HOME_TITLE, HOME_DESCRIPTION } from '@/lib/og/pages'
 import { Navbar } from '@/components/nav/navbar'
 import { Footer } from '@/components/nav/footer'
-import { getLaunchFlags } from '@/lib/flags'
+import { getLaunchFlags, isFeatureEnabled } from '@/lib/flags'
+import { isHomepageV2Enabled } from '@/lib/home/v2-flag'
+import { HomeV2Page } from '@/components/home/v2/page-shell'
+import { TRIAL_FLAG } from '@/lib/trial/copy'
 import { HERO_TOOL_ID, getTool, toolsInRow, mainAndOtherTools } from '@/tools/registry'
 import { ToolRow } from '@/components/showcase/tool-row'
 import { Hero } from '@/components/showcase/hero'
@@ -23,6 +26,8 @@ export const revalidate = 60
 
 export default async function Home() {
   const flags = await getLaunchFlags()
+  // Job-based homepage (PR 6): only when the GLOBAL homepage_v2 flag is on. Off = the page below, unchanged.
+  if (await isHomepageV2Enabled()) return <HomeV2Page flags={flags} trial={await isFeatureEnabled(TRIAL_FLAG)} />
   const hero = getTool(HERO_TOOL_ID)!
   const { main, rest } = mainAndOtherTools(flags)
   const cards = (row: 'all' | 'coaches' | 'creators' | 'everyone') => (row === 'all' ? rest : toolsInRow(row, flags)).map((t) => toolCard(t))
@@ -58,3 +63,4 @@ export default async function Home() {
     </div>
   )
 }
+

@@ -2,10 +2,18 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { isProtectedPath } from '@/tools/registry'
 import { legacyHostRedirect } from '@/lib/legacy-host'
+import { HOMEPAGE_V2_PREVIEW_PATH, isHomepageV2Preview } from '@/lib/home/v2'
 
 export async function middleware(request: NextRequest) {
   const legacy = legacyHostRedirect(request.headers.get('x-forwarded-host') || request.headers.get('host'), request.nextUrl.pathname, request.nextUrl.search)
   if (legacy) return NextResponse.redirect(legacy, 301)
+
+  // Homepage v2 preview: /?hp=2 renders the noindex preview route (URL stays /?hp=2).
+  if (isHomepageV2Preview(request.nextUrl.pathname, request.nextUrl.searchParams.get('hp'))) {
+    const u = request.nextUrl.clone()
+    u.pathname = HOMEPAGE_V2_PREVIEW_PATH
+    return NextResponse.rewrite(u)
+  }
 
   let response = NextResponse.next({
     request: {
