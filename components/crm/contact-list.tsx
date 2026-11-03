@@ -23,7 +23,7 @@ export function ContactList({ contacts, demo, today }: { contacts: Contact[]; de
     <div className="space-y-6">
       <section className="cine-hero relative overflow-hidden rounded-3xl p-6 ring-1 ring-white/10 sm:p-8" style={{ background: 'radial-gradient(120% 140% at 0% 0%, #be123c55, transparent 55%), radial-gradient(120% 120% at 100% 100%, #4338ca55, transparent 60%), #111116' }}>
         <div className="cine-grain" />
-        <p className="relative text-xs font-bold uppercase tracking-[.25em] text-rose-300">Client list</p>
+        <p className="relative text-xs font-bold uppercase tracking-[.25em] text-rose-300">Clients</p>
         <h1 className="relative mt-2 text-3xl font-black tracking-tight sm:text-4xl">Everyone you work with, in one place</h1>
         <p className="relative mt-2 max-w-2xl text-sm text-zinc-300">Pulled automatically from your Forms, funnel leads, Bookings, Proposals and Invoices. Add a status, tags, notes and a follow-up date.</p>
         <div className="relative mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">

@@ -10,7 +10,7 @@ export async function crmGuard(write: boolean) {
   const { data: { user } } = await db.auth.getUser()
   if (!user) return { err: NextResponse.json({ error: 'Please sign in again.' }, { status: 401 }) }
   const demo = isDemoUser(user.id)
-  if (!demo && !(await hasAccess(user, 'crm'))) return { err: NextResponse.json({ error: 'Client list is not on your plan yet.' }, { status: 403 }) }
+  if (!demo && !(await hasAccess(user, 'crm'))) return { err: NextResponse.json({ error: 'Clients is not on your plan yet.' }, { status: 403 }) }
   if (write && demo) return { err: NextResponse.json({ error: DEMO_MSG, demo: true }, { status: 403 }) }
   return { db, user, demo }
 }

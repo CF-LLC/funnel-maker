@@ -16,7 +16,7 @@ import { ldHtml, pricingLd } from '@/lib/seo/schema'
 export const metadata = pageMeta({ title: PRICING_TITLE, description: PRICING_DESCRIPTION, path: '/pricing', absoluteTitle: true })
 
 const FAQ = [
-  ['What is SaaS Nation?', 'A set of small tools for US online coaches and creators, including Funnels, Invoices, Forms, Proposals, Testimonials, Booking, Client list, Email list, Digital downloads and Link-in-bio.'],
+  ['What is SaaS Nation?', 'A set of small tools for US online coaches and creators, including Funnels, Invoices, Forms, Proposals, Testimonials, Booking, Clients, Email list, Digital downloads and Link-in-bio.'],
   ['How much is it?', '$12/mo ($99/yr) for one tool, or $29/mo ($249/yr) for All Access, including every future tool.'],
   ['Does SaaS Nation take a cut?', 'No. Customers pay you through your own Stripe Payment Link.'],
   ['Is there a free plan?', 'No paid-tool free plan, but the free tools at /free-tools need no signup.'],

@@ -7,6 +7,8 @@ import { Plus, Trash2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { ClientPicker } from '@/components/clients/client-picker'
+import { matchSaved, type PickerClient } from '@/lib/clients/picker-core'
 import { formatCurrency, toCents, totals } from '@/lib/invoices/core'
 import { effectiveStatus, lineRows, nextInvoiceNumber, proposalSchema, proposalToInvoice, publicProposalPath, STATUS_LABELS, STATUS_STYLES } from '@/lib/proposals/core'
 
@@ -14,7 +16,7 @@ type L = { description: string; quantity: string; price: string }
 type F = { clientId: string; title: string; intro: string; currency: string; expiresOn: string; lines: L[] }
 const blankLine = (): L => ({ description: '', quantity: '1', price: '' })
 
-export function ProposalEditor({ id }: { id?: string }) {
+export function ProposalEditor({ id, crmClients }: { id?: string; crmClients?: PickerClient[] }) {
   const supabase = createClient() as any
   const router = useRouter()
   const [f, setF] = useState<F | null>(null)
@@ -57,6 +59,13 @@ export function ProposalEditor({ id }: { id?: string }) {
     const it = items.find((x) => x.id === iid); if (!it) return
     const lines = f.lines.length === 1 && !f.lines[0].description ? [] : f.lines
     set('lines', [...lines, { description: it.description, quantity: '1', price: (Number(it.unit_price_cents) / 100).toFixed(2) }])
+  }
+
+  // workspace_v2 picker: select the saved client with the same email, else fill the new-client name + email (user still clicks Save).
+  const pickCrm = (c: PickerClient) => {
+    const saved = matchSaved(clients, c.email)
+    if (saved) { setF((p) => p && { ...p, clientId: saved.id }); setNewClient({ name: '', email: '' }); return }
+    setF((p) => p && { ...p, clientId: '' }); setNewClient({ name: c.name, email: c.email })
   }
 
   async function addClient() {
@@ -143,6 +152,7 @@ export function ProposalEditor({ id }: { id?: string }) {
       {row?.status === 'declined' && <p className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-900">Declined on {new Date(row.responded_at).toLocaleString('en-US', { timeZone: 'America/Chicago' })} (Central).</p>}
       <fieldset className="space-y-2 rounded-lg border p-3" disabled={!!locked}>
         <legend className="px-1 text-sm font-semibold">Client</legend>
+        {crmClients && !locked && <ClientPicker clients={crmClients} onPick={pickCrm} />}
         <select aria-label="Saved client" className="w-full rounded-md border bg-background px-3 py-2 text-sm" value={f.clientId} onChange={(e) => set('clientId', e.target.value)}>
           <option value="">— Pick a saved client —</option>{clients.map((c) => <option key={c.id} value={c.id}>{c.name}{c.email ? ` (${c.email})` : ''}</option>)}</select>
         {!locked && <div className="flex flex-wrap items-end gap-2 text-sm">
