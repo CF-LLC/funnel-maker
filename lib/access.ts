@@ -37,3 +37,14 @@ export async function currentUserHasAccess(tool: Tool): Promise<{ userId: string
   const { data: { user } } = await supabase.auth.getUser()
   return { userId: user?.id ?? null, allowed: await hasAccess(user, tool) }
 }
+
+/** Which of `tools` the user can open, using one app_access read (same rules as hasAccess). */
+export async function accessibleTools(user: { id: string } | null | undefined, tools: readonly Tool[]): Promise<Set<Tool>> {
+  const out = new Set<Tool>()
+  if (!user?.id) return out
+  const supabase = await createServerClient()
+  const { data } = await (supabase as any).from('app_access').select('tool').eq('user_id', user.id).eq('active', true).limit(100)
+  const rows: string[] = Array.isArray(data) ? data.map((r: any) => r.tool) : []
+  for (const t of tools) if (isIncludedTool(t) ? rows.length > 0 : rows.includes(t) || rows.includes('all')) out.add(t)
+  return out
+}
