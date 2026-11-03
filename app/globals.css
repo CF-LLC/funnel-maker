@@ -229,6 +229,10 @@
   color-scheme: light;
   color: hsl(var(--foreground));
 }
+/* The renderer root sets its own text colour (text-white on dark themes, text-gray-900 on classic).
+   Without these, the island rule above and the noir gray remap win, so headings came out dark-on-dark or white-on-white. */
+.noir .fm-theme.text-white { color: #fff; }
+.noir .fm-theme.text-gray-900 { color: #111827; }
 .light-surface .bg-app {
   background:
     radial-gradient(60rem 30rem at 0% -10%, rgba(124,58,237,.10), transparent 60%),
