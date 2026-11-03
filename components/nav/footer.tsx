@@ -95,7 +95,7 @@ export function Footer() {
             <h3 className="font-bold">SaaS Nation</h3>
             <p className="mb-4 text-[10px] font-medium uppercase tracking-wider text-zinc-400" data-logo-subtitle>Software as a Service</p>
             <p className="text-sm text-muted-foreground">
-              Simple online software tools (software as a service) for small business, coaches and creators: invoices, proposals, booking, forms, a client list, an email list, digital downloads and more. Support: <a href={`mailto:${SUPPORT_EMAIL}`} className="underline hover:text-foreground">{SUPPORT_EMAIL}</a>
+              Simple online software tools (software as a service) for small business, coaches and creators: invoices, proposals, booking, forms, a client list, an email list, digital downloads and more. Support: <a href={`mailto:${SUPPORT_EMAIL}`} className="underline break-all hover:text-foreground">{SUPPORT_EMAIL}</a>
             </p>
           </div>
         </div>
