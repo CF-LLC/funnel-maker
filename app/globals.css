@@ -233,6 +233,8 @@
    Without these, the island rule above and the noir gray remap win, so headings came out dark-on-dark or white-on-white. */
 .noir .fm-theme.text-white { color: #fff; }
 .noir .fm-theme.text-gray-900 { color: #111827; }
+/* Glass is not in the renderer's DARK list (root gets text-gray-900), but its cards sit on a blue/purple gradient: keep its text white like the body copy. */
+.fm-theme.fm-theme-glass.text-gray-900 { color: #fff; }
 .light-surface .bg-app {
   background:
     radial-gradient(60rem 30rem at 0% -10%, rgba(124,58,237,.10), transparent 60%),
@@ -329,7 +331,7 @@
 .fm-glass-blobs span:nth-child(3) { background: #facc15; bottom: -6rem; left: 20%; animation-delay: -10s; opacity: .45; }
 @keyframes blob { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(3rem,2rem) scale(1.15); } }
 .fm-glass-card {
-  padding: 2rem 1.25rem; border-radius: 1.75rem; background: rgba(255,255,255,.14);
+  padding: 2rem 1.25rem; border-radius: 1.75rem; background: rgba(30,27,75,.4); /* dark frost so white text stays >= 4.5:1 over the bright blobs */
   border: 1px solid rgba(255,255,255,.35); box-shadow: 0 20px 60px -20px rgba(15,23,42,.5);
   backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%);
 }

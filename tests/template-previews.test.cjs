@@ -55,3 +55,9 @@ test('renderer root text colour beats the noir island rule', () => {
   assert.match(css, /\.noir \.fm-theme\.text-white \{ color: #fff; \}/)
   assert.match(css, /\.noir \.fm-theme\.text-gray-900 \{ color: #111827; \}/)
 })
+
+test('glass template text stays white on its gradient cards', () => {
+  const css = read('app/globals.css')
+  assert.match(css, /\.fm-theme\.fm-theme-glass\.text-gray-900 \{ color: #fff; \}/)
+  assert.ok(css.indexOf('.fm-theme.fm-theme-glass.text-gray-900') > css.indexOf('.noir .fm-theme.text-gray-900'))
+})
