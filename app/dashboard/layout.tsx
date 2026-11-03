@@ -3,17 +3,20 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Zap, LogOut, Users, CreditCard, Shield, Menu, X, Plus, Search, Settings } from 'lucide-react'
+import { LayoutDashboard, Zap, LogOut, Users, CreditCard, Shield, Menu, X, Plus, Search, Settings, Lock } from 'lucide-react'
 import { CommandPalette, QUICK_CREATE, openPalette } from '@/components/dashboard/command-palette'
 import { createClient } from '@/lib/supabase'
 import { publicTools, LAUNCH_FLAGS, LAUNCH_FLAG_KEYS } from '@/tools/registry'
 import { TOOL_ICONS } from '@/components/tools/tool-icons'
+import { groupedNav } from '@/tools/groups'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false) // mobile drawer; desktop sidebar is always shown
   const [isAdmin, setIsAdmin] = useState(false)
   const [userEmail, setUserEmail] = useState('')
   const [flags, setFlags] = useState<Record<string, boolean>>({ ...LAUNCH_FLAGS })
+  // workspace_v2 grouped sidebar: null = flag off (sidebar exactly as before).
+  const [v2Access, setV2Access] = useState<string[] | null>(null)
   const pathname = usePathname()
   const supabase = createClient()
 
@@ -23,6 +26,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       // Admin link only for admin_users (fm_is_admin); /admin itself is enforced server-side.
       if (user) (supabase as any).rpc('fm_is_admin', { uid: user.id }).then(({ data }: { data: unknown }) => setIsAdmin(data === true))
     })
+    fetch('/api/me/sidebar', { cache: 'no-store' }).then((r) => r.json()).then((d) => { if (d?.v2 === true && Array.isArray(d.access)) setV2Access(d.access) }).catch(() => {})
     for (const k of LAUNCH_FLAG_KEYS) if (!LAUNCH_FLAGS[k]) (supabase as any).rpc('fm_public_flag', { flag_key: `${k}_public` }).then(({ data }: { data: unknown }) => setFlags((f) => ({ ...f, [k]: data === true })))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -71,11 +75,39 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </button>
       </div>
       <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain px-3 py-4" aria-label="Dashboard" data-dashboard-nav>
-        {navigation.map(({ name, href, icon: Icon }) => (
+        {v2Access === null ? navigation.map(({ name, href, icon: Icon }) => (
           <Link key={href} href={href} className={item(isActive(href))} aria-current={isActive(href) ? 'page' : undefined}>
             <Icon className="h-4 w-4" />{name}
           </Link>
-        ))}
+        )) : (
+          <div data-grouped-nav>
+            {navigation.filter((n) => n.href === '/dashboard').map(({ name, href, icon: Icon }) => (
+              <Link key={href} href={href} className={item(isActive(href))} aria-current={isActive(href) ? 'page' : undefined}><Icon className="h-4 w-4" />{name}</Link>
+            ))}
+            {groupedNav(publicTools(flags), v2Access).map((g) => (
+              <section key={g.name} aria-label={g.name} className="mt-4" data-nav-group={g.name}>
+                <h3 className="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{g.name}</h3>
+                <div className="space-y-1">
+                  {g.items.map((n) => {
+                    const Icon = TOOL_ICONS[n.icon]
+                    return n.locked ? (
+                      <Link key={n.toolId} href={n.href} data-locked-tool={n.toolId} aria-label={`${n.label}, locked, ${n.price}. See plans`} className={`${item(false)} text-muted-foreground`}>
+                        <Icon className="h-4 w-4" />{n.label}<span className="ml-auto flex items-center gap-1 text-xs"><Lock className="h-3.5 w-3.5" aria-hidden="true" />{n.price}</span>
+                      </Link>
+                    ) : (
+                      <Link key={n.href} href={n.href} className={item(isActive(n.href))} aria-current={isActive(n.href) ? 'page' : undefined}><Icon className="h-4 w-4" />{n.label}</Link>
+                    )
+                  })}
+                </div>
+              </section>
+            ))}
+            <div className="mt-4 space-y-1 border-t pt-3">
+              {navigation.filter((n) => ['/dashboard/organizations', '/dashboard/billing', '/dashboard/settings'].includes(n.href)).map(({ name, href, icon: Icon }) => (
+                <Link key={href} href={href} className={item(isActive(href))} aria-current={isActive(href) ? 'page' : undefined}><Icon className="h-4 w-4" />{name}</Link>
+              ))}
+            </div>
+          </div>
+        )}
         {isAdmin && (
           <>
             <div className="my-2 h-px bg-border" />
