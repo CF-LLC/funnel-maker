@@ -1,7 +1,10 @@
 import Link from 'next/link'
 import { createServerClient } from '@/lib/supabase'
 import { isDemoUser } from '@/lib/demo'
-import { hasAccess } from '@/lib/access'
+import { accessibleTools, hasAccess } from '@/lib/access'
+import { isUserFlagEnabled } from '@/lib/flags'
+import { loadClientWorkspace } from '@/lib/clients/workspace'
+import { WS_TOOLS, visibleTools, type WsSection } from '@/lib/clients/workspace-core'
 import { normEmail } from '@/lib/crm/core'
 import { loadContact } from '@/lib/crm/load'
 import { DEMO_ACTIVITIES, DEMO_NOTES, demoContacts } from '@/lib/crm/demo'
@@ -27,5 +30,11 @@ export default async function ContactPage({ params }: { params: Promise<{ contac
       <Link href="/crm" className="mt-4 inline-block rounded-full bg-white px-5 py-2 text-sm font-semibold text-black">Back to clients</Link>
     </div>
   )
-  return <ContactDetail contact={data.contact} activities={data.activities} notes={data.notes} demo={demo} />
+  // workspace_v2 (default off): extra tool sections, only for tools the viewer can open. Off = page unchanged.
+  let workspace: WsSection[] | undefined
+  if (!demo && (await isUserFlagEnabled('workspace_v2', user!.id))) {
+    const tools = visibleTools(await accessibleTools(user, WS_TOOLS))
+    workspace = await loadClientWorkspace(supabase, user!.id, data.contact.email, tools)
+  }
+  return <ContactDetail contact={data.contact} activities={data.activities} notes={data.notes} demo={demo} workspace={workspace} />
 }

@@ -5,6 +5,8 @@ import { ArrowLeft, ArrowUpRight, CalendarClock, Check, Loader2, Pencil, Trash2 
 import { CRM_STATUSES, STATUS_LABEL, type Activity, type Contact, type CrmStatus } from '@/lib/crm/core'
 import type { Note } from '@/lib/crm/load'
 import { Avatar, SourceBadge, StatusPill, money, shortDate } from './bits'
+import type { WsSection } from '@/lib/clients/workspace-core'
+import { ClientWorkspace } from './client-workspace'
 
 const DEMO_MSG = 'This is the demo account, so changes are not saved.'
 async function call(url: string, method: string, body?: unknown) {
@@ -14,7 +16,7 @@ async function call(url: string, method: string, body?: unknown) {
   return j
 }
 
-export function ContactDetail({ contact, activities, notes: initialNotes, demo }: { contact: Contact; activities: Activity[]; notes: Note[]; demo: boolean }) {
+export function ContactDetail({ contact, activities, notes: initialNotes, demo, workspace }: { contact: Contact; activities: Activity[]; notes: Note[]; demo: boolean; workspace?: WsSection[] }) {
   const [c, setC] = useState(contact)
   const [form, setForm] = useState({ name: contact.name, phone: contact.phone, company: contact.company, status: contact.status as CrmStatus, tags: contact.tags.join(', '), follow_up_on: contact.followUpOn || '' })
   const [saving, setSaving] = useState(false)
@@ -155,6 +157,7 @@ export function ContactDetail({ contact, activities, notes: initialNotes, demo }
           </ol>
         </section>
       </div>
+      {workspace && <ClientWorkspace sections={workspace} />}
     </div>
   )
 }
