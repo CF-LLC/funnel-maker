@@ -7,6 +7,7 @@ import { ArrowRight, Eye, Loader2, Sparkles } from 'lucide-react'
 import { templates, type FunnelTemplate } from '@/data/templates'
 import { createClient } from '@/lib/supabase'
 import { toast } from '@/components/ui/toast'
+import { templatePreview } from '@/data/template-previews'
 
 /**
  * Step 1 of the guided flow. Picking a template creates the funnel (optimistically showing
@@ -64,18 +65,18 @@ export function TemplatePicker({ returnTo }: { returnTo: string }) {
 
   return (
     <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-      {templates.map((t) => <TemplateCard key={t.id} t={t} busy={busy === t.id} disabled={!!busy && busy !== t.id} onUse={() => use(t.id)} />)}
+      {templates.map((t, i) => <TemplateCard key={t.id} t={t} eager={i < 3} busy={busy === t.id} disabled={!!busy && busy !== t.id} onUse={() => use(t.id)} />)}
     </div>
   )
 }
 
-function TemplateCard({ t, busy, disabled, onUse }: { t: FunnelTemplate; busy: boolean; disabled: boolean; onUse: () => void }) {
+function TemplateCard({ t, eager, busy, disabled, onUse }: { t: FunnelTemplate; eager: boolean; busy: boolean; disabled: boolean; onUse: () => void }) {
   const isNew = t.theme !== 'classic'
   return (
     <article className="lift group flex flex-col overflow-hidden rounded-2xl border bg-card">
-      <div className="relative aspect-[16/9] overflow-hidden" style={{ background: t.swatch }}>
-        <ThumbArt t={t} />
-        <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-gray-900 shadow">
+      <div className="relative aspect-[16/10] overflow-hidden border-b" style={{ background: t.swatch }}>
+        <PreviewImage t={t} eager={eager} />
+        <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-[#111827] shadow">
           {isNew && <Sparkles className="h-3 w-3 text-fuchsia-600" />}{t.effect}
         </span>
       </div>
@@ -100,19 +101,14 @@ function TemplateCard({ t, busy, disabled, onUse }: { t: FunnelTemplate; busy: b
   )
 }
 
-/** Tiny static mock of the page layout, so the picker stays fast (no iframes). */
-function ThumbArt({ t }: { t: FunnelTemplate }) {
-  const dark = t.theme !== 'classic'
-  const bar = dark ? 'bg-white/80' : 'bg-gray-900/70'
-  const sub = dark ? 'bg-white/45' : 'bg-gray-900/25'
+/** Real screenshot of the template's first screen. Fixed width/height so cards never shift. */
+function PreviewImage({ t, eager }: { t: FunnelTemplate; eager: boolean }) {
+  const p = templatePreview(t.id)
   return (
-    <div aria-hidden className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-6 transition-transform duration-500 group-hover:scale-[1.04]">
-      {t.theme === 'starfield' && <div className="absolute inset-0 opacity-80" style={{ backgroundImage: 'radial-gradient(1px 1px at 20% 30%,#fff,transparent),radial-gradient(1px 1px at 70% 20%,#fff,transparent),radial-gradient(1.5px 1.5px at 40% 70%,#fff,transparent),radial-gradient(1px 1px at 85% 60%,#fff,transparent),radial-gradient(1px 1px at 10% 80%,#fff,transparent)' }} />}
-      <div className={`relative flex w-3/4 flex-col items-center gap-2 ${t.theme === 'glass' ? 'rounded-xl border border-white/40 bg-white/20 p-3 backdrop-blur' : ''}`}>
-        <div className={`h-3 w-4/5 rounded-full ${bar}`} />
-        <div className={`h-2 w-3/5 rounded-full ${sub}`} />
-        <div className={`mt-1 h-5 w-24 rounded-full ${t.theme === 'neon' ? 'bg-cyan-400 shadow-[0_0_12px_#22d3ee]' : dark ? 'bg-white' : 'bg-brand'}`} />
-      </div>
-    </div>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={p.src} srcSet={p.srcSet} sizes="(min-width: 1280px) 400px, (min-width: 640px) 50vw, 100vw"
+      width={p.width} height={p.height} alt={p.alt}
+      loading={eager ? 'eager' : 'lazy'} fetchPriority={eager ? 'high' : 'auto'} decoding="async"
+      className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]" />
   )
 }
