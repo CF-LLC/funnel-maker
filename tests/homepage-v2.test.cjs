@@ -86,3 +86,24 @@ test('tracking events wired with the exact names via trackEvent and accepted by 
     assert.equal(parseBeacon({ event: e, path: '/', tool: 'get_clients' }, ['saasnation.site']).event, e)
   }
 })
+
+test('SEO: "/" with homepage_v2 on is indexable with canonical https://saasnation.site/; preview stays noindex', () => {
+  const page = read('app/page.tsx')
+  const layout = read('app/layout.tsx')
+  for (const s of [page, layout, read('components/home/v2/page-shell.tsx'), read('components/home/v2/home-v2.tsx')]) assert.doesNotMatch(s, /noindex|robots\s*:/)
+  assert.match(page, /pageMeta\(\{ title: HOME_TITLE, description: HOME_DESCRIPTION, path: '\/'/)
+  assert.match(layout, /metadataBase: new URL\(SITE_URL\)/)
+  const { canonicalSiteUrl } = jiti('../lib/free-tools/site-url.ts')
+  assert.equal(new URL('/', canonicalSiteUrl(undefined)).href, 'https://saasnation.site/')
+  const { pageMeta } = jiti('../lib/og/pages.ts')
+  const m = pageMeta({ title: 't', description: 'd', path: '/', absoluteTitle: true })
+  assert.equal(m.alternates.canonical, '/')
+  assert.equal(m.robots, undefined)
+  assert.match(read('app/home-v2/page.tsx'), /robots: \{ index: false, follow: false \}/)
+})
+
+test('free tools section says "six free tools" in visible copy', () => {
+  const src = read('components/home/v2/home-v2.tsx')
+  assert.match(src, />Try one of our six free tools</)
+  assert.match(src, />No signup, nothing stored\.</)
+})

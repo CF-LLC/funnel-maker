@@ -58,7 +58,8 @@ export function HomeV2({ flags, trial }: { flags: Record<string, boolean>; trial
       </section>
 
       <nav aria-label="Free tools" className="mx-auto max-w-5xl px-4 py-12" data-free-strip>
-        <h2 className="text-2xl font-bold sm:text-3xl">Free, no signup, nothing stored</h2>
+        <h2 className="text-2xl font-bold sm:text-3xl">Try one of our six free tools</h2>
+        <p className="mt-2 text-zinc-300">No signup, nothing stored.</p>
         <ul className="mt-4 flex flex-wrap gap-2">
           {FREE_TOOLS.map((t) => <li key={t.slug}><Link href={freeToolPath(t.slug)} className="inline-flex min-h-[40px] items-center rounded-full bg-white/10 px-4 text-sm font-semibold ring-1 ring-white/15 hover:bg-white/20">{t.name}</Link></li>)}
         </ul>
