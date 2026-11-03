@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase'
 import { Menu, X } from 'lucide-react'
 
-/** Phone menu links (big tap targets). Mirrors every desktop nav link, plus Guides. */
+/** Main nav links, shared by the desktop header and the phone menu so they never drift apart. */
 export const MOBILE_MENU_LINKS = [
   { href: '/#tools', label: 'Tools' },
   { href: '/templates', label: 'Templates' },
@@ -71,38 +71,38 @@ export function Navbar({ bottomBar = true }: { bottomBar?: boolean }) {
     window.location.href = '/'
   }
 
+  const desk = 'whitespace-nowrap rounded-md px-1 py-2 text-sm text-zinc-200 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary aria-[current=page]:text-white aria-[current=page]:font-semibold'
   const tap = 'flex min-h-[56px] items-center rounded-xl px-4 text-2xl font-bold text-white hover:bg-white/5'
 
   return (
     <nav className="sticky top-0 z-50 border-b border-white/5 bg-zinc-950/80 backdrop-blur" style={{ paddingTop: 'env(safe-area-inset-top)' }} aria-label="Main">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-4 sm:gap-8">
-          <Link href="/" className="flex items-center gap-2" aria-label="SaaS Nation, software as a service: home">
+        <div className="flex min-w-0 items-center gap-4 lg:gap-8">
+          <Link href="/" className="flex shrink-0 items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" aria-label="SaaS Nation, software as a service: home">
             <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand text-white text-sm">✦</span>
             <span className="flex flex-col leading-none">
               <span className="text-xl font-extrabold">SaaS Nation</span>
               <span className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-zinc-400" data-logo-subtitle>Software as a Service</span>
             </span>
           </Link>
-          <div className="hidden md:flex gap-6">
-            <Link href="/#tools" className="text-sm hover:text-primary">Tools</Link>
-            <Link href="/templates" className="text-sm hover:text-primary">Templates</Link>
-            <Link href="/free-tools" className="text-sm hover:text-primary">Free tools</Link>
-            <Link href="/pricing" className="text-sm hover:text-primary">Pricing</Link>
+          <div className="hidden md:flex items-center gap-4 lg:gap-6" data-desktop-nav-links>
+            {MOBILE_MENU_LINKS.map((l) => (
+              <Link key={l.href} href={l.href} className={desk} aria-current={pathname === l.href ? 'page' : undefined}>{l.label}</Link>
+            ))}
           </div>
         </div>
 
-        {/* Desktop actions (unchanged) */}
-        <div className="hidden md:flex items-center gap-4">
+        {/* Desktop actions: one focusable element each (no button nested in a link) */}
+        <div className="hidden md:flex shrink-0 items-center gap-2 lg:gap-4">
           {user ? (
             <>
-              <Link href="/dashboard"><Button variant="ghost" size="sm" className="sm:size-default">Dashboard</Button></Link>
-              <Button variant="outline" size="sm" className="sm:size-default" onClick={handleSignOut}>Sign Out</Button>
+              <Button asChild variant="ghost" size="sm" className="sm:size-default"><Link href="/dashboard">Dashboard</Link></Button>
+              <Button variant="outline" size="sm" className="sm:size-default" onClick={handleSignOut}>Sign out</Button>
             </>
           ) : (
             <>
-              <Link href="/auth/login"><Button variant="ghost" size="sm" className="sm:size-default">Login</Button></Link>
-              <Link href="/auth/register"><Button size="sm" className="sm:size-default">Start building</Button></Link>
+              <Button asChild variant="ghost" size="sm" className="sm:size-default"><Link href="/auth/login">Sign in</Link></Button>
+              <Button asChild size="sm" className="sm:size-default whitespace-nowrap"><Link href="/auth/register">Start building</Link></Button>
             </>
           )}
         </div>
