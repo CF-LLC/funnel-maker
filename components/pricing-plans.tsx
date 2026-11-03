@@ -9,7 +9,7 @@ import { ALL_ACCESS_PRICE, TOOL_PRICE, paymentLinkUrl, type Billing, type SoldKe
 
 // Main tools first (same order as MAIN_TOOL_IDS), then the rest.
 const SINGLE: { id: Exclude<SoldKey, 'all'>; name: string }[] = [
-  { id: 'dataremoval', name: 'Data Removal' }, { id: 'crm', name: 'Client list' },
+  { id: 'dataremoval', name: 'Data Removal' }, { id: 'crm', name: 'Clients' },
   { id: 'emaillist', name: 'Email list' }, { id: 'downloads', name: 'Digital downloads' },
   { id: 'funnels', name: 'Funnels' }, { id: 'invoices', name: 'Invoices' }, { id: 'forms', name: 'Forms' },
   { id: 'proposals', name: 'Proposals' }, { id: 'testimonials', name: 'Testimonials' }, { id: 'booking', name: 'Booking' },

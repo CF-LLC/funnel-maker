@@ -7,6 +7,8 @@ import { createClient } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { InvoicePreview } from './invoice-preview'
+import { ClientPicker } from '@/components/clients/client-picker'
+import { matchSaved, type PickerClient } from '@/lib/clients/picker-core'
 import { addDaysISO, formatCurrency, invoiceSchema, toCents, todayISO, totals } from '@/lib/invoices/core'
 
 type L = { description: string; quantity: string; price: string }
@@ -16,7 +18,7 @@ type F = {
 }
 const blankLine = (): L => ({ description: '', quantity: '1', price: '' })
 
-export function InvoiceEditor({ id }: { id?: string }) {
+export function InvoiceEditor({ id, crmClients }: { id?: string; crmClients?: PickerClient[] }) {
   const supabase = createClient() as any
   const router = useRouter()
   const [f, setF] = useState<F | null>(null)
@@ -59,6 +61,12 @@ export function InvoiceEditor({ id }: { id?: string }) {
   const tax = f.taxRate === '' ? null : Number(f.taxRate)
   const t = totals(linesCents, tax)
 
+  // workspace_v2 picker: fill name + email from a CRM client; reuse a saved client with the same email.
+  const pickCrm = (c: PickerClient) => {
+    const saved = matchSaved(clients, c.email)
+    if (saved) return setF((p) => p && { ...p, clientId: saved.id, clientName: saved.name ?? c.name, clientEmail: saved.email ?? c.email, clientAddress: saved.address ?? '' })
+    setF((p) => p && { ...p, clientId: null, clientName: c.name || p.clientName, clientEmail: c.email })
+  }
   const pickClient = (cid: string) => {
     const c = clients.find((x) => x.id === cid)
     setF({ ...f, clientId: c?.id ?? null, clientName: c?.name ?? f.clientName, clientEmail: c?.email ?? '', clientAddress: c?.address ?? '' })
@@ -119,6 +127,7 @@ export function InvoiceEditor({ id }: { id?: string }) {
         <div className="grid gap-3 sm:grid-cols-3">{inp('number', 'Invoice #')}{inp('issueDate', 'Issued', { type: 'date' })}{inp('dueDate', 'Due', { type: 'date' })}</div>
         <fieldset className="space-y-2 rounded-lg border p-3">
           <legend className="px-1 text-sm font-semibold">Client</legend>
+          {crmClients && <ClientPicker clients={crmClients} onPick={pickCrm} />}
           {clients.length > 0 && <select aria-label="Saved client" className="w-full rounded-md border bg-background px-3 py-2 text-sm" value={f.clientId || ''} onChange={(e) => pickClient(e.target.value)}>
             <option value="">— New / one-off client —</option>{clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>}
           <div className="grid gap-3 sm:grid-cols-2">{inp('clientName', 'Name')}{inp('clientEmail', 'Email (optional)', { type: 'email' })}</div>

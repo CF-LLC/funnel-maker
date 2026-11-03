@@ -1,2 +1,4 @@
 import { InvoiceEditor } from '@/components/invoices/invoice-editor'
-export default function NewInvoicePage() { return <InvoiceEditor /> }
+import { loadPickerClients } from '@/lib/clients/picker'
+export const dynamic = 'force-dynamic'
+export default async function NewInvoicePage() { return <InvoiceEditor crmClients={await loadPickerClients()} /> }

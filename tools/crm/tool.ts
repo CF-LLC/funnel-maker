@@ -1,10 +1,10 @@
 import type { ToolDef } from '../types'
 export const crmTool = {
   id: 'crm',
-  name: 'Client list',
+  name: 'Clients',
   tagline: 'Everyone who filled a form, booked a call, got a proposal or paid an invoice, in one list with notes and follow-ups.',
   route: '/crm',
-  nav: [{ label: 'Client list', href: '/crm', icon: 'users' }],
+  nav: [{ label: 'Clients', href: '/crm', icon: 'users' }],
   accessKey: 'crm',
   protectedPaths: ['/crm'],
   priceLabel: '$12/mo or $99/yr, or included in All Access',

@@ -72,7 +72,7 @@ export function FlagToggles({ flags, preview = false }: { flags: { key: string; 
         <div key={f.key} className="flex items-center gap-3 rounded-xl bg-white/[0.03] p-3 ring-1 ring-white/10">
           <div className="min-w-0 flex-1"><div className="font-mono text-sm font-semibold">{f.key}</div>{f.description && <div className="text-xs text-zinc-400">{f.description}</div>}</div>
           <button role="switch" aria-checked={f.enabled} aria-label={`${f.key} ${f.enabled ? 'on' : 'off'}`}
-            onClick={() => ask({ title: `Turn ${f.key} ${f.enabled ? 'off' : 'on'}?`, body: f.key === 'crm_public' && !f.enabled ? 'Client list (CRM) appears on home, pricing and the dashboard within about a minute. CRM pricing still needs your OK and has no Stripe links yet.' : 'Takes effect within about a minute.', danger: !f.enabled, url: '/api/admin/flags', payload: { key: f.key, enabled: !f.enabled } })}
+            onClick={() => ask({ title: `Turn ${f.key} ${f.enabled ? 'off' : 'on'}?`, body: f.key === 'crm_public' && !f.enabled ? 'Clients (CRM) appears on home, pricing and the dashboard within about a minute. CRM pricing still needs your OK and has no Stripe links yet.' : 'Takes effect within about a minute.', danger: !f.enabled, url: '/api/admin/flags', payload: { key: f.key, enabled: !f.enabled } })}
             className={`relative h-7 w-12 shrink-0 rounded-full transition ${f.enabled ? 'bg-emerald-500' : 'bg-zinc-700'}`}>
             <span className={`absolute top-1 h-5 w-5 rounded-full bg-white transition-all ${f.enabled ? 'left-6' : 'left-1'}`} />
           </button>
