@@ -12,6 +12,11 @@ import { UpsellTiles } from '@/components/dashboard/upsell-tiles'
 import { recordSignupOnce } from '@/lib/acquisition/server'
 import { ResultsPanel } from '@/components/dashboard/results-panel'
 import { loadResults } from '@/lib/me/results'
+import { loadToday } from '@/lib/me/today'
+import { buildToday, TODAY_TOOLS, type TodayItem } from '@/lib/me/today-core'
+import { TodayPanel } from '@/components/dashboard/today-panel'
+import { isUserFlagEnabled } from '@/lib/flags'
+import { isDemoUser } from '@/lib/demo'
 import { attachReferralOnce, getOrCreateCode, referralStats } from '@/lib/referrals/server'
 import { referralLink, referralRewardsEnabled } from '@/lib/referrals/core'
 import { ReferCard } from '@/components/referrals/refer-card'
@@ -40,6 +45,12 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const tools = [...publicTools(await getLaunchFlags())].sort((a, b) => a.showcase.order - b.showcase.order)
   const has = (t: ToolDef) => all || active.has(t.accessKey) || (!!t.includedWithAnyPlan && active.size > 0)
   const mine = tools.filter(has)
+  // workspace_v2 (default off): Today panel, only for tools the user has. Off = dashboard unchanged.
+  let today: TodayItem[] | null = null
+  if (!isDemoUser(user!.id) && (await isUserFlagEnabled('workspace_v2', user!.id))) {
+    const avail = new Set<string>(mine.map((t) => t.id).filter((id) => (TODAY_TOOLS as readonly string[]).includes(id)))
+    today = buildToday(await loadToday(supabase, user!.id, avail), avail)
+  }
   const locked = tools.filter((t) => !has(t))
 
   const last = recent[0]
@@ -73,6 +84,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           )}
         </div>
       )}
+
+      {today && <TodayPanel items={today} />}
 
       <Hero
         art={heroTool.id}
