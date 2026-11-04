@@ -16,7 +16,7 @@ export function buildSetup(f: SetupFacts, access: ReadonlySet<string>): SetupSte
   const step = (id: SetupStep['id'], label: string, done: boolean | undefined, href: string | null, hint: string, cta: string): SetupStep =>
     href ? { id, label, hint, href, cta, done: !!done, locked: false } : { id, label, hint: LOCKED_HINT, href: '/pricing', cta: 'See plans', done: !!done, locked: true }
 
-  const clientHref = has('crm') ? '/crm' : has('invoices') ? '/invoices/clients' : null
+  const clientHref = has('crm') ? '/crm/new' : has('invoices') ? '/invoices/clients' : null
   const sendHref = has('proposals') ? '/proposals' : has('invoices') ? '/invoices' : null
   const shareHref = has('booking') ? '/booking' : has('forms') ? '/forms' : has('funnels') ? '/funnels' : null
   const shareName = has('booking') ? 'a booking page' : has('forms') ? 'a form' : 'a funnel'

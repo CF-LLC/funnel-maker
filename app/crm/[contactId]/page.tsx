@@ -12,8 +12,9 @@ import { ContactDetail } from '@/components/crm/contact-detail'
 
 export const dynamic = 'force-dynamic'
 
-export default async function ContactPage({ params }: { params: Promise<{ contactId: string }> }) {
+export default async function ContactPage({ params, searchParams }: { params: Promise<{ contactId: string }>; searchParams?: Promise<Record<string, string | string[] | undefined>> }) {
   const { contactId } = await params
+  const added = (await searchParams)?.added === '1'
   let raw = contactId; try { raw = decodeURIComponent(contactId) } catch { /* keep raw */ }
   const email = normEmail(raw)
   const supabase = await createServerClient()
@@ -43,5 +44,8 @@ export default async function ContactPage({ params }: { params: Promise<{ contac
       ...(own.has('proposals') ? [{ href: '/proposals/new', label: 'New proposal' }] : []),
     ]
   }
-  return <ContactDetail contact={data.contact} activities={data.activities} notes={data.notes} demo={demo} workspace={workspace} nextSteps={nextSteps} />
+  return <>
+    {added && <p role="status" data-client-added className="mb-4 rounded-xl bg-emerald-500/15 px-4 py-2 text-sm text-emerald-100 ring-1 ring-emerald-400/30">Client saved.</p>}
+    <ContactDetail contact={data.contact} activities={data.activities} notes={data.notes} demo={demo} workspace={workspace} nextSteps={nextSteps} />
+  </>
 }

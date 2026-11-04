@@ -74,7 +74,7 @@ test('loader: only queries tools the user has; a failing query leaves just that 
 test('builder: owned tools link to the tool, locked ones to /pricing with plain wording', () => {
   const s = C.buildSetup({ client: true }, new Set(['crm', 'invoices']))
   assert.deepEqual(s.map((x) => x.id), ['client', 'send', 'share', 'paid'])
-  assert.deepEqual(s.map((x) => x.href), ['/crm', '/invoices', '/pricing', '/invoices'])
+  assert.deepEqual(s.map((x) => x.href), ['/crm/new', '/invoices', '/pricing', '/invoices'])
   assert.equal(s[0].done, true); assert.equal(s[2].locked, true)
   assert.match(s[2].hint, /\$12\/mo/)
   const n = C.buildSetup({}, new Set())

@@ -13,7 +13,7 @@ import { recordSignupOnce } from '@/lib/acquisition/server'
 import { ResultsPanel } from '@/components/dashboard/results-panel'
 import { loadResults } from '@/lib/me/results'
 import { loadToday } from '@/lib/me/today'
-import { buildToday, TODAY_TOOLS, type TodayItem } from '@/lib/me/today-core'
+import { buildToday, todayEmpty, TODAY_TOOLS, type TodayItem } from '@/lib/me/today-core'
 import { TodayPanel } from '@/components/dashboard/today-panel'
 import { loadSetup } from '@/lib/me/setup'
 import { buildSetup, SETUP_TOOLS, type SetupStep } from '@/lib/me/setup-core'
@@ -51,12 +51,14 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   // workspace_v2 (default off): Today panel, only for tools the user has. Off = dashboard unchanged.
   let today: TodayItem[] | null = null
   let setup: SetupStep[] | null = null
+  let todayEmptyState: ReturnType<typeof todayEmpty> | undefined
   if (!isDemoUser(user!.id) && (await isUserFlagEnabled('workspace_v2', user!.id))) {
     const avail = new Set<string>(mine.map((t) => t.id).filter((id) => (TODAY_TOOLS as readonly string[]).includes(id)))
     const setupAvail = new Set<string>(mine.map((t) => t.id).filter((id) => (SETUP_TOOLS as readonly string[]).includes(id)))
     const [counts, facts] = await Promise.all([loadToday(supabase, user!.id, avail), loadSetup(supabase, user!.id, setupAvail)])
     today = buildToday(counts, avail)
     setup = buildSetup(facts, setupAvail)
+    todayEmptyState = todayEmpty(!!facts.client, setupAvail)
   }
   const locked = tools.filter((t) => !has(t))
 
@@ -92,7 +94,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         </div>
       )}
 
-      {today && <TodayPanel items={today} />}
+      {today && <TodayPanel items={today} empty={todayEmptyState} />}
       {setup && <SetupChecklist steps={setup} />}
 
       <Hero
