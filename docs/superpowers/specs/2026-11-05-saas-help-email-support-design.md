@@ -6,7 +6,7 @@ The original request, verified as CTO user position 4175, is a good support opti
 
 ## What exists today
 
-`lib/site.ts` defines `SUPPORT_EMAIL` as `process.env.NEXT_PUBLIC_SUPPORT_EMAIL`, and if that is unset, `cooperfeatherstonellc@gmail.com`. A local resolution of the live footer matched that same address. This design does not claim the mailbox is monitored, that mail is delivered, or that the live environment variable was read from production secrets. A parent check of the authorized account is separate. No test message is part of this work.
+`lib/site.ts` defines `SUPPORT_EMAIL` as `process.env.NEXT_PUBLIC_SUPPORT_EMAIL`, and if that is unset, `cooperfeatherstonellc@gmail.com`. A local resolution of the live footer matched that same address. The sanctioned connector status reports server `user-Gmail--cooperfeatherstonellc-gmail-com` as connected, account `cooperfeatherstonellc@gmail.com`. That verifies Cooper's authorized linked business mailbox matches the observed live support destination and the source fallback. It does not verify that a person reads the mailbox on any schedule, or that a message is delivered. No email was sent. The live environment variable was not read from production secrets.
 
 The public footer, on desktop and in the stacked phone layout, already has a Support `mailto:` to `SUPPORT_EMAIL`. Privacy, terms, and the refund page use the same constant. There is no `/help` route and no `/contact` route. The marketing header and the phone menu list Tools, Templates, Free tools, Pricing, and Guides. They do not list Help. The signed-in dashboard sidebar and phone bar do not list Help. The welcome email says "visit our help center" and does not link a URL. This design does not change the welcome sending pipeline.
 
