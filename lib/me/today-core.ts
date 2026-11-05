@@ -19,7 +19,12 @@ export type TodayCounts = Partial<{
 }>
 
 export type TodayItem = { id: string; tool: TodayTool; text: string; href: string; cta: string }
-export const TODAY_EMPTY = { text: 'Nothing needs you today.', cta: 'Create your first client', href: '/crm' }
+export const TODAY_EMPTY = { text: 'Nothing needs you today.', cta: 'Create your first client', href: '/crm/new' }
+/** Empty-state next step. Has a client already = neutral "Add a client". No Clients tool = invoice clients, else pricing. */
+export function todayEmpty(hasClient: boolean, access: ReadonlySet<string>) {
+  const href = access.has('crm') ? '/crm/new' : access.has('invoices') ? '/invoices/clients' : '/pricing'
+  return { text: TODAY_EMPTY.text, cta: hasClient ? 'Add a client' : TODAY_EMPTY.cta, href }
+}
 
 const plural = (n: number, one: string, many = one + 's') => `${n} ${n === 1 ? one : many}`
 const money = (by: Record<string, number>) => Object.entries(by).filter(([, c]) => c > 0).sort().map(([cur, c]) => formatCurrency(c, cur)).join(' + ')

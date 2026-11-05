@@ -8,7 +8,7 @@ export function ClientPicker({ clients, onPick, disabled }: { clients: PickerCli
   const [q, setQ] = useState('')
   const [open, setOpen] = useState(false)
   const hits = useMemo(() => filterPicker(clients, q), [clients, q])
-  if (clients.length === 0) return <p className="text-xs text-muted-foreground">No clients yet. Type a name and email below, or add clients in <Link href="/crm" className="underline">Clients</Link>.</p>
+  if (clients.length === 0) return <p className="text-xs text-muted-foreground">No clients yet. Type a name and email below, or <Link href="/crm/new" className="underline">add a client</Link> in Clients.</p>
   return (
     <div className="relative">
       <label className="block text-sm"><span className="font-medium">Pick a client</span>

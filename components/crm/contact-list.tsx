@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
-import { Download, Search, CalendarClock, Users } from 'lucide-react'
+import { Download, Search, CalendarClock, Users, UserPlus } from 'lucide-react'
 import { CRM_STATUSES, SOURCES, STATUS_LABEL, SOURCE_LABEL, contactHref, filterContacts, type Contact } from '@/lib/crm/core'
 import { Avatar, SourceBadge, StatusPill, money, shortDate } from './bits'
 
@@ -24,7 +24,10 @@ export function ContactList({ contacts, demo, today }: { contacts: Contact[]; de
       <section className="cine-hero relative overflow-hidden rounded-3xl p-6 ring-1 ring-white/10 sm:p-8" style={{ background: 'radial-gradient(120% 140% at 0% 0%, #be123c55, transparent 55%), radial-gradient(120% 120% at 100% 100%, #4338ca55, transparent 60%), #111116' }}>
         <div className="cine-grain" />
         <p className="relative text-xs font-bold uppercase tracking-[.25em] text-rose-300">Clients</p>
-        <h1 className="relative mt-2 text-3xl font-black tracking-tight sm:text-4xl">Everyone you work with, in one place</h1>
+        <div className="relative mt-2 flex flex-wrap items-start justify-between gap-3">
+          <h1 className="text-3xl font-black tracking-tight sm:text-4xl">Everyone you work with, in one place</h1>
+          <Link href="/crm/new" data-add-client className="press inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-zinc-200"><UserPlus className="h-4 w-4" />Add client</Link>
+        </div>
         <p className="relative mt-2 max-w-2xl text-sm text-zinc-300">Pulled automatically from your Forms, funnel leads, Bookings, Proposals and Invoices. Add a status, tags, notes and a follow-up date.</p>
         <div className="relative mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {stat('Contacts', contacts.length)}
@@ -56,6 +59,7 @@ export function ContactList({ contacts, demo, today }: { contacts: Contact[]; de
           <Users className="mx-auto h-10 w-10 text-zinc-500" />
           <h2 className="mt-3 text-lg font-bold">No clients yet</h2>
           <p className="mx-auto mt-1 max-w-md text-sm text-zinc-400">When someone fills one of your forms, books a call, gets a proposal or an invoice, they show up here automatically.</p>
+          <Link href="/crm/new" data-add-client-empty className="press mt-4 inline-flex items-center gap-1.5 rounded-full bg-white px-5 py-2 text-sm font-semibold text-black hover:bg-zinc-200"><UserPlus className="h-4 w-4" />Add client</Link>
         </div>
       ) : list.length === 0 ? (
         <p className="rounded-2xl bg-white/[0.03] p-8 text-center text-sm text-zinc-400 ring-1 ring-white/10">No contacts match these filters.</p>
