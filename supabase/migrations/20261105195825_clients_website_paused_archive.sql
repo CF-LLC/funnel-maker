@@ -47,6 +47,9 @@ alter table public.crm_contacts
 
 -- Ordinary rollback is an application/image rollback only. Keep this migration's
 -- columns, the widened status check, and every stored value (website, paused, archived_at).
--- The previous app build does not show the new fields. It does not erase rows or those columns.
+-- The previous app (59dacf05) does not show the new fields. It does not erase rows or those columns.
 -- Do not drop website or archived_at, and do not narrow the status check or clear paused/website
 -- values. That would destroy user data and is not an authorized rollback.
+-- While that older build is running, do not open and save a Paused client: it does not
+-- recognize paused, so a save can rewrite the status to lead. Leave those rows untouched
+-- until a build that includes paused is restored.
