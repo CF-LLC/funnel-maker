@@ -23,6 +23,7 @@ export const EXPORT_TABLES: { table: string; col: string }[] = [
   { table: 'inv_invoices', col: 'user_id' }, { table: 'frm_forms', col: 'user_id' }, { table: 'frm_responses', col: 'user_id' },
   { table: 'prp_proposals', col: 'user_id' }, { table: 'tst_reviews', col: 'user_id' }, { table: 'bk_bookings', col: 'user_id' },
   { table: 'lib_profiles', col: 'user_id' }, { table: 'dr_profiles', col: 'user_id' }, { table: 'crm_contacts', col: 'user_id' },
+  { table: 'crm_tasks', col: 'user_id' },
   { table: 'el_subscribers', col: 'user_id' }, { table: 'dl_products', col: 'user_id' }, { table: 'organizations', col: 'owner_id' },
   { table: 'user_notification_prefs', col: 'user_id' },
 ]

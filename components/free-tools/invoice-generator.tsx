@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { InvoicePreview } from '@/components/invoices/invoice-preview'
-import { FREE_INVOICE_CURRENCIES, blankFreeInvoice, pdfFileName, toPreviewData, type FreeInvoiceForm } from '@/lib/free-tools/invoice'
+import { FREE_INVOICE_CURRENCIES, blankFreeInvoice, freeInvoiceProblems, freeInvoiceReady, pdfFileName, toPreviewData, type FreeInvoiceForm } from '@/lib/free-tools/invoice'
 
 // Browser-only: state lives in React memory only. No browser storage, no network calls.
 const inp = 'w-full rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-violet-400 focus:outline-none'
@@ -12,12 +12,14 @@ export function FreeInvoiceGenerator() {
   const [f, setF] = useState<FreeInvoiceForm>(() => blankFreeInvoice())
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
+  const problems = useMemo(() => freeInvoiceProblems(f), [f])
   const d = useMemo(() => toPreviewData(f), [f])
   const set = <K extends keyof FreeInvoiceForm>(k: K, v: FreeInvoiceForm[K]) => setF((p) => ({ ...p, [k]: v }))
   const setLine = (i: number, k: 'description' | 'quantity' | 'price', v: string) =>
     setF((p) => ({ ...p, lines: p.lines.map((l, j) => (j === i ? { ...l, [k]: v } : l)) }))
 
   async function download() {
+    if (!freeInvoiceReady(f)) { setErr(problems[0] || 'Fix the highlighted amounts before downloading.'); return }
     setBusy(true); setErr(null)
     try {
       const [{ pdf }, { InvoicePdf }] = await Promise.all([import('@react-pdf/renderer'), import('@/components/invoices/invoice-pdf')])
@@ -70,9 +72,9 @@ export function FreeInvoiceGenerator() {
           <div><label className={lbl} htmlFor="notes">Notes</label><textarea id="notes" rows={2} className={inp} value={f.notes} onChange={(e) => set('notes', e.target.value)} placeholder="Thanks for your business! Payment by bank transfer." /></div>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <button type="submit" disabled={busy} className="rounded-xl bg-gradient-to-r from-violet-600 to-pink-600 px-6 py-3 font-bold text-white shadow-lg hover:brightness-110 disabled:opacity-60">{busy ? 'Building PDF…' : 'Download PDF'}</button>
+          <button type="submit" disabled={busy || problems.length > 0} className="rounded-xl bg-gradient-to-r from-violet-600 to-pink-600 px-6 py-3 font-bold text-white shadow-lg hover:brightness-110 disabled:opacity-60">{busy ? 'Building PDF…' : 'Download PDF'}</button>
           <button type="button" onClick={() => setF(blankFreeInvoice())} className="text-sm text-zinc-400 hover:text-white">Clear</button>
-          {err ? <span role="alert" className="text-sm text-red-400">{err}</span> : null}
+          {problems.length ? <ul role="alert" className="w-full list-disc pl-5 text-sm text-red-400">{problems.map((p) => <li key={p}>{p}</li>)}</ul> : err ? <span role="alert" className="text-sm text-red-400">{err}</span> : null}
         </div>
       </form>
       <div className="min-w-0 lg:sticky lg:top-20 lg:self-start">
