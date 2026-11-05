@@ -60,6 +60,17 @@ test('filters by search, status, source, tag and due follow-ups', () => {
   assert.deepEqual(f({ tag: 'vip' }), ['sam@example.org'])
   assert.deepEqual(f({ due: true }), ['sam@example.org'])
   assert.equal(f({ status: 'bogus', source: 'bogus' }).length, 2)
+  const hidden = C.aggregate([], [{ email: 'old@example.com', status: 'paused', tags: [], website: 'https://old.example', archived_at: '2026-10-01T00:00:00Z' }, { email: 'now@example.com', status: 'lead', tags: [] }])
+  assert.deepEqual(C.filterContacts(hidden, {}, '2026-10-26').map((c) => c.email), ['now@example.com'])
+  assert.deepEqual(C.filterContacts(hidden, { archived: true }, '2026-10-26').map((c) => c.email), ['old@example.com'])
+  assert.equal(C.cleanWebsite('brightpixel.studio').website, 'https://brightpixel.studio')
+  assert.equal(C.cleanWebsite('').website, null)
+  assert.equal(C.cleanWebsite('javascript:alert(1)').ok, false)
+  assert.equal(C.cleanWebsite('data:text/html,hi').ok, false)
+  assert.equal(C.safeWebsiteHref('javascript:alert(1)'), null)
+  assert.equal(C.safeWebsiteHref('https://example.com/a'), 'https://example.com/a')
+  assert.equal(C.isStatus('paused'), true)
+  assert.equal(C.isStatus('lead'), true)
 })
 
 test('CSV export: header, quoting, money and formula injection guard', () => {
@@ -71,6 +82,8 @@ test('CSV export: header, quoting, money and formula injection guard', () => {
   assert.match(row, /^"x@y\.co","'=HYPERLINK\(""evil""\)",""/)
   assert.match(row, /"He said ""hi"", ok","Past client","a b"/)
   assert.match(row, /"123\.45","123\.45","USD","2026-10-01"/)
+  assert.ok(head.endsWith('"Website","Archived"'))
+  assert.ok(row.endsWith(',"",""'))
   assert.ok(csv.endsWith('\r\n'))
 })
 

@@ -21,7 +21,7 @@ export async function loadTemplates(): Promise<Template[]> {
 }
 export async function loadContacts(): Promise<{ name: string; email: string }[]> {
   const db: any = await createServerClient()
-  const { data } = await db.from('crm_contacts').select('name, email').order('updated_at', { ascending: false }).limit(500)
+  const { data } = await db.from('crm_contacts').select('name, email').is('archived_at', null).order('updated_at', { ascending: false }).limit(500)
   return (data || []).filter((c: any) => c.email).map((c: any) => ({ name: c.name || c.email, email: c.email }))
 }
 export type Candidate = Item & { email: string | null }

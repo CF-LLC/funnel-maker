@@ -14,10 +14,11 @@ export const DEMO_ACTIVITIES: Activity[] = [
   { source: 'invoice', id: 'd10', email: 'li.wei@example.net', name: 'Li Wei', at: d(90), title: 'Invoice INV-0004 (paid)', href: '/invoices', amountCents: 80000, currency: 'USD', paid: true },
 ]
 export const DEMO_OWN: OwnContact[] = [
-  { email: 'maya.lopez@example.com', company: 'Lopez Wellness', status: 'active', tags: ['vip', 'coaching'], follow_up_on: '2026-10-28' },
-  { email: 'jordan@brightpixel.studio', company: 'Bright Pixel', status: 'lead', tags: ['agency'], follow_up_on: '2026-10-24' },
+  { email: 'maya.lopez@example.com', company: 'Lopez Wellness', status: 'active', tags: ['vip', 'coaching'], follow_up_on: '2026-10-28', website: 'https://lopezwellness.example' },
+  { email: 'jordan@brightpixel.studio', company: 'Bright Pixel', status: 'paused', tags: ['agency'], follow_up_on: '2026-10-24', website: 'https://brightpixel.studio' },
   { email: 'priya@northwind.co', company: 'Northwind', status: 'not_a_fit', tags: [] },
   { email: 'li.wei@example.net', status: 'past', tags: ['referral'] },
+  { email: 'archive.demo@example.com', name: 'Archived Demo', company: 'Old Studio', status: 'active', tags: ['retainer'], website: 'http://oldstudio.example', archived_at: '2026-10-01T00:00:00Z', created_at: '2026-09-01T00:00:00Z' },
 ]
 export const demoContacts = () => aggregate(DEMO_ACTIVITIES, DEMO_OWN)
 export const DEMO_NOTES = [{ id: 'n1', body: 'Wants to add a group program in Q1. Send pricing after the next session.', created_at: d(3), updated_at: d(3) }]

@@ -1,4 +1,4 @@
-import { SOURCE_LABEL, STATUS_LABEL, type CrmStatus, type Source } from '@/lib/crm/core'
+import { safeWebsiteHref, SOURCE_LABEL, STATUS_LABEL, type CrmStatus, type Source } from '@/lib/crm/core'
 
 const SRC_CLS: Record<Source, string> = {
   form: 'bg-sky-500/15 text-sky-200 ring-sky-400/30',
@@ -9,6 +9,7 @@ const SRC_CLS: Record<Source, string> = {
 const STATUS_CLS: Record<CrmStatus, string> = {
   lead: 'bg-violet-500/20 text-violet-100 ring-violet-400/40',
   active: 'bg-emerald-500/20 text-emerald-100 ring-emerald-400/40',
+  paused: 'bg-amber-500/20 text-amber-100 ring-amber-400/40',
   past: 'bg-zinc-500/20 text-zinc-200 ring-zinc-400/30',
   not_a_fit: 'bg-rose-500/15 text-rose-200 ring-rose-400/30',
 }
@@ -18,6 +19,13 @@ export const SourceBadge = ({ s, n }: { s: Source; n?: number }) => (
 export const StatusPill = ({ s }: { s: CrmStatus }) => (
   <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold ring-1 ${STATUS_CLS[s]}`}>{STATUS_LABEL[s]}</span>
 )
+/** Link only when the value is an http(s) URL. Otherwise plain text, never a raw href. */
+export function WebsiteLink({ url }: { url: string }) {
+  const href = safeWebsiteHref(url)
+  if (!href) return url ? <span className="break-all text-zinc-300">{url}</span> : null
+  const label = href.replace(/^https?:\/\//, '')
+  return <a href={href} target="_blank" rel="noopener noreferrer" className="break-all text-rose-200 underline-offset-2 hover:underline">{label}</a>
+}
 export function Avatar({ name, email, size = 40 }: { name: string; email: string; size?: number }) {
   const ini = (name || email).split(/[\s@._-]+/).filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join('')
   let h = 0; for (const ch of email) h = (h * 31 + ch.charCodeAt(0)) % 360
