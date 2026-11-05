@@ -73,7 +73,7 @@ export function FreeInvoiceGenerator() {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <button type="submit" disabled={busy || problems.length > 0} className="rounded-xl bg-gradient-to-r from-violet-600 to-pink-600 px-6 py-3 font-bold text-white shadow-lg hover:brightness-110 disabled:opacity-60">{busy ? 'Building PDF…' : 'Download PDF'}</button>
-          <button type="button" onClick={() => setF(blankFreeInvoice())} className="text-sm text-zinc-400 hover:text-white">Clear</button>
+          <button type="button" onClick={() => { setF(blankFreeInvoice()); setErr(null) }} className="text-sm text-zinc-400 hover:text-white">Clear</button>
           {problems.length ? <ul role="alert" className="w-full list-disc pl-5 text-sm text-red-400">{problems.map((p) => <li key={p}>{p}</li>)}</ul> : err ? <span role="alert" className="text-sm text-red-400">{err}</span> : null}
         </div>
       </form>

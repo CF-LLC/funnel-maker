@@ -1,6 +1,7 @@
 // Free invoice generator: the same toPreviewData + totals + formatCurrency path the page and PDF use.
 const test = require('node:test')
 const assert = require('node:assert/strict')
+const fs = require('fs')
 const path = require('path')
 const root = path.resolve(__dirname, '..')
 const jiti = require('jiti')(__filename, { alias: { '@': root } })
@@ -84,6 +85,77 @@ test('a negative unit price still totals as finite money and can be exported', (
   assert.equal(m.total, '-$50.00')
 })
 
+test('a finite credit with ordinary tax still totals exactly', () => {
+  const m = money(form({ lines: [{ description: 'QA extreme', quantity: '2', price: '-25' }], taxRate: '8.5' }))
+  assert.deepEqual(m.problems, [])
+  assert.equal(m.ready, true)
+  assert.equal(m.t.subtotal, -5000)
+  assert.equal(m.t.tax, -425)
+  assert.equal(m.t.total, -5425)
+  assert.equal(m.total, '-$54.25')
+})
+
+test('combined amounts that the production total cannot represent are not previewed or exported', () => {
+  // Each line is a safe integer and formats exactly. Their sum is also the safe integer
+  // 8199717789473059, but formatCurrency prints a different cent.
+  const faithful = 8199717789473056
+  const plain = [{ quantity: 1, unit_price_cents: faithful }, { quantity: 1, unit_price_cents: 3 }]
+  const added = totals(plain, null)
+  assert.equal(added.subtotal, faithful + 3)
+  assert.notEqual(formatCurrency(added.subtotal), '$81,997,177,894,730.59')
+  const shown = money(form({
+    lines: [
+      { description: 'Ceiling', quantity: '1', price: '81997177894730.56' },
+      { description: 'Plus', quantity: '1', price: '0.03' },
+    ],
+    taxRate: '',
+  }))
+  assert.ok(shown.problems.length > 0)
+  assert.equal(shown.ready, false)
+  assert.equal(shown.d.lines.length, 0)
+  assert.equal(shown.total, '$0.00')
+  finiteMoney(shown)
+
+  // Two safe line amounts whose Number sum drops a cent: 9007199254740991 + 2.
+  const ceiling = [{ quantity: 9007199254740991, unit_price_cents: 1 }, { quantity: 2, unit_price_cents: 1 }]
+  const lost = totals(ceiling, null)
+  assert.equal(BigInt(lost.subtotal), 9007199254740992n)
+  assert.notEqual(BigInt(lost.subtotal), 9007199254740991n + 2n)
+  const pair = money(form({
+    lines: [
+      { description: 'A', quantity: '9007199254740991', price: '0.01' },
+      { description: 'B', quantity: '2', price: '0.01' },
+    ],
+    taxRate: '0',
+  }))
+  assert.equal(pair.ready, false)
+  assert.equal(pair.d.lines.length, 0)
+  finiteMoney(pair)
+
+  // A display-exact subtotal whose 8.5% total is a safe integer formatCurrency does not print exactly.
+  const taxed = totals([{ quantity: 1, unit_price_cents: 8199717789473055 }], 8.5)
+  assert.equal(taxed.total, 8896693801578265)
+  assert.notEqual(formatCurrency(taxed.total), '$88,966,938,015,782.65')
+  const withTax = money(form({
+    lines: [{ description: 'Ceiling', quantity: '1', price: '81997177894730.55' }],
+    taxRate: '8.5',
+  }))
+  assert.equal(withTax.ready, false)
+  assert.equal(withTax.d.lines.length, 0)
+  finiteMoney(withTax)
+
+  // The same size without the extra cents still totals and formats exactly. This is not a dollar cap.
+  const still = money(form({
+    lines: [{ description: 'Ceiling', quantity: '1', price: '81997177894730.56' }],
+    taxRate: '8.5',
+  }))
+  assert.deepEqual(still.problems, [])
+  assert.equal(still.ready, true)
+  assert.equal(still.t.subtotal, 8199717789473056)
+  assert.equal(still.t.total, 8896693801578266)
+  assert.equal(still.total, '$88,966,938,015,782.66')
+})
+
 test('non-finite quantity and an overflowing line are not previewed or exported', () => {
   const sci = money(form({ lines: [{ description: 'QA extreme', quantity: '1e309', price: '25' }], taxRate: '' }))
   assert.ok(sci.problems.some((p) => /quantity/i.test(p)))
@@ -97,4 +169,12 @@ test('non-finite quantity and an overflowing line are not previewed or exported'
   finiteMoney(huge)
   assert.equal(huge.d.lines.length, 0)
   assert.equal(huge.total, '$0.00')
+})
+
+test('Clear resets a stale PDF error along with the form', () => {
+  const src = fs.readFileSync(path.join(root, 'components/free-tools/invoice-generator.tsx'), 'utf8')
+  assert.match(src, /setErr\('Could not build the PDF\. Please try again\.'\)/)
+  const clear = src.slice(src.indexOf('>Clear<') - 220, src.indexOf('>Clear<'))
+  assert.match(clear, /blankFreeInvoice\(\)/)
+  assert.match(clear, /setErr\(null\)/)
 })
