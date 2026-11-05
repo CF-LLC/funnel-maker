@@ -42,4 +42,4 @@ File: `supabase/migrations/20261105195825_clients_website_paused_archive.sql` (c
 
 Apply it before serving this app. The new picker queries filter `archived_at is null` and will error if the column is missing.
 
-Rollback is the commented transaction in that file. It fails while any row is `paused` or has a `website`; change those rows first if you mean to roll back. Dropping `archived_at` un-archives everyone by forgetting the flag. It does not delete client rows.
+Ordinary rollback is an application or image rollback only. Leave the additive columns, the widened status check, and the stored website, Paused, and `archived_at` values in place. The previous app build may not show those fields. It does not erase client records or those columns. Do not drop `website` or `archived_at`, narrow the status check, or clear Paused or website values. That would lose user data and is not authorized.

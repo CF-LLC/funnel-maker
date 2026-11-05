@@ -45,13 +45,8 @@ alter table public.crm_contacts
     )
   );
 
--- Rollback (one transaction). Fails if any row is still status 'paused' or has a website;
--- clear those first if you intend to roll back. archived_at values are dropped with the column.
--- begin;
---   alter table public.crm_contacts drop constraint if exists crm_contacts_website_check;
---   alter table public.crm_contacts drop constraint if exists crm_contacts_status_check;
---   alter table public.crm_contacts add constraint crm_contacts_status_check
---     check (status in ('lead', 'active', 'past', 'not_a_fit'));
---   alter table public.crm_contacts drop column if exists website;
---   alter table public.crm_contacts drop column if exists archived_at;
--- commit;
+-- Ordinary rollback is an application/image rollback only. Keep this migration's
+-- columns, the widened status check, and every stored value (website, paused, archived_at).
+-- The previous app build does not show the new fields. It does not erase rows or those columns.
+-- Do not drop website or archived_at, and do not narrow the status check or clear paused/website
+-- values. That would destroy user data and is not an authorized rollback.
