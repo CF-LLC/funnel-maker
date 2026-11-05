@@ -17,7 +17,7 @@ export async function GET(req: Request) {
     g.db.from('tt_projects').select('id, client_id, name, hourly_rate_cents, billable, archived').order('name'),
     g.db.from('tt_entries').select(ENTRY_COLS).gte('entry_date', from).not('seconds', 'is', null).order('entry_date', { ascending: false }).order('created_at', { ascending: false }).limit(2000),
     g.db.from('tt_entries').select(ENTRY_COLS).is('seconds', null).limit(1),
-    g.db.from('crm_contacts').select('email, name, company').order('name').limit(500),
+    g.db.from('crm_contacts').select('email, name, company').is('archived_at', null).order('name').limit(500),
   ])
   if (c.error || p.error || e.error) return bad('Could not load your time.', 500)
   return NextResponse.json({

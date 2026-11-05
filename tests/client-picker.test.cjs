@@ -15,6 +15,7 @@ test('picker options: normalized email, invalid dropped, deduped, sorted by name
     { email: 'not an email', name: 'Ghost' },
     { email: 'ann@x.co', name: '  Ann ' },
     { email: 'zed@x.co' },
+    { email: 'old@x.co', name: 'Old', archived_at: '2026-10-01T00:00:00Z' },
   ])
   assert.deepEqual(o.map((x) => x.email), ['ann@x.co', 'maya@example.com', 'zed@x.co'])
   assert.equal(o[0].name, 'Ann'); assert.equal(o[1].company, 'Riverside')

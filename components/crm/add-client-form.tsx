@@ -7,7 +7,7 @@ type Err = { field?: string; error: string; href?: string } | null
 
 export function AddClientForm({ demo }: { demo: boolean }) {
   const router = useRouter()
-  const [f, setF] = useState({ name: '', email: '', company: '', phone: '' })
+  const [f, setF] = useState({ name: '', email: '', company: '', phone: '', website: '' })
   const [err, setErr] = useState<Err>(null)
   const [busy, setBusy] = useState(false)
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) => setF({ ...f, [k]: e.target.value })
@@ -25,7 +25,7 @@ export function AddClientForm({ demo }: { demo: boolean }) {
     <label className="block">
       <span className="text-sm font-semibold">{label}{!req && <span className="font-normal text-zinc-400"> (optional)</span>}</span>
       <input name={k} type={type} required={req} autoComplete={auto} value={f[k]} onChange={set(k)} aria-invalid={err?.field === k || undefined}
-        maxLength={k === 'phone' ? 50 : 200} className={`cine-input mt-1 ${err?.field === k ? '!ring-2 !ring-rose-400' : ''}`} />
+        maxLength={k === 'phone' ? 50 : k === 'website' ? 500 : 200} className={`cine-input mt-1 ${err?.field === k ? '!ring-2 !ring-rose-400' : ''}`} />
     </label>
   )
   return (
@@ -34,9 +34,10 @@ export function AddClientForm({ demo }: { demo: boolean }) {
         <h1 className="text-2xl font-black tracking-tight">Add client</h1>
         <p className="mt-1 text-sm text-zinc-400">Their email links them to your invoices, proposals, bookings and forms.</p>
       </div>
-      {field('name', 'Name', 'text', true, 'name')}
+      {field('name', 'Contact person', 'text', true, 'name')}
       {field('email', 'Email', 'email', true, 'email')}
-      {field('company', 'Company', 'text', false, 'organization')}
+      {field('company', 'Company / business', 'text', false, 'organization')}
+      {field('website', 'Website', 'url', false, 'url')}
       {field('phone', 'Phone', 'tel', false, 'tel')}
       {err && (
         <p role="alert" className="rounded-xl bg-rose-500/15 px-3 py-2 text-sm text-rose-100 ring-1 ring-rose-400/30" data-add-client-error>

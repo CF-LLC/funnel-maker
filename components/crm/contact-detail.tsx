@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { ArrowLeft, ArrowUpRight, CalendarClock, Check, Loader2, Pencil, Trash2 } from 'lucide-react'
 import { CRM_STATUSES, STATUS_LABEL, type Activity, type Contact, type CrmStatus } from '@/lib/crm/core'
 import type { Note } from '@/lib/crm/load'
-import { Avatar, SourceBadge, StatusPill, money, shortDate } from './bits'
+import { Avatar, SourceBadge, StatusPill, WebsiteLink, money, shortDate } from './bits'
 import type { WsSection } from '@/lib/clients/workspace-core'
 import { ClientWorkspace } from './client-workspace'
 
@@ -18,7 +18,7 @@ async function call(url: string, method: string, body?: unknown) {
 
 export function ContactDetail({ contact, activities, notes: initialNotes, demo, workspace, nextSteps }: { contact: Contact; activities: Activity[]; notes: Note[]; demo: boolean; workspace?: WsSection[]; nextSteps?: { href: string; label: string }[] }) {
   const [c, setC] = useState(contact)
-  const [form, setForm] = useState({ name: contact.name, phone: contact.phone, company: contact.company, status: contact.status as CrmStatus, tags: contact.tags.join(', '), follow_up_on: contact.followUpOn || '' })
+  const [form, setForm] = useState({ name: contact.name, phone: contact.phone, company: contact.company, website: contact.website, status: contact.status as CrmStatus, tags: contact.tags.join(', '), follow_up_on: contact.followUpOn || '' })
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
   const [notes, setNotes] = useState(initialNotes)
@@ -32,9 +32,20 @@ export function ContactDetail({ contact, activities, notes: initialNotes, demo, 
     setSaving(true)
     try {
       const { contact: row } = await call('/api/crm/contact', 'PUT', { email: c.email, ...form })
-      setC({ ...c, name: row.name || c.name, phone: row.phone || '', company: row.company || '', status: row.status, tags: row.tags, followUpOn: row.follow_up_on })
+      setC({ ...c, name: row.name || c.name, phone: row.phone || '', company: row.company || '', website: row.website || '', status: row.status, tags: row.tags, followUpOn: row.follow_up_on, archivedAt: row.archived_at ?? c.archivedAt })
       setForm((f) => ({ ...f, tags: row.tags.join(', ') }))
       setMsg({ ok: true, text: 'Saved' })
+    } catch (err: any) { setMsg({ ok: false, text: err.message }) } finally { setSaving(false) }
+  }
+  async function setArchived(archived: boolean) {
+    setMsg(null)
+    if (demo) return setMsg({ ok: false, text: DEMO_MSG })
+    if (archived && !confirm('Archive this client? You can restore them later. Nothing is deleted.')) return
+    setSaving(true)
+    try {
+      const row = await call('/api/crm/archive', 'POST', { email: c.email, archived })
+      setC({ ...c, archivedAt: row.archived_at })
+      setMsg({ ok: true, text: archived ? 'Archived' : 'Restored' })
     } catch (err: any) { setMsg({ ok: false, text: err.message }) } finally { setSaving(false) }
   }
   async function addNote() {
@@ -53,9 +64,9 @@ export function ContactDetail({ contact, activities, notes: initialNotes, demo, 
     if (!confirm('Delete this note?')) return
     try { await call(`/api/crm/notes?id=${id}`, 'DELETE'); setNotes(notes.filter((n) => n.id !== id)) } catch (err: any) { setNoteErr(err.message) }
   }
-  const field = (k: 'name' | 'phone' | 'company', label: string, type = 'text') => (
+  const field = (k: 'name' | 'phone' | 'company' | 'website', label: string, type = 'text') => (
     <label className="block text-xs font-semibold text-zinc-400">{label}
-      <input type={type} value={form[k]} onChange={(e) => setForm({ ...form, [k]: e.target.value })} className="cine-input mt-1 !py-2 !text-sm" maxLength={k === 'phone' ? 50 : 200} />
+      <input type={type} value={form[k]} onChange={(e) => setForm({ ...form, [k]: e.target.value })} className="cine-input mt-1 !py-2 !text-sm" maxLength={k === 'phone' ? 50 : k === 'website' ? 500 : 200} />
     </label>
   )
   return (
@@ -69,7 +80,8 @@ export function ContactDetail({ contact, activities, notes: initialNotes, demo, 
           <div className="min-w-0 flex-1">
             <h1 className="truncate text-2xl font-black tracking-tight sm:text-3xl">{c.name || c.email}</h1>
             <p className="truncate text-sm text-zinc-300">{c.email}{c.company ? ` · ${c.company}` : ''}{c.phone ? ` · ${c.phone}` : ''}</p>
-            <div className="mt-2 flex flex-wrap items-center gap-1.5"><StatusPill s={c.status} />{c.sources.map((s) => <SourceBadge key={s} s={s} n={c.counts[s]} />)}{c.tags.map((t) => <span key={t} className="text-xs text-zinc-400">#{t}</span>)}</div>
+            {c.website && <p className="mt-1 text-sm"><WebsiteLink url={c.website} /></p>}
+            <div className="mt-2 flex flex-wrap items-center gap-1.5"><StatusPill s={c.status} />{c.archivedAt && <span data-archived-banner className="inline-flex rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-bold text-zinc-200 ring-1 ring-white/15">Archived</span>}{c.sources.map((s) => <SourceBadge key={s} s={s} n={c.counts[s]} />)}{c.tags.map((t) => <span key={t} className="text-xs text-zinc-400">#{t}</span>)}</div>
           </div>
         </div>
         <div className="relative mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -85,14 +97,14 @@ export function ContactDetail({ contact, activities, notes: initialNotes, demo, 
             <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-300">Details</h2>
             <div>
               <span className="text-xs font-semibold text-zinc-400">Status</span>
-              <div role="radiogroup" aria-label="Status" className="mt-1 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+              <div role="radiogroup" aria-label="Status" className="mt-1 grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-5">
                 {CRM_STATUSES.map((s) => (
                   <button key={s} type="button" role="radio" aria-checked={form.status === s} onClick={() => setForm({ ...form, status: s })}
                     className={`rounded-xl px-2 py-2 text-xs font-semibold ring-1 transition ${form.status === s ? 'bg-white text-black ring-white' : 'text-zinc-300 ring-white/15 hover:ring-white/40'}`}>{STATUS_LABEL[s]}</button>
                 ))}
               </div>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">{field('name', 'Name')}{field('company', 'Company')}{field('phone', 'Phone', 'tel')}
+            <div className="grid gap-3 sm:grid-cols-2">{field('name', 'Contact person')}{field('company', 'Company / business')}{field('website', 'Website', 'url')}{field('phone', 'Phone', 'tel')}
               <label className="block text-xs font-semibold text-zinc-400">Follow up on
                 <input type="date" value={form.follow_up_on} onChange={(e) => setForm({ ...form, follow_up_on: e.target.value })} className="cine-input mt-1 !py-2 !text-sm [color-scheme:dark]" />
               </label>
@@ -102,6 +114,7 @@ export function ContactDetail({ contact, activities, notes: initialNotes, demo, 
             </label>
             <div className="flex items-center gap-3">
               <button disabled={saving} className="inline-flex items-center gap-1.5 rounded-full bg-white px-5 py-2 text-sm font-semibold text-black hover:bg-zinc-200 disabled:opacity-60">{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}Save</button>
+              <button type="button" disabled={saving} data-archive-toggle onClick={() => setArchived(!c.archivedAt)} className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-zinc-200 ring-1 ring-white/15 hover:ring-white/40 disabled:opacity-60">{c.archivedAt ? 'Restore' : 'Archive'}</button>
               {msg && <span role="status" className={`text-sm ${msg.ok ? 'text-emerald-300' : 'text-rose-300'}`}>{msg.text}</span>}
             </div>
           </form>

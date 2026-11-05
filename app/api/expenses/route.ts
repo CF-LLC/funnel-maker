@@ -20,7 +20,7 @@ export async function GET(req: Request) {
   const [e, projects, crm] = await Promise.all([
     g.db.from('ex_expenses').select(EXPENSE_COLS).gte('expense_date', since).order('expense_date', { ascending: false }).order('created_at', { ascending: false }).limit(5000),
     loadProjects(g.db),
-    g.db.from('crm_contacts').select('email, name, company').order('name').limit(500),
+    g.db.from('crm_contacts').select('email, name, company').is('archived_at', null).order('name').limit(500),
   ])
   if (e.error) return bad('Could not load your expenses.', 500)
   return NextResponse.json({ demo: false, categories: cats, expenses: e.data || [], projects, crm: crm.data || [] })

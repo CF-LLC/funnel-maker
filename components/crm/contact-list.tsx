@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { Download, Search, CalendarClock, Users, UserPlus } from 'lucide-react'
 import { CRM_STATUSES, SOURCES, STATUS_LABEL, SOURCE_LABEL, contactHref, filterContacts, type Contact } from '@/lib/crm/core'
 import { Avatar, SourceBadge, StatusPill, money, shortDate } from './bits'
+import { safeWebsiteHref } from '@/lib/crm/core'
 
 export function ContactList({ contacts, demo, today }: { contacts: Contact[]; demo: boolean; today: string }) {
   const [q, setQ] = useState('')
@@ -11,13 +12,15 @@ export function ContactList({ contacts, demo, today }: { contacts: Contact[]; de
   const [source, setSource] = useState('')
   const [tag, setTag] = useState('')
   const [due, setDue] = useState(false)
-  const tags = useMemo(() => [...new Set(contacts.flatMap((c) => c.tags))].sort(), [contacts])
-  const list = useMemo(() => filterContacts(contacts, { q, status, source, tag, due }, today), [contacts, q, status, source, tag, due, today])
-  const dueCount = contacts.filter((c) => c.followUpOn && c.followUpOn <= today).length
+  const [archived, setArchived] = useState(false)
+  const active = useMemo(() => contacts.filter((c) => !c.archivedAt), [contacts])
+  const tags = useMemo(() => [...new Set(active.flatMap((c) => c.tags))].sort(), [active])
+  const list = useMemo(() => filterContacts(contacts, { q, status, source, tag, due, archived }, today), [contacts, q, status, source, tag, due, archived, today])
+  const dueCount = active.filter((c) => c.followUpOn && c.followUpOn <= today).length
   const stat = (label: string, v: string | number) => (
     <div className="rounded-2xl bg-white/[0.04] p-4 ring-1 ring-white/10"><div className="text-2xl font-black tracking-tight sm:text-3xl">{v}</div><div className="mt-0.5 text-xs font-semibold uppercase tracking-wider text-zinc-400">{label}</div></div>
   )
-  const exportHref = `/api/crm/export?${new URLSearchParams({ q, status, source, tag, ...(due ? { due: '1' } : {}) })}`
+  const exportHref = `/api/crm/export?${new URLSearchParams({ q, status, source, tag, ...(due ? { due: '1' } : {}), ...(archived ? { archived: '1' } : {}) })}`
   const sel = 'cine-input !py-2 !text-sm'
   return (
     <div className="space-y-6">
@@ -30,9 +33,9 @@ export function ContactList({ contacts, demo, today }: { contacts: Contact[]; de
         </div>
         <p className="relative mt-2 max-w-2xl text-sm text-zinc-300">Pulled automatically from your Forms, funnel leads, Bookings, Proposals and Invoices. Add a status, tags, notes and a follow-up date.</p>
         <div className="relative mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {stat('Contacts', contacts.length)}
-          {stat('Leads', contacts.filter((c) => c.status === 'lead').length)}
-          {stat('Active', contacts.filter((c) => c.status === 'active').length)}
+          {stat('Contacts', active.length)}
+          {stat('Leads', active.filter((c) => c.status === 'lead').length)}
+          {stat('Active', active.filter((c) => c.status === 'active').length)}
           {stat('Follow-ups due', dueCount)}
         </div>
       </section>
@@ -41,7 +44,7 @@ export function ContactList({ contacts, demo, today }: { contacts: Contact[]; de
         <label className="relative flex-1">
           <span className="sr-only">Search</span>
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, email, company, tag" className="cine-input !py-2 !pl-9 !text-sm" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, email, company, website, tag" className="cine-input !py-2 !pl-9 !text-sm" />
         </label>
         <div className="grid grid-cols-3 gap-2 lg:flex">
           <select aria-label="Status" value={status} onChange={(e) => setStatus(e.target.value)} className={sel}><option value="">All statuses</option>{CRM_STATUSES.map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}</select>
@@ -50,11 +53,12 @@ export function ContactList({ contacts, demo, today }: { contacts: Contact[]; de
         </div>
         <div className="flex gap-2">
           <button type="button" aria-pressed={due} onClick={() => setDue(!due)} className={`inline-flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold ring-1 transition lg:flex-none ${due ? 'bg-amber-400 text-black ring-amber-300' : 'text-zinc-200 ring-white/15 hover:ring-white/40'}`}><CalendarClock className="h-4 w-4" />Due{dueCount ? ` (${dueCount})` : ''}</button>
+          <button type="button" aria-pressed={archived} onClick={() => setArchived(!archived)} data-archived-filter className={`inline-flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold ring-1 transition lg:flex-none ${archived ? 'bg-white text-black ring-white' : 'text-zinc-200 ring-white/15 hover:ring-white/40'}`}>Archived</button>
           <a href={exportHref} className="inline-flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-zinc-200 lg:flex-none"><Download className="h-4 w-4" />Export CSV</a>
         </div>
       </div>
 
-      {contacts.length === 0 ? (
+      {active.length === 0 && !archived ? (
         <div className="cine-glass rounded-2xl p-10 text-center">
           <Users className="mx-auto h-10 w-10 text-zinc-500" />
           <h2 className="mt-3 text-lg font-bold">No clients yet</h2>
@@ -78,9 +82,10 @@ export function ContactList({ contacts, demo, today }: { contacts: Contact[]; de
                     <span className="min-w-0">
                       <span className="block truncate font-semibold group-hover:text-rose-200">{c.name || c.email}</span>
                       <span className="block truncate text-xs text-zinc-400">{c.name ? c.email : ''}{c.company ? `${c.name ? ' · ' : ''}${c.company}` : ''}</span>
+                      {safeWebsiteHref(c.website) && <span className="block truncate text-xs text-zinc-500">{safeWebsiteHref(c.website)!.replace(/^https?:\/\//, '')}</span>}
                     </span>
                   </span>
-                  <span className="justify-self-end md:justify-self-start"><StatusPill s={c.status} /></span>
+                  <span className="justify-self-end md:justify-self-start"><StatusPill s={c.status} />{c.archivedAt && <span className="ml-1 inline-flex rounded-full bg-white/10 px-2 py-0.5 text-[11px] font-semibold text-zinc-300">Archived</span>}</span>
                   <span className="col-span-2 flex flex-wrap items-center gap-1 md:col-span-1">
                     {c.sources.map((s) => <SourceBadge key={s} s={s} n={c.counts[s]} />)}
                     {c.tags.slice(0, 3).map((t) => <span key={t} className="text-[11px] text-zinc-400">#{t}</span>)}

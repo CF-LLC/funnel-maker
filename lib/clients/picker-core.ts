@@ -5,9 +5,10 @@ import { clientEmail } from '@/lib/clients/email'
 export type PickerClient = { name: string; email: string; company: string }
 
 /** CRM contacts -> picker options: valid normalized email only, deduped by email, sorted by name. */
-export function toPickerOptions(contacts: ReadonlyArray<{ email?: unknown; name?: unknown; company?: unknown }>): PickerClient[] {
+export function toPickerOptions(contacts: ReadonlyArray<{ email?: unknown; name?: unknown; company?: unknown; archivedAt?: unknown; archived_at?: unknown }>): PickerClient[] {
   const seen = new Map<string, PickerClient>()
   for (const c of contacts || []) {
+    if (c?.archivedAt || c?.archived_at) continue
     const email = clientEmail(c?.email)
     if (!email || seen.has(email)) continue
     const name = typeof c.name === 'string' ? c.name.trim() : ''

@@ -9,7 +9,7 @@ export async function GET(req: Request) {
   const g = await crmGuard(false); if (g.err) return g.err
   const sp = new URL(req.url).searchParams
   const all = g.demo ? demoContacts() : await loadContacts(g.user.id)
-  const list = filterContacts(all, { q: sp.get('q') || '', status: sp.get('status') || '', source: sp.get('source') || '', tag: sp.get('tag') || '', due: sp.get('due') === '1' })
+  const list = filterContacts(all, { q: sp.get('q') || '', status: sp.get('status') || '', source: sp.get('source') || '', tag: sp.get('tag') || '', due: sp.get('due') === '1', archived: sp.get('archived') === '1' })
   return new Response('\uFEFF' + toCsv(list), { headers: {
     'content-type': 'text/csv; charset=utf-8', 'content-disposition': `attachment; filename="clients-${new Date().toISOString().slice(0, 10)}.csv"`, 'cache-control': 'no-store' } })
 }

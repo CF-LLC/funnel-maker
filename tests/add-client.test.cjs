@@ -17,7 +17,7 @@ const post = (body, ct = 'application/json') => R.POST(new Request('https://saas
 
 test('validation: required name/email, email format, lengths, phone characters; plain errors', () => {
   const ok = V.validateAddClient({ name: ' Maya Lopez ', email: '  Maya@Example.COM ', company: '', phone: '' })
-  assert.deepEqual(ok, { ok: true, value: { name: 'Maya Lopez', email: 'maya@example.com', company: null, phone: null } })
+  assert.deepEqual(ok, { ok: true, value: { name: 'Maya Lopez', email: 'maya@example.com', company: null, phone: null, website: null } })
   assert.equal(V.validateAddClient({ name: 'A', email: 'a@b.co', company: ' Acme ', phone: '+1 (555) 010-2030' }).value.phone, '+1 (555) 010-2030')
   const f = (b) => V.validateAddClient(b)
   assert.equal(f({ email: 'a@b.co' }).field, 'name')
@@ -29,6 +29,9 @@ test('validation: required name/email, email format, lengths, phone characters; 
   assert.equal(f({ name: 'A', email: 'a@b.co', phone: '---' }).field, 'phone')
   assert.equal(f({ name: 'A', email: 'a@b.co', company: 'c'.repeat(201) }).field, 'company')
   assert.equal(f({ name: 'A', email: 'a@b.co', company: 5 }).field, 'company')
+  assert.equal(f({ name: 'A', email: 'a@b.co', website: 'javascript:alert(1)' }).field, 'website')
+  assert.equal(f({ name: 'A', email: 'a@b.co', website: 'https://user:pass@example.com' }).field, 'website')
+  assert.equal(f({ name: 'A', email: 'a@b.co', website: 'brightpixel.studio' }).value.website, 'https://brightpixel.studio')
   assert.equal(f(null).field, 'form'); assert.equal(f([]).field, 'form')
   assert.match(f({ name: 'A', email: 'nope' }).error, /looks invalid/)
 })
@@ -49,7 +52,7 @@ test('saves normalized email with user_id from the session (body user_id ignored
   assert.deepEqual(await r.json(), { ok: true, href: '/crm/maya%40example.com?added=1' })
   assert.equal(G.inserts.length, 1)
   const row = G.inserts[0]
-  assert.equal(row.user_id, U1.id); assert.equal(row.email, 'maya@example.com'); assert.equal(row.company, 'Acme'); assert.equal(row.phone, '555 0100')
+  assert.equal(row.user_id, U1.id); assert.equal(row.email, 'maya@example.com'); assert.equal(row.company, 'Acme'); assert.equal(row.phone, '555 0100'); assert.equal(row.website, null)
   assert.ok(!('status' in row), 'status left to the column default')
   const theirs = G.rows.find((x) => x.user_id === U2.id)
   assert.deepEqual(theirs, { user_id: U2.id, email: 'maya@example.com', name: 'Theirs', company: 'Other', phone: null }, 'other users\' rows untouched')
