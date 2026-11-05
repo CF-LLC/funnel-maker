@@ -4,7 +4,7 @@ export const crmTool = {
   name: 'Clients',
   tagline: 'Everyone who filled a form, booked a call, got a proposal or paid an invoice, in one list with notes and follow-ups.',
   route: '/crm',
-  nav: [{ label: 'Clients', href: '/crm', icon: 'users' }],
+  nav: [{ label: 'Clients', href: '/crm', icon: 'users' }, { label: 'Tasks', href: '/crm/tasks', icon: 'clipboard' }],
   accessKey: 'crm',
   protectedPaths: ['/crm'],
   priceLabel: '$12/mo or $99/yr, or included in All Access',
