@@ -118,8 +118,12 @@ function lineAmounts(lines: DraftLine[]): number[] {
   return lines.map((l) => Math.round(l.quantity * l.unit_price_cents))
 }
 
-/** True when subtotal, tax, total, and each line amount survive the production total and currency format exactly. */
-function statementHolds(amounts: number[], taxRaw: string, currency: string): boolean {
+/** True when each unit price, line amount, subtotal, tax, and total survive the production currency format exactly. */
+function statementHolds(lines: DraftLine[], taxRaw: string, currency: string): boolean {
+  for (const l of lines) {
+    if (!Number.isSafeInteger(l.unit_price_cents) || !centsHold(BigInt(l.unit_price_cents), currency)) return false
+  }
+  const amounts = lineAmounts(lines)
   let sub = BigInt(0)
   for (const a of amounts) {
     if (!Number.isSafeInteger(a)) return false
@@ -152,7 +156,7 @@ export function freeInvoiceProblems(f: FreeInvoiceForm): string[] {
     }
   })
   if (parseNum(f.taxRate).kind === 'bad') out.push('Tax is not a usable number.')
-  if (!statementHolds(lineAmounts(draftLines(f)), f.taxRate, currencyOf(f.currency))) out.push(TOO_LARGE)
+  if (!statementHolds(draftLines(f), f.taxRate, currencyOf(f.currency))) out.push(TOO_LARGE)
   return out
 }
 
@@ -162,7 +166,7 @@ export const freeInvoiceReady = (f: FreeInvoiceForm) => freeInvoiceProblems(f).l
 export function toPreviewData(f: FreeInvoiceForm): PreviewData {
   const lines = draftLines(f)
   const currency = currencyOf(f.currency)
-  const hold = statementHolds(lineAmounts(lines), f.taxRate, currency)
+  const hold = statementHolds(lines, f.taxRate, currency)
   return {
     number: f.number.trim() || 'INV-0001', issue_date: f.issueDate, due_date: f.dueDate,
     currency, tax_rate: hold ? taxRateOf(f.taxRate) : null, notes: f.notes.trim() || null,

@@ -156,6 +156,24 @@ test('combined amounts that the production total cannot represent are not previe
   assert.equal(still.total, '$88,966,938,015,782.66')
 })
 
+test('a unit price that cannot format exactly is rejected even when the line amount can', () => {
+  const unitCents = 7036874417766409
+  assert.equal(formatCurrency(unitCents), '$70,368,744,177,664.10')
+  assert.notEqual(formatCurrency(unitCents), '$70,368,744,177,664.09')
+  const amount = Math.round(0.5 * unitCents)
+  assert.equal(formatCurrency(amount), '$35,184,372,088,832.05')
+  const m = money(form({
+    lines: [{ description: 'Unit', quantity: '0.5', price: '70368744177664.09' }],
+    taxRate: '',
+  }))
+  assert.equal(m.d.lines.length === 0 || m.d.lines[0].unit_price_cents === unitCents, true)
+  assert.ok(m.problems.length > 0)
+  assert.equal(m.ready, false)
+  assert.equal(m.d.lines.length, 0)
+  finiteMoney(m)
+  assert.equal(m.total, '$0.00')
+})
+
 test('non-finite quantity and an overflowing line are not previewed or exported', () => {
   const sci = money(form({ lines: [{ description: 'QA extreme', quantity: '1e309', price: '25' }], taxRate: '' }))
   assert.ok(sci.problems.some((p) => /quantity/i.test(p)))
