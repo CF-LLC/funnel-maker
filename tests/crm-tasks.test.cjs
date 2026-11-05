@@ -101,6 +101,28 @@ test('edit and done/reopen change only the owner row', async () => {
   assert.equal((await done(ID2, { done: true })).status, 404)
 })
 
+test('a read error is not an empty task list, and a 200-character title wraps', () => {
+  const leaked = { message: 'password=supersecret relation crm_tasks', code: '42P01' }
+  const failed = T.tasksFromQuery({ data: null, error: leaked })
+  assert.deepEqual(failed, { ok: false })
+  assert.equal(JSON.stringify(failed).includes('supersecret'), false)
+  assert.equal(JSON.stringify(failed).includes('crm_tasks'), false)
+  const ok = T.tasksFromQuery({ data: [{ id: '1', title: 'A', due_on: null, done_at: null }], error: null })
+  assert.equal(ok.ok, true)
+  assert.equal(ok.tasks.length, 1)
+  const load = read('lib/crm/tasks-load.ts')
+  assert.match(load, /tasksFromQuery/)
+  assert.doesNotMatch(load, /if \(error\) return \[\]/)
+  assert.doesNotMatch(load, /console\.error\([^)]*\berror\b/)
+  const ui = read('components/crm/task-list.tsx')
+  const page = read('app/crm/tasks/page.tsx')
+  assert.match(ui, /data-task-load-error/)
+  assert.match(ui, /data-task-title[\s\S]*overflow-wrap:anywhere/)
+  assert.match(ui, /min-w-0 max-w-full break-words/)
+  assert.match(page, /loadError=\{!loaded\.ok\}/)
+  assert.doesNotMatch(read('supabase/migrations/20261105210037_crm_tasks.sql'), /loadError|overflow-wrap/)
+})
+
 test('SQL grants are narrow; this file check is not live RLS proof', () => {
   const sql = read('supabase/migrations/20261105210037_crm_tasks.sql')
   assert.match(sql, /create table if not exists public\.crm_tasks/)

@@ -13,6 +13,6 @@ export default async function TasksPage() {
   const demo = isDemoUser(user!.id)
   if (!demo && !(await hasAccess(user, 'crm'))) return null
   const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' })
-  const tasks = demo ? demoTasks(today) : await loadTasks(user!.id)
-  return <TaskList tasks={tasks} today={today} demo={demo} />
+  const loaded = demo ? { ok: true as const, tasks: demoTasks(today) } : await loadTasks(user!.id)
+  return <TaskList tasks={loaded.ok ? loaded.tasks : []} today={today} demo={demo} loadError={!loaded.ok} />
 }

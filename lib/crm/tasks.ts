@@ -1,5 +1,12 @@
 // Private manual tasks. Pure helpers only. Not portal checklists and not Today.
 export type TaskRow = { id: string; title: string; due_on: string | null; done_at: string | null }
+export type TaskLoad = { ok: true; tasks: TaskRow[] } | { ok: false }
+
+/** A query error is a failed load, never an empty list. The error text is not returned. */
+export function tasksFromQuery(result: { data?: unknown; error?: unknown } | null | undefined): TaskLoad {
+  if (!result || result.error) return { ok: false }
+  return { ok: true, tasks: Array.isArray(result.data) ? result.data as TaskRow[] : [] }
+}
 
 const TITLE_MAX = 200
 export function cleanTitle(v: unknown): { ok: true; title: string } | { ok: false; error: string } {
