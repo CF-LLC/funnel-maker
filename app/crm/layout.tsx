@@ -18,6 +18,7 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
       <header className="sticky top-0 z-30 border-b border-white/10 bg-black/70 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
           <Link href="/crm" className="text-lg font-extrabold">Clients</Link>
+          <Link href="/crm/tasks" className="text-sm font-semibold text-zinc-300 hover:text-white">Tasks</Link>
           <Link href="/dashboard" className="ml-auto text-sm text-zinc-400 hover:underline">← Dashboard</Link>
         </div>
       </header>
