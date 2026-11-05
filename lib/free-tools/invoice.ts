@@ -19,27 +19,24 @@ export function blankFreeInvoice(today = todayISO()): FreeInvoiceForm {
   }
 }
 
-/** Same bounds as the paid invoice form (lib/invoices/core.ts lineSchema / taxRate). */
-const QTY_MAX = 1_000_000
-const PRICE_MAX = 10_000_000
-
 type Parsed = { kind: 'blank' } | { kind: 'bad' } | { kind: 'ok'; n: number }
 
-/** Blank stays blank. Only a plain decimal is a number; 1e308 and other non-finite text are rejected. */
+/** Blank stays blank, including a minus sign still being typed. Exponent text such as 1e308 is rejected. */
 function parseNum(raw: string): Parsed {
   const s = String(raw ?? '').trim().replace(/,/g, '')
-  if (!s) return { kind: 'blank' }
+  if (!s || s === '+' || s === '-' || /^[+-]?\.$/.test(s)) return { kind: 'blank' }
   if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(s)) return { kind: 'bad' }
   const n = Number(s)
   return Number.isFinite(n) ? { kind: 'ok', n } : { kind: 'bad' }
 }
 
-function lineAmount(qty: number, price: number): number | null {
+/** Cents for a line that preview and PDF can format. Negative prices stay; non-finite products do not. */
+function lineCents(qty: number, price: number): number | null {
   const cents = Math.round(price * 100)
-  const amount = Math.round(qty * cents)
-  if (!Number.isSafeInteger(cents) || cents < 0) return null
-  if (!Number.isSafeInteger(amount) || amount < 0) return null
-  return amount
+  const amount = Math.round(Math.max(0, qty) * cents)
+  if (!Number.isFinite(cents) || !Number.isSafeInteger(cents)) return null
+  if (!Number.isFinite(amount) || !Number.isSafeInteger(amount)) return null
+  return cents
 }
 
 function lineActive(l: FreeInvoiceForm['lines'][number]): boolean {
@@ -48,32 +45,35 @@ function lineActive(l: FreeInvoiceForm['lines'][number]): boolean {
   if (q.kind === 'bad' || p.kind === 'bad') return true
   if (l.description.trim()) return true
   if (p.kind === 'ok' && p.n !== 0) return true
-  if (q.kind === 'ok' && (q.n < 0 || q.n > QTY_MAX)) return true
   return false
 }
 
-/** Plain messages for values the paid invoice form already rejects. Blank fields are not errors. */
+/** Messages only when a number cannot be totaled. A negative price is a finite credit, not an error. */
 export function freeInvoiceProblems(f: FreeInvoiceForm): string[] {
   const out: string[] = []
   f.lines.forEach((l, i) => {
     if (!lineActive(l)) return
     const q = parseNum(l.quantity)
     const p = parseNum(l.price)
-    if (q.kind === 'bad' || (q.kind === 'ok' && (q.n < 0 || q.n > QTY_MAX))) out.push(`Line ${i + 1}: quantity must be from 0 to 1,000,000.`)
-    if (p.kind === 'bad' || (p.kind === 'ok' && (p.n < 0 || p.n > PRICE_MAX))) out.push(`Line ${i + 1}: price must be from 0 to 10,000,000.`)
-    else if (q.kind === 'ok' && p.kind === 'ok' && lineAmount(q.n, p.n) == null) out.push(`Line ${i + 1}: that quantity and price are too large to total.`)
+    if (q.kind === 'bad') out.push(`Line ${i + 1}: quantity is not a usable number.`)
+    if (p.kind === 'bad') out.push(`Line ${i + 1}: price is not a usable number.`)
+    if (q.kind !== 'bad' && p.kind !== 'bad') {
+      const qn = q.kind === 'ok' ? q.n : 0
+      const pn = p.kind === 'ok' ? p.n : 0
+      if (lineCents(qn, pn) == null) out.push(`Line ${i + 1}: that quantity and price are too large to total.`)
+    }
   })
-  const tax = parseNum(f.taxRate)
-  if (tax.kind === 'bad' || (tax.kind === 'ok' && (tax.n < 0 || tax.n > 100))) out.push('Tax must be from 0 to 100.')
+  if (parseNum(f.taxRate).kind === 'bad') out.push('Tax is not a usable number.')
   return out
 }
 
 export const freeInvoiceReady = (f: FreeInvoiceForm) => freeInvoiceProblems(f).length === 0
 
-/** Map the free form to the paid Invoices preview/PDF shape. Invalid numbers are left out, never turned into 0 or infinity. */
+/** Map the free form to the preview/PDF shape. Non-finite lines are left out. A negative price is kept. */
 export function toPreviewData(f: FreeInvoiceForm): PreviewData {
   const tax = parseNum(f.taxRate)
-  const taxRate = tax.kind === 'ok' && tax.n > 0 && tax.n <= 100 ? tax.n : null
+  const taxN = tax.kind === 'ok' ? Math.min(100, Math.max(0, tax.n)) : 0
+  const taxRate = taxN || null
   const lines = f.lines.flatMap((l) => {
     if (!lineActive(l)) return []
     const q = parseNum(l.quantity)
@@ -81,10 +81,9 @@ export function toPreviewData(f: FreeInvoiceForm): PreviewData {
     if (q.kind === 'bad' || p.kind === 'bad') return []
     const qn = q.kind === 'ok' ? q.n : 0
     const pn = p.kind === 'ok' ? p.n : 0
-    if (qn < 0 || qn > QTY_MAX || pn < 0 || pn > PRICE_MAX) return []
-    const cents = Math.round(pn * 100)
-    if (lineAmount(qn, pn) == null) return []
-    return [{ description: l.description.trim(), quantity: qn, unit_price_cents: cents }]
+    const cents = lineCents(qn, pn)
+    if (cents == null) return []
+    return [{ description: l.description.trim(), quantity: Math.max(0, qn), unit_price_cents: cents }]
   })
   return {
     number: f.number.trim() || 'INV-0001', issue_date: f.issueDate, due_date: f.dueDate,
