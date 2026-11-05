@@ -1,6 +1,5 @@
 'use client'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Check, Plus, RotateCcw } from 'lucide-react'
 import { groupTasks, type TaskRow } from '@/lib/crm/tasks'
@@ -15,7 +14,6 @@ async function call(url: string, method: string, body: unknown) {
 }
 
 export function TaskList({ tasks: initial, today, demo, loadError = false }: { tasks: TaskRow[]; today: string; demo: boolean; loadError?: boolean }) {
-  const router = useRouter()
   const [tasks, setTasks] = useState(initial)
   const [title, setTitle] = useState('')
   const [due, setDue] = useState('')
@@ -108,7 +106,7 @@ export function TaskList({ tasks: initial, today, demo, loadError = false }: { t
           <h2 className="text-lg font-bold">Tasks could not be loaded</h2>
           <p className="mt-1 text-sm text-zinc-400">Refresh this page and try again. Your clients page and the rest of the app are still available.</p>
           <div className="mt-4 flex flex-wrap gap-2">
-            <button type="button" onClick={() => router.refresh()} className="inline-flex min-h-[44px] items-center rounded-full bg-white px-4 text-sm font-semibold text-black">Try again</button>
+            <button type="button" onClick={() => window.location.reload()} className="inline-flex min-h-[44px] items-center rounded-full bg-white px-4 text-sm font-semibold text-black">Try again</button>
             <Link href="/crm" className="inline-flex min-h-[44px] items-center rounded-full px-4 text-sm font-semibold text-zinc-200 ring-1 ring-white/15">Back to clients</Link>
           </div>
         </div>
