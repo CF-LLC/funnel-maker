@@ -3,10 +3,11 @@ import { FREE_TOOLS, FREE_TOOLS_PATH, freeToolPath } from '@/lib/free-tools/regi
 import { SITE_URL, STATIC_PUBLIC_PATHS } from '@/lib/free-tools/site-url'
 import { GUIDES, GUIDES_PATH, guidePath } from '@/lib/guides/registry'
 import { LANDINGS, landingPath, COMPARES, comparePath } from '@/lib/landing/registry'
+import { FREE_TEMPLATES, FREE_TEMPLATES_PATH, freeTemplatePath } from '@/lib/landing/free-templates'
 
 
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const paths = [...STATIC_PUBLIC_PATHS, FREE_TOOLS_PATH, ...FREE_TOOLS.map((t) => freeToolPath(t.slug)), GUIDES_PATH, ...GUIDES.map((g) => guidePath(g.slug)), ...LANDINGS.map((l) => landingPath(l.slug)), ...COMPARES.map((c) => comparePath(c.slug))]
-  return paths.map((p) => ({ url: `${SITE_URL}${p === '/' ? '' : p}`, changeFrequency: 'weekly', priority: p === '/' ? 1 : p.startsWith(FREE_TOOLS_PATH) ? 0.8 : p.startsWith(GUIDES_PATH) ? 0.7 : 0.6 }))
+  const paths = [...STATIC_PUBLIC_PATHS, FREE_TOOLS_PATH, ...FREE_TOOLS.map((t) => freeToolPath(t.slug)), GUIDES_PATH, ...GUIDES.map((g) => guidePath(g.slug)), ...LANDINGS.map((l) => landingPath(l.slug)), ...COMPARES.map((c) => comparePath(c.slug)), FREE_TEMPLATES_PATH, ...FREE_TEMPLATES.map((t) => freeTemplatePath(t.slug))]
+  return paths.map((p) => ({ url: `${SITE_URL}${p === '/' ? '' : p}`, changeFrequency: 'weekly', priority: p === '/' ? 1 : p.startsWith(FREE_TOOLS_PATH) ? 0.8 : p.startsWith(GUIDES_PATH) || p.startsWith(FREE_TEMPLATES_PATH) ? 0.7 : 0.6 }))
 }

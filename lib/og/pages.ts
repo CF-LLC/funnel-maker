@@ -2,6 +2,7 @@
 import type { Metadata } from 'next'
 import { FREE_TOOLS, freeToolPath } from '@/lib/free-tools/registry'
 import { LANDINGS, COMPARES, LANDING_PATH, COMPARE_PATH } from '@/lib/landing/registry'
+import { FREE_TEMPLATES, FREE_TEMPLATES_PATH, freeTemplatePath } from '@/lib/landing/free-templates'
 
 export const SITE_NAME = 'SaaS Nation'
 /** Plain-language spelling of the brand's category, used in titles, descriptions and the footer. */
@@ -11,6 +12,8 @@ export const HOME_TITLE = 'Simple online software tools for small business | Saa
 export const HOME_DESCRIPTION = 'SaaS Nation is software as a service for small business: 18 simple tools for coaches, creators and solo businesses, including invoices, proposals, booking, forms, a client list, an email list, digital downloads and a client portal. $12/mo per tool or $29/mo for All Access, plus free no-signup tools.'
 export const PRICING_DESCRIPTION = 'SaaS Nation (software as a service) pricing: each tool is $12/mo or $99/yr; All Access to all 18 tools is $29/mo or $249/yr. Buying a plan gives you access right away. 14-day money-back guarantee.'
 export const FREE_TOOLS_DESCRIPTION = 'Free online tools from SaaS Nation (software as a service) for freelancers, coaches and small businesses: invoice generator, late invoice kit, hourly rate calculator, UTM builder, QR code and email signature generators. No signup, they run in your browser.'
+
+export const FREE_TEMPLATES_DESCRIPTION = 'Free copy-paste templates for freelancers and coaches: timesheet, scope change form, proposal, intake form, client report, payment terms and more. No signup.'
 
 export type OgCard = { path: string; title: string; subtitle: string; colors: [string, string]; eyebrow: string }
 
@@ -22,6 +25,8 @@ export function ogCards(): OgCard[] {
     ...FREE_TOOLS.map((t) => ({ path: freeToolPath(t.slug), eyebrow: 'Free tool · no signup', title: t.h1.replace(/^./, (c) => c.toUpperCase()), subtitle: t.blurb, colors: t.colors })),
     ...LANDINGS.map((l) => ({ path: `${LANDING_PATH}/${l.slug}`, eyebrow: `SaaS Nation ${l.tool}`, title: l.h1, subtitle: '$12/mo or $99/yr, or every tool for $29/mo.', colors: l.colors })),
     ...COMPARES.map((c) => ({ path: `${COMPARE_PATH}/${c.slug}`, eyebrow: 'Comparison', title: c.h1, subtitle: c.ogSubtitle, colors: c.colors })),
+    { path: FREE_TEMPLATES_PATH, eyebrow: 'Free templates', title: 'Free templates for client work', subtitle: 'Timesheets, proposals, scope changes, intake forms and more. No signup.', colors: ['#7c3aed', '#06b6d4'] },
+    ...FREE_TEMPLATES.map((t) => ({ path: freeTemplatePath(t.slug), eyebrow: 'Free template · no signup', title: t.h1, subtitle: `Copy and paste. Then do it in SaaS Nation ${t.tool}.`, colors: t.colors })),
   ]
 }
 
