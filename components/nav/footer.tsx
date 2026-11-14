@@ -30,6 +30,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/free-templates" className="hover:text-foreground">
+                  Free templates
+                </Link>
+              </li>
+              <li>
                 <Link href="/guides" className="hover:text-foreground">
                   Guides
                 </Link>

@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import { LandingShell } from '@/components/landing/landing-shell'
 import { ACCESS_LINE, COMPARES, LANDINGS, comparePath, getLanding, landingPath } from '@/lib/landing/registry'
 import { softwareAppLd } from '@/lib/seo/schema'
+import { FREE_TEMPLATES, freeTemplatePath } from '@/lib/landing/free-templates'
 
 export const dynamicParams = false
 export function generateStaticParams() {
@@ -27,6 +28,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       <ul>{l.points.map((p) => <li key={p}>{p}</li>)}</ul>
       <h2>Price</h2>
       <p>{l.tool === 'Link-in-bio' ? 'Included with any paid plan.' : `${l.tool} is $12/mo or $99/yr on its own, or included in All Access at $29/mo or $249/yr.`} {ACCESS_LINE} <Link href="/pricing" className="underline">See pricing</Link>.</p>
+      {FREE_TEMPLATES.filter((t) => t.landing === l.slug).map((t) => <p key={t.slug} data-free-template>Free template: <Link href={freeTemplatePath(t.slug)} className="underline">{t.h1}</Link> (copy and paste, no signup).</p>)}
       <h2>Other SaaS Nation tools</h2>
       <ul>{others.map((o) => <li key={o.slug}><Link href={landingPath(o.slug)} className="underline">{o.h1}</Link></li>)}</ul>
       {COMPARES.some((c) => c.links.some(([s]) => s === l.slug)) && <><h2>Comparisons</h2><ul>{COMPARES.filter((c) => c.links.some(([s]) => s === l.slug)).map((c) => <li key={c.slug}><Link href={comparePath(c.slug)} className="underline">{c.h1}</Link></li>)}</ul></>}
